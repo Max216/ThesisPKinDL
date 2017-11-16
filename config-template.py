@@ -29,3 +29,8 @@ PATH_DEV_DATA = '/path/to/snli_1.0_dev.jsonl'
 Path to the test data
 '''
 PATH_TEST_DATA = ''
+
+'''
+Name of the model that is trained and saved on the disk
+'''
+FILENAME_BEST_MODEL = 'trained_model.py'

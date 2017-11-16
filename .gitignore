@@ -1,1 +1,3 @@
 config.py
+trained_model.py
+__pycache__/**
