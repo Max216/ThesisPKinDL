@@ -118,7 +118,7 @@ class EntailmentClassifier(nn.Module):
         self.dropout1 = nn.Dropout(p=dropout)
         self.dropout2 = nn.Dropout(p=dropout)
     
-    def forward(self, sent1, sent2):
+    def forward(self, sent1, sent2, output_sent_info=False):
         batch_size = sent1.size()[1]
         
         # Map to embeddings
@@ -130,8 +130,8 @@ class EntailmentClassifier(nn.Module):
         sent2_representation = self.sent_encoder(embedded2)
         
         # Max pooling
-        sent1_representation, _ = torch.max(sent1_representation, dim=0)
-        sent2_representation, _ = torch.max(sent2_representation, dim=0)
+        sent1_representation, idxs1 = torch.max(sent1_representation, dim=0)
+        sent2_representation, idxs2 = torch.max(sent2_representation, dim=0)
         
         # Create feature tensor
         feedforward_input = torch.cat((
@@ -148,4 +148,8 @@ class EntailmentClassifier(nn.Module):
         out = self.dropout2(out)
         out = self.hidden3(out)
         tag_scores = F.softmax(out)
+
+        if output_sent_info:
+            return tag_scores, [idxs1, idxs2]
+
         return tag_scores

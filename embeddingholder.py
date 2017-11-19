@@ -1,4 +1,6 @@
 import numpy as np
+import gzip
+import codecs
 
 class EmbeddingHolder:
     
@@ -11,32 +13,27 @@ class EmbeddingHolder:
     PADDING = '@@PADDING@@'
     
     def __init__(self, path):
-        cnt = 0
-        words = dict()
-        vectors = []
-        file = open(path, "r")
-        for line in file:
-            splitted_line = line.split()
-            words[splitted_line[0]] = cnt
-            vectors.append(np.asarray(splitted_line[1:], dtype='float'))
-            cnt += 1
-            
-            # TODO rm
-            #if cnt == 100:
-            #    break
-                
-        self.dimen = len(vectors[0])
-        print(len(vectors), 'word embeddings loaded.')
+
+
+        # red previously stored binary word embeddings and vocab
+        wv = np.load(path + '.npy')
+        vocab_file = open(path + '.vocab', 'r')
+        vocab = [w.rstrip('\n') for w in vocab_file]
+        words = dict([(vocab[i], i) for i in range(len(vocab))])
+        
+        amount = wv.shape[0]
+        self.dimen = wv.shape[1]
         
         # Add OOV and PADDING
-        words[self.OOV] = cnt
-        words[self.PADDING] = cnt+1
-        oov_vector = np.random.rand(self.dimen)
-        vectors.append(oov_vector)
-        vectors.append(np.zeros(self.dimen))
+        words[self.OOV] = amount
+        words[self.PADDING] = amount+1
+        unk = np.random.random_sample((wv.shape[1],))
+        padding = np.zeros(self.dimen)
+        wv = np.vstack((wv, unk, padding))
+
         
         self.words = words
-        self.embeddings = np.matrix(vectors)
+        self.embeddings = wv
     
     def embedding_matrix(self):
         """
@@ -65,3 +62,9 @@ class EmbeddingHolder:
         Get the index of the Padding symbol.
         """
         return self.word_index(self.PADDING)
+
+    def reverse(self):
+        """
+        Get the reversed dictionary to lookup words from indizes
+        """
+        return dict((v,k) for k,v in self.words.items())

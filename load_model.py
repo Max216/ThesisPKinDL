@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+import analyse
 
 import config
 import model
@@ -24,7 +25,11 @@ classifier = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings,
                                             nonlinearity=nonlinearity, 
                                             dropout=dropout))
 
+print('Load best model', config.FILENAME_BEST_MODEL)
 classifier.load_state_dict(torch.load(config.FILENAME_BEST_MODEL))
+print('loaded')
 
-snli_dev = mydataloader.SNLIDataset(config.PATH_DEV_DATA, embedding_holder, max_size=500)
-train.evaluate(classifier, snli_dev, 32, embedding_holder.padding())
+snli_train = mydataloader.SNLIDataset(config.PATH_TRAIN_DATA, embedding_holder)
+#result = train.evaluate(classifier, snli_dev, 32, embedding_holder.padding())
+
+analyse.analyse(classifier, snli_train, 3, embedding_holder)

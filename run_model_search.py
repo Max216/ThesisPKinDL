@@ -5,12 +5,12 @@ import config
 from config import *
 
 embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
-# How much data to load
-SIZE_TRAIN = 40
-SIZE_DEV = 15
+
         
-snli_train = mydataloader.SNLIDataset(PATH_TRAIN_DATA, embedding_holder, max_size=SIZE_TRAIN)
-snli_dev = mydataloader.SNLIDataset(PATH_DEV_DATA, embedding_holder, max_size=SIZE_DEV)
+snli_train = mydataloader.get_dataset_chunks(PATH_TRAIN_DATA, embedding_holder, chunk_size=5)
+snli_dev = mydataloader.get_dataset_chunks(PATH_DEV_DATA, embedding_holder, chunk_size=5)
+
+print(snli_train)
 
 
 #model, epochs, dev_acc, train_acc = train_model(classifier, snli_train, snli_dev, 
@@ -29,4 +29,4 @@ dimens_hidden=[800]
 dimens_sent_encoder = [[64,128,256]]
 batch_sizes=[5]
 
-train.search_best_model(snli_train, snli_dev, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes, epochs=40, validate_after=40)
+train.search_best_model(snli_train, snli_dev, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes, epochs=5, validate_after=40)
