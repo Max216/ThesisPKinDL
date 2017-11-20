@@ -141,6 +141,8 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
         total_loss = 0
         number_batches = 0
         # go through all chunks of train set
+        
+
         for chunk in loader_train:
             # go through all minibatches of chunk
             for i_batch, (batch_p, batch_h, batch_lbl) in enumerate(chunk):

@@ -7,13 +7,24 @@ from config import *
 embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
 
 
-lrs = [0.0002]
-dimens_hidden=[1600]
-dimens_sent_encoder = [[256,512,1024]]
-batch_sizes=[29]
-chunk_size = 32*400
-validate_after = 500
-epochs=50
+only_test = False
+
+if only_test:
+	lrs = [0.0002]
+	dimens_hidden=[400]
+	dimens_sent_encoder = [[32,64,128]]
+	batch_sizes=[5]
+	chunk_size = 5#
+	validate_after = 30
+	epochs=2
+else:
+	lrs = [0.0002]
+	dimens_hidden=[1600]
+	dimens_sent_encoder = [[256,512,1024]]
+	batch_sizes=[32]
+	chunk_size = 32*400
+	validate_after = 500
+	epochs=10
         
 snli_train = mydataloader.get_dataset_chunks(PATH_TRAIN_DATA, embedding_holder, chunk_size=chunk_size, mark_as='[train]')
 snli_dev = mydataloader.get_dataset_chunks(PATH_DEV_DATA, embedding_holder, chunk_size=chunk_size, mark_as='[dev]')

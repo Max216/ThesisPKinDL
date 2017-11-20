@@ -104,7 +104,7 @@ class EntailmentClassifier(nn.Module):
                 
         self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
         # Use pretrained values
-        self.embeddings.weight.data.copy_(cuda_wrap(torch.from_numpy(pretrained_embeddings)))
+        self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
                                                
         # since it is bidirectional, use half size of wanted dimensions
         self.sent_encoder = SentenceEncoder(pretrained_embeddings.shape[1], dimen_sent_encoder[0], dimen_sent_encoder[1], dimen_sent_encoder[2])          
