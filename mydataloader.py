@@ -24,7 +24,7 @@ def extract_snli(raw_instance):
     """
     
     parsed_data = json.loads(raw_instance)
-    return (word_tokenize(parsed_data['sentence1']), word_tokenize(parsed_data['sentence2'].lower()), parsed_data['gold_label'])
+    return (word_tokenize(parsed_data['sentence1']).lower(), word_tokenize(parsed_data['sentence2'].lower()), parsed_data['gold_label'])
 
 def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
     """
