@@ -25,8 +25,11 @@ classifier = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings,
                                             nonlinearity=nonlinearity, 
                                             dropout=dropout))
 
-print('Load best model', config.FILENAME_BEST_MODEL)
-classifier.load_state_dict(torch.load(config.FILENAME_BEST_MODEL))
+name='models/5e-05lr-800hidden-64_128_256lstm-5batch-6_3-relu-0_1dropout.model'
+
+print('Load best model', name)
+
+classifier.load_state_dict(torch.load(name))
 print('loaded')
 
 snli_train = mydataloader.SNLIDataset(config.PATH_TRAIN_DATA, embedding_holder)

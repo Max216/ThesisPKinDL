@@ -175,6 +175,9 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                     all_acc_train.append(train_acc)
                     all_acc_dev.append(dev_acc)
                     all_amount_trained.append(amount_trained)
+                    print('after seeing', amount_trained, 'samples:')
+                    print('Accuracy on train data:', train_acc)
+                    print('Accuracy on dev data:', dev_acc)
                     # mean loss per sample
                     all_err.append(total_loss[0] / number_batches)
 
@@ -196,8 +199,6 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                 pg['lr'] = lr
 
         print('mean loss in epoch', epoch+1, ':', total_loss[0] / number_batches)
-        print('Accuracy on train data:', train_acc)
-        print('Accuracy on dev data:', dev_acc)
         print('Running time:', time.time() - start, 'seconds.')
 
     # Done training, return best settings

@@ -14,6 +14,11 @@ def idx_to_w(idxs, word_dict):
 
 
 def analyse(model, data, batch_size, embedding_holder):
+    '''
+    Analyse what the model learned by checking where max-activation from the sentence
+    representation are coming from.
+    '''
+
     loader = DataLoader(data, 
                         drop_last = False,    # drops last batch if it is incomplete
                         batch_size=batch_size, 

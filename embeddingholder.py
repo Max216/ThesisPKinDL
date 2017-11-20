@@ -26,6 +26,7 @@ class EmbeddingHolder:
         
         # Add OOV and PADDING
         words[self.OOV] = amount
+        self.oov_index = amount
         words[self.PADDING] = amount+1
         unk = np.random.random_sample((wv.shape[1],))
         padding = np.zeros(self.dimen)
@@ -52,10 +53,7 @@ class EmbeddingHolder:
         """
         Get the index of the given word within the embedding matrix.
         """
-        if word in self.words:
-            return self.words[word]
-        else:
-            return self.words[self.OOV]
+        return self.words.get(word, self.oov_index)
         
     def padding(self):
         """

@@ -24,7 +24,7 @@ def extract_snli(raw_instance):
     """
     
     parsed_data = json.loads(raw_instance)
-    return (word_tokenize(parsed_data['sentence1'].lower()), word_tokenize(parsed_data['sentence2'].lower()), parsed_data['gold_label'])
+    return (word_tokenize(parsed_data['sentence1']), word_tokenize(parsed_data['sentence2'].lower()), parsed_data['gold_label'])
 
 def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
     """
@@ -57,17 +57,19 @@ class SNLIDataset(Dataset):
     def __getitem__(self, idx):
         return self.converted_samples[idx]
 
-def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000):
+def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as=''):
     '''
     Divides the data into several chunks with the premise having approximately the same size of all examples
     to reduce padding.
 
     @param filepath - path to data to be divided
     @param chunk_size - each resulting chunk will have this size (or less, if not enough data left)
+    @param mark_as - just for output message to specify thee data loaded
     '''
 
     # sort by length
     raw_samples = load_snli(filepath) 
+    print('Loaded', len(raw_samples),'samples with valid labels.', mark_as)
     raw_samples = sorted(raw_samples, key=lambda sample: len(sample[0])) # 0 is premise
 
     return [SNLIDataset(raw_samples[i:i + chunk_size], embedding_holder) for i in range(0, len(raw_samples), chunk_size)]
