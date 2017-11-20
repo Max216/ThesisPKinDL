@@ -79,7 +79,7 @@ def evaluate(model, data, size, padding_token):
                                     ).data
                                      
             _, predicted_idx = torch.max(predictions, dim=1)
-            correct += torch.sum(torch.eq(batch_lbl, predicted_idx))
+            correct += torch.sum(torch.eq(cuda_wrap(batch_lbl), predicted_idx))
     
     # Accuracy
     return correct / total
