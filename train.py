@@ -10,6 +10,8 @@ import torch.optim as optim
 
 import time
 import copy
+import random
+from random import shuffle
 import matplotlib.pyplot as plt
 
 import model
@@ -142,8 +144,11 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
         number_batches = 0
         # go through all chunks of train set
         
+        chunk_idxs =  [i for i in range(len(loader_train))]
+        shuffle(chunk_idxs)
 
-        for chunk in loader_train:
+        for chunk_idx in chunk_idxs:
+            chunk = loader_train[chunk_idx]
             # go through all minibatches of chunk
             for i_batch, (batch_p, batch_h, batch_lbl) in enumerate(chunk):
                 number_batches += 1
@@ -181,7 +186,9 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                     print('Accuracy on train data:', train_acc)
                     print('Accuracy on dev data:', dev_acc)
                     # mean loss per sample
-                    all_err.append(total_loss[0] / number_batches)
+                    mean_loss = total_loss[0] / number_batches
+                    print('mean loss', mean_loss)
+                    all_err.append(mean_loss)
 
 
                     model.train()
@@ -200,7 +207,7 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
             for pg in optimizer.param_groups:
                 pg['lr'] = lr
 
-        print('mean loss in epoch', epoch+1, ':', total_loss[0] / number_batches)
+        #print('mean loss in epoch', epoch+1, ':', total_loss[0] / number_batches)
         print('Running time:', time.time() - start, 'seconds.')
 
     # Done training, return best settings
@@ -269,7 +276,15 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
 
                             if(plot):
                                 # plot learning curve
+
                                 name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data))
+                                f = open(name + '.traininfo', 'w')
+                                f.write(name + '\n')
+                                f.write(' '.join([str(x) for x in amount_trained]) + '\n')
+                                f.write(' '.join([str(x) for x in all_acc_train]) + '\n')
+                                f.write(' '.join([str(x) for x in all_acc_dev]) + '\n')
+                                f.write(' '.join([str(x) for x in all_mean_loss]))
+                                f.close()
                                 plot_learning(name, amount_trained, all_acc_train, all_acc_dev, all_mean_loss)
                             
                             # remember best model
