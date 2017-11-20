@@ -19,8 +19,8 @@ if only_test:
 	epochs=2
 else:
 	lrs = [0.0002]
-	dimens_hidden=[1600]
-	dimens_sent_encoder = [[256,512,1024]]
+	dimens_hidden=[800]
+	dimens_sent_encoder = [[64,128,256]]
 	batch_sizes=[32]
 	chunk_size = 32*400
 	validate_after = 500
