@@ -58,12 +58,12 @@ class SentenceEncoder(nn.Module):
         
     def init_hidden(self, batch_size):
         # (num_layers*directions, minibatch_size, hidden_dim)
-        self.hidden_state1 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen1))
-        self.cell_state1 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen1))
-        self.hidden_state2 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen2))
-        self.cell_state2 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen2))
-        self.hidden_state3 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out))
-        self.cell_state3 = autograd.Variable(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out))
+        self.hidden_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
+        self.cell_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
+        self.hidden_state2 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen2)))
+        self.cell_state2 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen2)))
+        self.hidden_state3 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out)))
+        self.cell_state3 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out)))
     
     def forward(self, sents):
         # init for current batch size
