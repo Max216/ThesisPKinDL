@@ -294,7 +294,7 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                                 f.write(' '.join([str(x) for x in all_acc_dev]) + '\n')
                                 f.write(' '.join([str(x) for x in all_mean_loss]))
                                 f.close()
-                                plot_learning(name, amount_trained, all_acc_train, all_acc_dev, all_mean_loss)
+                                #plot_learning(name, amount_trained, all_acc_train, all_acc_dev, all_mean_loss)
                             
                             # remember best model
                             if dev_acc > best_dev_acc:

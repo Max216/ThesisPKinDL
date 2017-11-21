@@ -3,7 +3,7 @@ import train
 import mydataloader
 import config
 from config import *
-
+print('Start script: model search')
 embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
 
 
