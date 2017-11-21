@@ -14,7 +14,6 @@ import datetime
 import copy
 import random
 from random import shuffle
-import matplotlib.pyplot as plt
 
 import model
 from model import cuda_wrap, EntailmentClassifier
@@ -227,17 +226,6 @@ def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_
         '-relu-0_1dropout' + \
         '_' + end_time
 
-def plot_learning(name, amount_data, acc_train, acc_dev, mean_loss):
-    plt.plot(amount_data, acc_dev,label='dev set (accuracy)')
-    plt.plot(amount_data, acc_train, label='train set (accuracy)')
-    plt.plot(amount_data, mean_loss, label='mean loss on train')
-    plt.xlabel('# samples')
-    plt.ylabel('acccuracy/loss')
-    plt.legend()
-    plt.title(name)
-    plt.savefig('./plots/' + name +'.png')
-    plt.clf()
-
 
 def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50):
     torch.manual_seed(6)
@@ -294,7 +282,6 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                                 f.write(' '.join([str(x) for x in all_acc_dev]) + '\n')
                                 f.write(' '.join([str(x) for x in all_mean_loss]))
                                 f.close()
-                                #plot_learning(name, amount_trained, all_acc_train, all_acc_dev, all_mean_loss)
                             
                             # remember best model
                             if dev_acc > best_dev_acc:

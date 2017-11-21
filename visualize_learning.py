@@ -2,11 +2,9 @@ from __future__ import print_function
 
 import sys
 import codecs
-import numpy as np
+import matplotlib.pyplot as plt
 
 from docopt import docopt
-
-import train
 
 def main():
     args = docopt("""Visualize the training outputs of a model.
@@ -28,12 +26,19 @@ def main():
     acc_train = [float(val) for val in content[3].strip().split(' ')]
     acc_dev = [float(val) for val in content[4].strip().split(' ')]
     mean_loss = [float(val) for val in content[5].strip().split(' ')]
-    print('amounts', amounts)
-    print('acc_train', acc_train)
-    print('acc_dev', acc_dev)
-    print('mean_loss', mean_loss)
+    plot_learning(name, amounts, acc_train, acc_dev, mean_loss)
 
 
+def plot_learning(name, amount_data, acc_train, acc_dev, mean_loss):
+    plt.plot(amount_data, acc_dev,label='dev set (accuracy)')
+    plt.plot(amount_data, acc_train, label='train set (accuracy)')
+    plt.plot(amount_data, mean_loss, label='mean loss on train')
+    plt.xlabel('# samples')
+    plt.ylabel('acccuracy/loss')
+    plt.legend()
+    plt.title(name)
+    plt.savefig('./plots/' + name +'.png')
+    plt.clf()
 
 if __name__ == '__main__':
     main()
