@@ -7,16 +7,14 @@ from config import *
 embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
 
 
-only_test = False
-
-if only_test:
+if ONLY_TEST:
 	lrs = [0.0002]
 	dimens_hidden=[400]
 	dimens_sent_encoder = [[32,64,128]]
 	batch_sizes=[5]
 	chunk_size = 5#
 	validate_after = 30
-	epochs=2
+	epochs=5
 else:
 	lrs = [0.0002]
 	dimens_hidden=[800]

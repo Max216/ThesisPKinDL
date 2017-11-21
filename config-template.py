@@ -31,3 +31,8 @@ PATH_DEV_DATA = '/path/to/snli_1.0_dev.jsonl'
 Path to the test data
 '''
 PATH_TEST_DATA = ''
+
+'''
+Just a flag to run the model on simple settings when set to True
+'''
+ONLY_TEST = False

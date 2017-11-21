@@ -1,5 +1,6 @@
 # For running on cluster
 import os; 
+import sys
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import torch
@@ -9,6 +10,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 
 import time
+import datetime
 import copy
 import random
 from random import shuffle
@@ -188,6 +190,7 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                     # mean loss per sample
                     mean_loss = total_loss[0] / number_batches
                     print('mean loss', mean_loss)
+                    sys.stdout.flush()
                     all_err.append(mean_loss)
 
 
@@ -208,19 +211,21 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                 pg['lr'] = lr
 
         #print('mean loss in epoch', epoch+1, ':', total_loss[0] / number_batches)
-        print('Running time:', time.time() - start, 'seconds.')
+        running_time = time.time() - start
+        print('Running time:', running_time, 'seconds.')
 
     # Done training, return best settings
-    return (best_model, best_data_amount, best_dev_acc, best_train_acc, all_acc_train, all_acc_dev, all_err, all_amount_trained)
+    return (best_model, best_data_amount, best_dev_acc, best_train_acc, all_acc_train, all_acc_dev, all_err, all_amount_trained, running_time)
     
 
-def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev):
+def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev, end_time):
     return str(lr).replace('.','_') + 'lr-' + \
         str(dim_hidden) + 'hidden-' + \
         str(dim_sent_encoder[0]) + '_' + str(dim_sent_encoder[1]) + '_' + str(dim_sent_encoder[2]) + 'lstm-' + \
         str(batch_size) + 'batch-' + \
         str(data_size_train) + '_' + str(data_size_dev) + \
-        '-relu-0_1dropout' # fixed for now
+        '-relu-0_1dropout' + \
+        '_' + end_time
 
 def plot_learning(name, amount_data, acc_train, acc_dev, mean_loss):
     plt.plot(amount_data, acc_dev,label='dev set (accuracy)')
@@ -261,7 +266,7 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                                             dropout=dropout))
 
                             # train model
-                            trained_model, data_used, dev_acc, train_acc, all_acc_train, all_acc_dev, all_mean_loss, amount_trained = train_model(classifier, 
+                            trained_model, data_used, dev_acc, train_acc, all_acc_train, all_acc_dev, all_mean_loss, amount_trained, running_time = train_model(classifier, 
                                 train_set=train_data, 
                                 dev_set=dev_data, 
                                 padding_token=embedding_holder.padding(),
@@ -274,12 +279,16 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                             result = (settings, data_used, dev_acc, train_acc)
                             results.append(result)
 
+                            endtime = datetime.datetime.now()
+                            endtime = endtime.strftime("%Y-%m-%d_%H:%M")
+                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), endtime)
                             if(plot):
                                 # plot learning curve
 
-                                name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data))
+                                
                                 f = open(name + '.traininfo', 'w')
                                 f.write(name + '\n')
+                                f.write(str(running_time) + '\n')
                                 f.write(' '.join([str(x) for x in amount_trained]) + '\n')
                                 f.write(' '.join([str(x) for x in all_acc_train]) + '\n')
                                 f.write(' '.join([str(x) for x in all_acc_dev]) + '\n')
@@ -291,11 +300,10 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                             if dev_acc > best_dev_acc:
                                 best_dev_acc = dev_acc
                                 best_model = trained_model
-                                best_name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data))
                                 print('Stored as best model so far', result)
 
     print('Results:')
     print(results)
-    print('Saving best model into', best_name + '.model')
-    torch.save(best_model, 'models/' + best_name + '.model')
+    print('Saving best model into', name + '.model')
+    torch.save(best_model, 'models/' + name + '.model')
     print('Done.')
