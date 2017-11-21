@@ -1,7 +1,4 @@
-from __future__ import print_function
-
 import sys
-import codecs
 import matplotlib.pyplot as plt
 
 from docopt import docopt
