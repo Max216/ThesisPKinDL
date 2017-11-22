@@ -87,8 +87,16 @@ def evaluate(model, data, size, padding_token):
     # Accuracy
     return correct / total
 
+def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev, end_time, appendix=''):
+    return str(lr).replace('.','_') + 'lr-' + \
+        str(dim_hidden) + 'hidden-' + \
+        str(dim_sent_encoder[0]) + '_' + str(dim_sent_encoder[1]) + '_' + str(dim_sent_encoder[2]) + 'lstm-' + \
+        str(batch_size) + 'batch-' + \
+        str(data_size_train) + '_' + str(data_size_dev) + \
+        '-relu-0_1dropout' + \
+        '_' + end_time + '_' + appendix
 
-def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, batch_size, validate_after=50):
+def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, batch_size, validate_after=50, store_intermediate_name=None):
     '''
     Train the given model.
 
@@ -202,6 +210,11 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
                         best_train_acc = train_acc
                         best_data_amount = amount_trained
                         #print('Stored these model settings as best in this configuration.')
+
+                        # Since training is long -> always store current best on file.
+                        if store_intermediate_name is not None:
+                            print('Saving best model so far into', store_intermediate_name + '.model')
+                            torch.save(best_model, 'models/' + store_intermediate_name + '.model')
                 
             # apply half decay learn rate (copied from original paper)
             decay = epoch // 2
@@ -217,17 +230,10 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
     return (best_model, best_data_amount, best_dev_acc, best_train_acc, all_acc_train, all_acc_dev, all_err, all_amount_trained, running_time)
     
 
-def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev, end_time, appendix=''):
-    return str(lr).replace('.','_') + 'lr-' + \
-        str(dim_hidden) + 'hidden-' + \
-        str(dim_sent_encoder[0]) + '_' + str(dim_sent_encoder[1]) + '_' + str(dim_sent_encoder[2]) + 'lstm-' + \
-        str(batch_size) + 'batch-' + \
-        str(data_size_train) + '_' + str(data_size_dev) + \
-        '-relu-0_1dropout' + \
-        '_' + end_time + '_' + appendix
 
 
-def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50, appendix=''):
+
+def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50, appendix='', directsave=False):
     torch.manual_seed(6)
 
     results = []
@@ -254,6 +260,8 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                                             dropout=dropout))
 
                             # train model
+                            now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
+                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), now, appendix) + '.tmp'
                             trained_model, data_used, dev_acc, train_acc, all_acc_train, all_acc_dev, all_mean_loss, amount_trained, running_time = train_model(classifier, 
                                 train_set=train_data, 
                                 dev_set=dev_data, 
@@ -261,7 +269,8 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                                 loss_fn=F.cross_entropy, 
                                 lr=lr, epochs=epochs, 
                                 batch_size=batch_size, 
-                                validate_after=validate_after)
+                                validate_after=validate_after,
+                                store_intermediate_name = name)
 
                             # remember results
                             result = (settings, data_used, dev_acc, train_acc)
