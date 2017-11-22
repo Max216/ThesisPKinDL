@@ -64,3 +64,9 @@ class EmbeddingHolder:
         Get the reversed dictionary to lookup words from indizes
         """
         return dict((v,k) for k,v in self.words.items())
+
+    def replace_unk(self, words):
+        '''
+        replaces tokens with "UNK" if they are not known for embeddings.
+        '''
+        return [w if w in self.words else 'UNK' for w in words]

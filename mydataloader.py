@@ -9,6 +9,8 @@ tag_to_index['neutral'] = 0
 tag_to_index['contradiction'] = 1
 tag_to_index['entailment'] = 2
 
+index_to_tag = ['neutral', 'contradiction', 'entailment']
+
 def extract_snli(raw_instance):
     """
     @param raw_instance - from the official SNLI dataset the .jsonl file format
@@ -24,7 +26,7 @@ def extract_snli(raw_instance):
     """
     
     parsed_data = json.loads(raw_instance)
-    return (word_tokenize(parsed_data['sentence1'].lower()), word_tokenize(parsed_data['sentence2'].lower()), parsed_data['gold_label'])
+    return (word_tokenize(parsed_data['sentence1']), word_tokenize(parsed_data['sentence2']), parsed_data['gold_label'])
 
 def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
     """
@@ -56,6 +58,7 @@ class SNLIDataset(Dataset):
     
     def __getitem__(self, idx):
         return self.converted_samples[idx]
+
 
 def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as=''):
     '''

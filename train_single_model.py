@@ -1,13 +1,14 @@
 """
 Usage:
     train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] 
-    train_single_model.py continue
+    train_single_model.py continue <file>
 
 Options:
     <dim_hidden>    Hidden dimension of MLP.
     <dim_s1>        Hidden dimension in first sentence encoding LSTM.
     <dim_s2>        Hidden dimension in second sentence encoding LSTM.
     <dim_s3>        Hidden dimension in third sentence encoding LSTM.
+    <file>          Already trained model. (not renamed)
 
     --iterations=<iterations>           How many iterations to train.
     --validate_after=<validate_after>   After how many examples evaluate on the entire data (train & dev).
@@ -28,7 +29,7 @@ import train
 def main():
 
     args = docopt(__doc__)
-    
+
     DEFAULT_ITERATIONS = 4
     DEFAULT_LR = 0.0002
     DEFAULT_VAL_AFTER = 2000
@@ -37,6 +38,11 @@ def main():
     
     if args['continue']:
         print('continue learning a model')
+        name = args['<file>'].split('/')[-1]
+        print(name)
+        # Parse name
+        # Do when needed
+
     elif args['new']:
         print('new model')
         dim_hidden = int(args['<dim_hidden>'])
@@ -53,14 +59,14 @@ def main():
         path_dev = args.get('--path_dev') or PATH_DEV_DATA
 
 
-    print('Start training a model:')
-    
+        print('Start training a new model:')
+        
 
-    embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
-    snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
-    snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
+        embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
+        snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
+        snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
 
-    train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after)
+        train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after)
 
 if __name__ == '__main__':
     main()
