@@ -1,6 +1,6 @@
 """
 Usage:
-    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] 
+    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] 
     train_single_model.py continue <file>
 
 Options:
@@ -17,6 +17,7 @@ Options:
     --lr=<lr>                           Learning rate.
     --path_train=<path_train>           Path to train set.
     --path_dev=<path_dev>               Path to development set.
+    --appendix=<appendix>               Appendix to add to the name.
 """
 from docopt import docopt
 
@@ -30,7 +31,7 @@ def main():
 
     args = docopt(__doc__)
 
-    DEFAULT_ITERATIONS = 4
+    DEFAULT_ITERATIONS = 2
     DEFAULT_LR = 0.0002
     DEFAULT_VAL_AFTER = 2000
     DEFAULT_BATCH = 32
@@ -57,6 +58,7 @@ def main():
         lr = float(args.get('--lr') or DEFAULT_LR)
         path_train = args.get('--path_train') or PATH_TRAIN_DATA
         path_dev = args.get('--path_dev') or PATH_DEV_DATA
+        appendix = args.get('--appendix') or ''
 
 
         print('Start training a new model:')
@@ -66,7 +68,7 @@ def main():
         snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
         snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
 
-        train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after)
+        train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after, appendix=appendix)
 
 if __name__ == '__main__':
     main()

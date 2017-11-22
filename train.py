@@ -217,17 +217,17 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
     return (best_model, best_data_amount, best_dev_acc, best_train_acc, all_acc_train, all_acc_dev, all_err, all_amount_trained, running_time)
     
 
-def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev, end_time):
+def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_size_dev, end_time, appendix=''):
     return str(lr).replace('.','_') + 'lr-' + \
         str(dim_hidden) + 'hidden-' + \
         str(dim_sent_encoder[0]) + '_' + str(dim_sent_encoder[1]) + '_' + str(dim_sent_encoder[2]) + 'lstm-' + \
         str(batch_size) + 'batch-' + \
         str(data_size_train) + '_' + str(data_size_dev) + \
         '-relu-0_1dropout' + \
-        '_' + end_time
+        '_' + end_time + '_' + appendix
 
 
-def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50):
+def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50, appendix=''):
     torch.manual_seed(6)
 
     results = []
@@ -269,7 +269,7 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
 
                             endtime = datetime.datetime.now()
                             endtime = endtime.strftime("%Y-%m-%d_%H:%M")
-                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), endtime)
+                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), endtime, appendix)
                             if(plot):
                                 # plot learning curve
 
