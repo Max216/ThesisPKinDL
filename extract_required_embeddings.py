@@ -10,9 +10,7 @@ def extract_vocab(dataset_path):
     Extract a set of all words occuring in the given dataset.
     '''
 
-    print('dataset path', dataset_path)
     dataset = mydataloader.load_snli(dataset_path)
-
     p_h_combined = [(p+h) for p,h,lbl in dataset]
     return set([w for p_h in p_h_combined for w in p_h])
 
@@ -37,7 +35,10 @@ def main():
 
     # Vocabulary
     voc_train = extract_vocab(data_train_path)
+    print('vocab train', len(voc_train))
     voc_dev = extract_vocab(data_dev_path)
+    print('vocab dev', len(voc_dev))
+
     voc = voc_train | voc_dev
 
     print('Total vocabulary in data:', len(voc))

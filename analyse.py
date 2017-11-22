@@ -101,22 +101,10 @@ def plot_word_activations(words, activations, last_idx_forward, directory, embed
     print('Saved plot', path)
     plt.clf()
 
-
-def main():
-    args = docopt("""Analyse the model.
-
-    Usage:
-        analyse.py <model> <premise> <hypothesis> 
-
-        <model>         Path to trained model that gets analysed.
-        <premise>       Premise as a sentence.
-        <hypothesis>    Hypothesis as a sentence
-    """)
-
-    model_path = args['<model>']
-    premise = word_tokenize(args['<premise>'])
-    hypothesis = word_tokenize(args['<hypothesis>'])
-    
+def run(model_path, premise, hypothesis):
+    '''
+    Use this method to automatically trigger the analysis process from within a program.
+    '''
     model_name = model_path.split('/')[-1]
     splitted = model_name.split('-')
 
@@ -166,6 +154,25 @@ def main():
 
     plot_word_activations(premise, result_p, last_idx_forward, directory, embedding_holder)
     plot_word_activations(hypothesis, result_h, last_idx_forward, directory, embedding_holder)
+
+
+def main():
+    args = docopt("""Analyse the model.
+
+    Usage:
+        analyse.py <model> <premise> <hypothesis> 
+
+        <model>         Path to trained model that gets analysed.
+        <premise>       Premise as a sentence.
+        <hypothesis>    Hypothesis as a sentence
+    """)
+
+    model_path = args['<model>']
+    premise = word_tokenize(args['<premise>'])
+    hypothesis = word_tokenize(args['<hypothesis>'])
+    
+    run(model_path, premise, hypothesis)
+    
 
 if __name__ == '__main__':
     main()
