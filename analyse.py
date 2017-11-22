@@ -114,8 +114,8 @@ def main():
     """)
 
     model_path = args['<model>']
-    premise = word_tokenize(args['<premise>'].lower())
-    hypothesis = word_tokenize(args['<hypothesis>'].lower())
+    premise = word_tokenize(args['<premise>'])
+    hypothesis = word_tokenize(args['<hypothesis>'])
     
     model_name = model_path.split('/')[-1]
     splitted = model_name.split('-')
