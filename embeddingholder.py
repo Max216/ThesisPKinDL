@@ -69,4 +69,4 @@ class EmbeddingHolder:
         '''
         replaces tokens with "UNK" if they are not known for embeddings.
         '''
-        return [w if w in self.words else 'UNK' for w in words]
+        return [w if w in self.words else w + '<UNK>' for w in words]

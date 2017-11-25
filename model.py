@@ -24,6 +24,11 @@ else:
     print('Running without cuda.')
     cuda_wrap = make_without_cuda
 
+def load_model_state(stored_model_path):
+    if cu.is_available():
+        return torch.load(stored_model_path)
+    else:
+        return torch.load(stored_model_path, map_location=lambda storage, loc: storage)
 
 class SentenceEncoder(nn.Module):
     """
@@ -150,6 +155,6 @@ class EntailmentClassifier(nn.Module):
         tag_scores = F.softmax(out)
 
         if output_sent_info:
-            return tag_scores, [idxs1, idxs2]
+            return tag_scores, [idxs1, idxs2], [sent1_representation, sent2_representation]
 
         return tag_scores
