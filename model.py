@@ -165,7 +165,12 @@ class EntailmentClassifier(nn.Module):
         '''
         #self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
         wv_new = cuda_wrap(torch.from_numpy(wv).float())
-        self.embeddings.weight.data.copy_(torch.cat([self.embeddings.weight.data, wv_new]))
+        wv_combined = torch.cat([self.embeddings.weight.data, wv_new])
+
+        # adjust embedding layer size
+        self.embeddings = nn.Embedding(wv_combined.size()[0], wv_combined.size()[1])
+        self.embeddings.weight.data.copy_(wv_combined)
+        
 
 def left_number(val):
     '''
