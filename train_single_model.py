@@ -1,6 +1,6 @@
 """
 Usage:
-    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--directsave]
+    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
     train_single_model.py continue <file>
 
 Options:
@@ -18,6 +18,7 @@ Options:
     --path_train=<path_train>           Path to train set.
     --path_dev=<path_dev>               Path to development set.
     --appendix=<appendix>               Appendix to add to the name.
+    --relative                          Only use |p-h|, p*h for classification if set
     --directsave                        If set, always the best performing model on dev is written to the file while training, else only at the end.
 """
 from docopt import docopt
@@ -61,6 +62,12 @@ def main():
         path_dev = args.get('--path_dev') or PATH_DEV_DATA
         appendix = args.get('--appendix') or ''
         directsave = args.get('--directsave') or False
+        relative = args.get('--relative')
+
+        if relative:
+            sent_repr = 'relative'
+        else:
+            sent_repr = 'all'
 
 
         print('Start training a new model:')
@@ -70,7 +77,7 @@ def main():
         snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
         snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
 
-        train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after, appendix=appendix, directsave=directsave)
+        train.search_best_model(snli_train, snli_dev, embedding_holder, [lr], [dim_hidden], [[dim_s1, dim_s2, dim_s3]], [batch], epochs=iterations, validate_after=validate_after, appendix=appendix, directsave=directsave, sent_repr=sent_repr)
 
 if __name__ == '__main__':
     main()

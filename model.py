@@ -89,7 +89,7 @@ class EntailmentClassifier(nn.Module):
     followed by a FeedForward network of three layers.
     """
     
-    def __init__(self, pretrained_embeddings, dimen_hidden, dimen_out, dimen_sent_encoder = [64,128,256], nonlinearity=F.relu, dropout=0.1):
+    def __init__(self, pretrained_embeddings, dimen_hidden, dimen_out, dimen_sent_encoder = [64,128,256], nonlinearity=F.relu, dropout=0.1, sent_repr='all'):
         """
         @param pretrained_embeddings - Already trained embeddings to initialize the embeddings layer
         @param dimen_sent_repr - Size of the learned representation of a single sentence
@@ -98,6 +98,8 @@ class EntailmentClassifier(nn.Module):
         @param dimen_out - Amount of output units of the output layer of the FF
         @param nonlinearity - Nonlinearity function that is applied to the ouputs of the hidden layers.
         @param dropout - Dropout rate applied within the FF 
+        @param sent_repr - "all" means the concatenation [p,p,p-h,p*h] is classified
+                           "relative" means that only [p-h,p*h] is classified
         """ 
         
         super(EntailmentClassifier, self).__init__()
@@ -106,6 +108,7 @@ class EntailmentClassifier(nn.Module):
             raise Exception('must have three values for dimen_sent_encoder.')
 
         self.nonlinearity = nonlinearity
+        self.sent_repr = sent_repr
                 
         self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
         # Use pretrained values
@@ -116,7 +119,15 @@ class EntailmentClassifier(nn.Module):
                 
         # 3 layer Feedforward 
         dimen_sent_repr = dimen_sent_encoder[2] * 2 # multiplication because bidirectional
-        self.hidden1 = nn.Linear(dimen_sent_repr * 4, dimen_hidden) # multiplication because of feature concatenation
+
+        if sent_repr == "all":
+            features = 4
+        elif sent_repr == "relative":
+            features = 2
+        else:
+            raise Exception('Invalid keyword for sent_repr. Must be "all" or "relative".')
+
+        self.hidden1 = nn.Linear(dimen_sent_repr * features, dimen_hidden) # multiplication because of feature concatenation
         self.hidden2 = nn.Linear(dimen_hidden, dimen_hidden)
         self.hidden3 = nn.Linear(dimen_hidden, dimen_out)
         
@@ -139,12 +150,18 @@ class EntailmentClassifier(nn.Module):
         sent2_representation, idxs2 = torch.max(sent2_representation, dim=0)
         
         # Create feature tensor
-        feedforward_input = torch.cat((
-            sent1_representation,
-            sent2_representation,
-            torch.abs(sent1_representation - sent2_representation),
-            sent1_representation * sent2_representation
-        ),1)
+        if self.sent_repr == "all":
+            feedforward_input = torch.cat((
+                sent1_representation,
+                sent2_representation,
+                torch.abs(sent1_representation - sent2_representation),
+                sent1_representation * sent2_representation
+            ),1)
+        else:
+            feedforward_input = torch.cat((
+                torch.abs(sent1_representation - sent2_representation),
+                sent1_representation * sent2_representation
+            ),1)
         
         # Run through feed forward network
         out = self.nonlinearity(self.hidden1(feedforward_input))
