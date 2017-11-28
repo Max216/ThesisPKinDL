@@ -33,15 +33,13 @@ def evaluate(model_path, data_path, new_embeddings=None):
     if new_embeddings != None:
         print ('Merge embeddings')
         embedding_holder_new = embeddingholder.EmbeddingHolder(new_embeddings)
-        embedding_holder_new.words['testyyyy'] =  6
         embeddings_diff = embedding_holder.add_unknowns_from(embedding_holder_new)
 
     print('Load model ...')
     classifier, _ = m.load_model(model_path, embedding_holder=embedding_holder)
 
-    if len(embeddings_diff) != 0:
+    if embeddings_diff.shape[1] != 0:
         # Merge into model
-        print('inc')
         classifier.inc_embedding_layer(embeddings_diff)
 
     print('Load data ...')
