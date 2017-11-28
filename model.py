@@ -7,6 +7,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.cuda as cu
 
+import embeddingholder
+import config
+
+import re
+
+
 # for cuda
 def make_with_cuda(t):
     return t.cuda()
@@ -23,12 +29,6 @@ if cu.is_available():
 else:
     print('Running without cuda.')
     cuda_wrap = make_without_cuda
-
-def load_model_state(stored_model_path):
-    if cu.is_available():
-        return torch.load(stored_model_path)
-    else:
-        return torch.load(stored_model_path, map_location=lambda storage, loc: storage)
 
 class SentenceEncoder(nn.Module):
     """
@@ -122,7 +122,7 @@ class EntailmentClassifier(nn.Module):
         
         self.dropout1 = nn.Dropout(p=dropout)
         self.dropout2 = nn.Dropout(p=dropout)
-    
+
     def forward(self, sent1, sent2, output_sent_info=False):
         batch_size = sent1.size()[1]
         
@@ -158,3 +158,70 @@ class EntailmentClassifier(nn.Module):
             return tag_scores, [idxs1, idxs2], [sent1_representation, sent2_representation]
 
         return tag_scores
+
+    def inc_embedding_layer(self, wv):
+        '''
+        Increase the embedding layer by the matrix wv.
+        '''
+        #self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
+        wv_new = cuda_wrap(torch.from_numpy(wv).float())
+        self.embeddings.weight.data.copy_(torch.cat([self.embeddings.weight.data, wv_new]))
+
+def left_number(val):
+    '''
+    Remove the letters from a value of a model name. e.g. 0_001lr -> 0.001
+    '''
+    return re.split('[a-z]', val)[0]
+
+def lbl_to_float(val):
+    '''
+    Map a value from a name to a float.
+    '''
+    return float(val.replace('_', '.'))
+
+def load_model(model_path, embedding_holder = None):
+    '''
+    Load a model. Parameters are retrieved from the given model name.
+
+    @param stored_model     Path to the stored model. Name must be untouched.
+    @param embedding_holder Optional, if not specified the one inf config.py is used. Must have correct dimensions
+                            with the trained model.
+
+    @return (model, model_name)
+    '''
+
+    if embedding_holder == None:
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+
+    # Model params:
+    model_name = model_path.split('/')[-1]
+    splitted = model_name.split('-')
+
+    lr = lbl_to_float(left_number(splitted[0]))
+    hidden_dim = int(left_number(splitted[1]))
+    lstm_dim = [int(i) for i in left_number(splitted[2]).split('_')]
+    batch_size = int(left_number(splitted[3]))
+    dropout = lbl_to_float(left_number(splitted[6]))
+
+    if splitted[5] == 'relu':
+        nonlinearity = F.relu
+    else:
+        print('Unknown:', splitted[5])
+        raise Exception('Unknown activation function.', splitted[5])
+
+    # Create new model with correct dimensions
+    model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+                                            dimen_hidden=hidden_dim, 
+                                            dimen_out=3, 
+                                            dimen_sent_encoder=lstm_dim,
+                                            nonlinearity=nonlinearity, 
+                                            dropout=dropout))
+
+    # Model state:
+    if cu.is_available():
+        model.load_state_dict(torch.load(model_path))
+    else:
+        model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
+
+    model.eval()
+    return model, model_name

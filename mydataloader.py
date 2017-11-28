@@ -4,6 +4,9 @@ import json
 import torch
 from torch.utils.data import Dataset
 
+import embeddingholder
+import config
+
 tag_to_index = dict()
 tag_to_index['neutral'] = 0
 tag_to_index['contradiction'] = 1
@@ -40,6 +43,16 @@ def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
 
     return [(p, h, lbl) for (p, h, lbl) in all_lines if lbl in valid_labels]
 
+
+def simple_load(path, embedding_holder=None):
+    '''
+    Simply load everythin into a @class SNLIDataset.
+    '''
+
+    if embedding_holder == None:
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+
+    return SNLIDataset(load_snli(path), embedding_holder)
 
 class SNLIDataset(Dataset):
     '''

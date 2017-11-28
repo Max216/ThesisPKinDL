@@ -70,3 +70,32 @@ class EmbeddingHolder:
         replaces tokens with "UNK" if they are not known for embeddings.
         '''
         return [w if w in self.words else w + '<UNK>' for w in words]
+
+    def add_unknowns_from(self, other):
+        '''
+        Add all word embeddings from another embeddingholder that are not known to this instance. Already
+        known words are untouched.
+        E.g. to increase the embeddings with new vocabulary from the test set.
+
+        @param other    embedding_holder containing new words
+        '''
+
+        # find new words
+        words_this = list(self.words.keys())
+        words_other = list(other.words.keys())
+        new_words = np.setdiff1d(words_other, words_this)
+
+        # matrix of new embeddings
+        wv = np.asmatrix([other.embedding_matrix()[other.word_index(new_words[i])] for i in range(len(new_words))])
+
+        # add words to vocab
+        last_idx = len(self.words) 
+        for w in new_words:
+            self.words[w] = last_idx
+            last_idx += 1
+
+        print('Added', len(new_words), 'vocabs.')
+
+
+        return wv
+

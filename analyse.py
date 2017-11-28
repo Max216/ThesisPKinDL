@@ -1,3 +1,7 @@
+
+##### not sure if still works
+
+
 import sys
 import os
 import matplotlib.pyplot as plt
@@ -6,10 +10,9 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import model
-from model import cuda_wrap, EntailmentClassifier, load_model_state
+from model import cuda_wrap, EntailmentClassifier, load_model
 
 from docopt import docopt
-import re
 
 import nltk
 from nltk import word_tokenize
@@ -68,18 +71,6 @@ class OutWriter:
         print('Done.')
 
 
-
-def left_number(val):
-    '''
-    Remove the letters from a value of a model name. e.g. 0_001lr -> 0.001
-    '''
-    return re.split('[a-z]', val)[0]
-
-def lbl_to_float(val):
-    '''
-    Map a value from a name to a float.
-    '''
-    return float(val.replace('_', '.'))
 
 def idx_to_w(idxs, word_dict):
     return [word_dict[i] for i in idxs.data.numpy()]
@@ -292,8 +283,9 @@ def analyse_single_sent(words, activations, representation):
         for word ,amount_act, sum_act, abs_sum_act, min_act, max_act, _ in analysed_sent]
 
     def activations_to_str(val):
+        word = val[0]
         activations = val[-1]
-        return '; '.join([str(idx) + '=' + str(round(act, 3)) for idx, act in activations])
+        return val[0] + ':\n' + '; '.join([str(idx) + '=' + str(round(act, 3)) for idx, act in activations])
 
     all_activations = [activations_to_str(v) for v in analysed_sent]
 
@@ -339,45 +331,11 @@ def stringify_overlap(premise, hypothesis, overlap):
 
     return [premise[ip] + ' (premise[' + str(ip) + ']) \t ' + hypothesis[ih] + ' (hypothesis[' + str(ih) + '])\n' + \
         'intersect_len=' + str(len(intersect)) + ', percent_premise=' + str(round(percent_p, 2)) + ', percent_hyp=' + str(round(percent_h, 2)) + '\n' + \
-        'intersect_sum_premise=' + str(round(sum_repr_p, 3)) + ', intersect_sum_hyp=' + str(round(sum_repr_h)) + '\n' +\
+        'intersect_sum_premise=' + str(round(sum_repr_p, 3)) + ', intersect_sum_hyp=' + str(round(sum_repr_h, 3)) + '\n' +\
         'intersect_abs_diff=' + str(round(sum_abs_diff, 3)) + ', intersect_avg_abs_diff=' + str(round_with_str(avg_abs_diff, 3)) + '\n' +\
         'intersect=' + ','.join([str(i) for i in intersect])
         for ip, ih, intersect, percent_p, percent_h, sum_repr_p, sum_repr_h, sum_abs_diff, avg_abs_diff in overlap
     ]
-
-def load_model(model_path, embedding_holder):
-    '''
-    Loads a trained model. If not renamed, parameters can be regained from the model's name.
-    '''
-    model_name = model_path.split('/')[-1]
-    splitted = model_name.split('-')
-
-    lr = lbl_to_float(left_number(splitted[0]))
-    hidden_dim = int(left_number(splitted[1]))
-    lstm_dim = [int(i) for i in left_number(splitted[2]).split('_')]
-    batch_size = int(left_number(splitted[3]))
-    dropout = lbl_to_float(left_number(splitted[6]))
-
-    if splitted[5] == 'relu':
-        nonlinearity = F.relu
-    else:
-        raise Eception('Unknown activation function.', splitted[5])
-
-
-    
-    model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
-                                            dimen_hidden=hidden_dim, 
-                                            dimen_out=3, 
-                                            dimen_sent_encoder=lstm_dim,
-                                            nonlinearity=nonlinearity, 
-                                            dropout=dropout))
-
-    print('Load model ...')
-    model.load_state_dict(load_model_state(model_path))
-    model.eval()
-    print('Loaded.')
-
-    return model, model_name
 
 def run(model, model_name, embedding_holder, premise, hypothesis, amount=5):
     '''
@@ -450,24 +408,34 @@ def run(model, model_name, embedding_holder, premise, hypothesis, amount=5):
     ow.put(plt_repr_h)
 
     ow.h1('Part of single words in the sentence representation')
-    ow.h2('Premise')
+
+    ow.put('Word activations: \n')
     analysed_p_general, analysed_p_act = analyse_single_sent(premise, result_p, repr_p)
+    analysed_h_general, analysed_h_act = analyse_single_sent(hypothesis, result_h, repr_h) 
+
+    ow.h3('Of premise:')
     for i in range(len(analysed_p_general)):
-        ow.h3(analysed_p_general[i])
         ow.put(analysed_p_act[i])
         ow.put()
 
-    ow.h2('Hypothesis')
-    analysed_h_general, analysed_h_act = analyse_single_sent(hypothesis, result_h, repr_h)  
+    ow.h3('Of hypothesis:')
     for i in range(len(analysed_h_general)):
-        ow.h3(analysed_h_general[i])
         ow.put(analysed_h_act[i])
         ow.put()
+
+    ow.h2('Premise')
+    for i in range(len(analysed_h_general)):
+        ow.h3(analysed_p_general[i])
+    
+
+    ow.h2('Hypothesis')
+    for i in range(len(analysed_h_general)):
+        ow.h3(analysed_h_general[i])
 
     # BOTH SENT ANALYSIS
     ow.h1('Similarities of sentence representation')
     # sentence representation comparison
-    amount_similarities = 50
+    amount_similarities = 100
     unsimilarities, similarites = find_similarities_unsimilarities(premise, hypothesis, idx_p, idx_h, repr_p, repr_h, amount=amount_similarities)
     ow.h2('Similarities')
     ow.put_all(similarites)

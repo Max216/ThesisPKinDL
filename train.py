@@ -231,7 +231,47 @@ def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, b
     
 
 
+def load_trained_model(model_path, embedding_holder=None):
+    '''
+    Loads a trained model. If not renamed, parameters can be regained from the model's name.
 
+    @param model_path   path to trained model
+    @param embedding_holder     can be supplied. [DEFAULT: from config.py]
+
+    @return (model, model_name)
+    '''
+
+    model_name = model_path.split('/')[-1]
+    splitted = model_name.split('-')
+
+    lr = lbl_to_float(left_number(splitted[0]))
+    hidden_dim = int(left_number(splitted[1]))
+    lstm_dim = [int(i) for i in left_number(splitted[2]).split('_')]
+    batch_size = int(left_number(splitted[3]))
+    dropout = lbl_to_float(left_number(splitted[6]))
+
+    if splitted[5] == 'relu':
+        nonlinearity = F.relu
+    else:
+        raise Eception('Unknown activation function.', splitted[5])
+
+    if embedding_holder is None:
+        # use the one from config
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+    
+    model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+                                            dimen_hidden=hidden_dim, 
+                                            dimen_out=3, 
+                                            dimen_sent_encoder=lstm_dim,
+                                            nonlinearity=nonlinearity, 
+                                            dropout=dropout))
+
+    print('Load model ...')
+    model.load_state_dict(load_model_state(model_path))
+    model.eval()
+    print('Loaded.')
+
+    return model, model_name
 
 def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden, dimens_sent_encoder, batch_sizes=[5], nonlinearities=[F.relu], dropouts=[0.1], epochs=50, plot=True, validate_after=50, appendix='', directsave=False):
     torch.manual_seed(6)
