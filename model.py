@@ -1,6 +1,10 @@
 
 # coding: utf-8
 
+# For running on cluster
+import os; 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import torch
 import torch.autograd as autograd
 import torch.nn as nn

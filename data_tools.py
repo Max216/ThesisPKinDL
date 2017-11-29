@@ -71,7 +71,8 @@ def unique_sents(model_path, data_path, amount, name_out):
 
     # Load model
     print('Load model ...')
-    classifier, _ = m.cuda_wrap(m.load_model(model_path))
+    classifier, _ = m.load_model(model_path)
+    classifier = m.cuda_wrap(classifier)
     classifier.eval()
     embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
     print('Done.')

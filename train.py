@@ -1,7 +1,5 @@
-# For running on cluster
-import os; 
+
 import sys
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import torch
 import torch.autograd as autograd
@@ -303,7 +301,7 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
 
                             # train model
                             now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
-                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), now, appendix) + '.tmp'
+                            name = to_name(lr, dim_hidden, dim_sent_encoder, batch_size, len(train_data), len(dev_data), now, sent_repr, appendix) + '.tmp'
                             trained_model, data_used, dev_acc, train_acc, all_acc_train, all_acc_dev, all_mean_loss, amount_trained, running_time = train_model(classifier, 
                                 train_set=train_data, 
                                 dev_set=dev_data, 
