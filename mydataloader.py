@@ -39,10 +39,26 @@ def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
     Load instances of the SNLI dataset into an array.
     """
     with open(path) as file:
-        all_lines = [extract_snli(line) for line in open(path)]
+        all_lines = [extract_snli(line) for line in file]
 
     return [(p, h, lbl) for (p, h, lbl) in all_lines if lbl in valid_labels]
 
+def load_snli_with_parse(path, valid_labels=['neutral','contradiction','entailment']):
+    '''
+    Loads textual SNLI instances including binary parse information, sentences and label.
+    '''
+
+    def extract(raw):   
+        parsed_data = json.loads(raw)
+        return (
+            word_tokenize(parsed_data['sentence1']), word_tokenize(parsed_data['sentence2']), parsed_data['gold_label'], 
+            parsed_data['sentence1_binary_parse'], parsed_data['sentence2_binary_parse']
+        )
+
+    with open(path) as f_in:
+        all_lines = [extract(line) for line in f_in]
+
+    return [(p, h, lbl, parse_p, parse_h) for (p, h, lbl, parse_p, parse_h) in all_lines if lbl in valid_labels]
 
 def simple_load(path, embedding_holder=None):
     '''

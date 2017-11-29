@@ -24,7 +24,6 @@ def main():
     evaluate(model_path, data_path, embeddings_path)
 
 
-
 def evaluate(model_path, data_path, new_embeddings=None):
     # Load model
 
