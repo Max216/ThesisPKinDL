@@ -103,6 +103,7 @@ def unique_sents(model_path, data_path, amount, name_out):
             # else ignore
 
     # only use useful ones (model predict)
+    print('Checking for correctness ...')
     correct_sents = []
     for key in premise_to_hypothesis:
         # must have three hypothesis
@@ -151,7 +152,7 @@ def unique_sents(model_path, data_path, amount, name_out):
         f_out.write('# MODEL:' + model_path + ';DATA:' + data_path+'\n')
         f_out.write('# SENTS:' + str(len(subset)) + ';LEN:' + str(most_common) + '\n')
         
-        mean, sd, abs_min, abs_max = stats(np.array([r.squeeze().numpy() for s,p,a,r in subset]))
+        mean, sd, abs_min, abs_max = stats(np.array([r.cpu().squeeze().numpy() for s,p,a,r in subset]))
         f_out.write('# STATS: mean, standard_deviation, min, max\n')
         f_out.write(' '.join([str(v) for v in mean]) + '\n')
         f_out.write(' '.join([str(v) for v in sd]) + '\n')
@@ -162,8 +163,8 @@ def unique_sents(model_path, data_path, amount, name_out):
         for sent, parse, act, repr in subset:
             f_out.write(' '.join(sent) + '\n')
             f_out.write(parse + '\n')
-            f_out.write(' '.join([str(v) for v in act.squeeze().numpy()]) + '\n')
-            f_out.write(' '.join([str(v) for v in repr.squeeze().numpy()]) + '\n')
+            f_out.write(' '.join([str(v) for v in act.cpu().squeeze().numpy()]) + '\n')
+            f_out.write(' '.join([str(v) for v in repr.cpu().squeeze().numpy()]) + '\n')
 
 
 def stats(representations):
