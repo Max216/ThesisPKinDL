@@ -29,7 +29,7 @@ def adjust_plot_size(width=30, height=30):
 	fig_size[1] = height
 	plt.rcParams["figure.figsize"] = fig_size
 
-def general(a_set, q=None, save=None, filter_q=None):
+def general(a_set, q=None, save=None, filter_q=None, params=None):
 	'''Plot mean, variance, min, max of a sentence repr'''
 	adjust_plot_size(12,12)
 	x = a_set.enum_repr(np.arange(len(a_set.sents)))
@@ -227,27 +227,189 @@ def plot_dim_details(a_set, settings, dim, title, save):
 	plot_stats()
 	plt.clf()
 
-def words_analysis(a_set, name, word_fn, exclude=None, dim=None, save=False, q=None, filter_q=None, show_stats=False):
-	pass
+def words_analysis(a_set, name, word_fn, labels, exclude=None, dim=None, save=False, q=None, filter_q=None, show_stats=False, ext_priority_fn=None):
+	def colors():
+		''' Map category to color '''
+		colors = {lbl : color_palette[i] for i, lbl in enumerate(labels)}
+		return colors
 
-def most_common_words(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False):
-	def simplify(pos):
-		if pos.startswith('JJ'):
-			return 'JJ'
-		elif pos.startswith('NN'):
-			return 'NN'
-		elif pos.startswith('VB'):
-			return 'VB'
-		elif pos.startswith('PRP'):
-			return 'PRP'
-		elif pos.startswith('RB'):
-			return 'RB'
+	def color_sent(words, pos, parse, act, repr, indizes):
+		''' Create dict() for sent with k=category, v=[indizes] '''
+		result = dict()
+		for lbl in labels:
+			result[lbl] = [idx for i, idx in enumerate(indizes) if word_fn(words[act[i]]) == lbl]
+		return result
+
+	def distribution(sent_indizes, dim):
+		''' Create dict() for activations with k=category, v=len(activations) '''
+		act, _ = a_set.get_dim(sent_indizes, dim)
+		words = a_set.get_word_along_dim(sent_indizes, act)
+		word_categories = [word_fn(w) for w in words]
+		
+		result = dict()
+		for lbl in labels:
+			result[lbl] = [(word_cat, words[i]) for i,word_cat in enumerate(word_categories) if word_cat == lbl]
+
+		# print words
+		print_dist(words, result)
+
+		for k in result.keys():
+			result[k] = len(result[k])
+
+		return result
+
+	def stats(dim, activations, representations, sent_indizes):
+		'''Create dict with k=category, v=(mean, sd, min, max)'''
+		result = dict()
+		word_categories = [word_fn(w) for w in a_set.get_word_along_dim(sent_indizes, activations)]
+
+		# remember repr values per category
+		for lbl in labels:
+			result[lbl] = [representations[i] for i in range(len(representations)) if lbl == word_categories[i]]
+
+		for lbl in labels:
+			r = np.array(result[lbl])
+			if r.shape[0] > 0:
+				mean = np.mean(r)
+				sd = np.std(r)
+				abs_min = np.amin(r)
+				abs_max = np.amax(r)
+
+				result[str(lbl)] = (mean, sd, abs_min, abs_max)
+			else:
+				# rm key
+				result.pop(str(lbl), None)
+
+		return result
+
+	def priority_fn(sent_indizes, activations):
+		'''return a score for the dimension for having one dominant category'''
+		word_categories = [word_fn(w) for w in a_set.get_word_along_dim(sent_indizes, activations)]	
+		if exclude != None:
+			word_categories = [w for w in word_categories if w != exclude]	
+
+		most_common = Counter(word_categories).most_common(1)
+		if len(most_common) > 0:
+			_, most_freq = most_common[0]
+			return most_freq
 		else:
-			return pos
+			return 0
 
+	def query_fn(sent_indizes, activations):
+		'''return a score for the dimension for containing the query'''
+		word_categories = [word_fn(w) for w in a_set.get_word_along_dim(sent_indizes, activations)]		
+		return len([w for w in word_categories if w == q])
+
+	def filter_fn(sent_idx):
+		return filter_q in [word_fn(w) for w in a_set.sents[sent_idx]]
+
+	def count_fn(working_sent_idx, labels):
+		'''Count Occurences for each'''
+		word_categories = [word_fn(a_set.sents[sent_idx][w_idx]) for sent_idx in working_sent_idx for w_idx in range(len(a_set.sents[sent_idx]))]
+		counter = Counter(word_categories)
+		return counter
+
+
+	settings = GridSettings(color_sent, colors, distribution, stats, filter_fn, count_fn)
+	if filter_q != None:
+		settings.filter(True)
+		name +='[filter=' + str(filter_q) + ']'
+
+	if ext_priority_fn != None:
+		plot_grid(a_set, ext_priority_fn, name + ' of 300 dimensions (most activations for group)', settings)
+	elif show_stats:
+		plot_general_stats(a_set, name + ' Overview', settings, save)
+	elif dim == None and q == None:
+		plot_grid(a_set, 'positional',name + ' of 300 dimensions (first dimensions)', settings)
+		plot_grid(a_set, 'sd', name + ' of 300 dimensions (most SD)', settings)
+		plot_grid(a_set, priority_fn, name + ' of 300 dimensions (most activations per single position)', settings)
+	elif q != None:	
+		plot_grid(a_set, query_fn, name + ' of 300 dimensions (most of:' + q + ')', settings)
+	else:
+		plot_dim_details(a_set, settings, dim, name, save)
+
+def words(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
+
+	w_list = params['w_list']
+	g_list = params['g_list']
+	grouping = params['group']
+
+	w_fn = None 		# word function
+	g_fn = None 	# grouping function
+	name = None
+
+	if w_list != None:	
+		name = 'Lexical Analysis: ' + w_list
+		labels = w_list.split(' ')
+		labels.append('OTHER')
+
+		def word_fn(w):
+			if w.lower() in labels:
+				return w.lower()
+			else:
+			 return 'OTHER'
+
+		def grouping_fn(sent_indizes, activations):
+			'''return a score for the dimension for having other category than OTHER'''
+			word_categories = [word_fn(w) for w in a_set.get_word_along_dim(sent_indizes, activations)]
+			return len([w for w in word_categories if w != 'OTHER'])
+
+		w_fn = word_fn
+		g_fn = grouping_fn
+
+	else:
+
+		# get labels
+		categories = g_list.split(';')
+		categories = [cat.split('=') for cat in categories]
+		categories = [(cat[0].strip(), [w.strip().lower() for w in cat[1].split(' ')]) for cat in categories]
+
+		labels = [lbl for lbl, words in categories]
+		all_words = [w for lbl, words in categories for w in words]
+		labels.append('OTHER')
+
+		name = 'Lexical Analysis: ' + ' '.join(labels)
+
+		def word_fn(w):
+			w = w.lower()
+			for lbl, words in categories:
+				if w in words:
+					return lbl
+			return 'OTHER'
+
+		def grouping_fn(sent_indizes, activations):
+			mapped_words = [word_fn(w) for w in a_set.get_word_along_dim(sent_indizes, activations)]
+			return len([w for w in mapped_words if w != 'OTHER'])
+
+		w_fn = word_fn
+		g_fn = grouping_fn
+
+	priority_fn = None
+	if grouping:
+		# change priority fn
+		priority_fn = g_fn
+		name += '(grouping)'
+
+	words_analysis(a_set, name, w_fn, labels, exclude='OTHER', dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats, ext_priority_fn=priority_fn)
+		
+def most_common_words(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 	
-	name = 'Simplified POS'
-	pos(a_set, name, simplify, exclude=None, dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats)
+
+	# find most common words
+	all_words = [a_set.sents[sent_idx][w_idx] for sent_idx in range(len(a_set.sents)) for w_idx in range(len(a_set.sents[sent_idx]))]
+	most_common = Counter(all_words).most_common(13)
+	labels = [lbl for lbl, cnt in most_common if lbl != '.']	# . already coverd in POS
+	labels.append('OTHER')
+
+	def word_fn(w):
+		if w in labels:
+			return w
+		else:
+			return 'OTHER'
+	
+
+	name = 'Most common words'
+	words_analysis(a_set, name, word_fn, labels, exclude='OTHER', dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats)
 
 def pos(a_set, name, pos_fn, exclude=None, dim=None, save=False, q=None, filter_q=None, show_stats=False):
 	labels = sorted(list(set([pos_fn(p) for ps in a_set.pos for p in ps])))
@@ -345,7 +507,7 @@ def pos(a_set, name, pos_fn, exclude=None, dim=None, save=False, q=None, filter_
 	else:
 		plot_dim_details(a_set, settings, dim, name, save)
 
-def simple_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False):
+def simple_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 
 	def simplify(pos):
 		if pos.startswith('JJ'):
@@ -365,7 +527,7 @@ def simple_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=Fa
 	name = 'Simplified POS'
 	pos(a_set, name, simplify, exclude=None, dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats)
 
-def verb_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False):
+def verb_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 
 	def only_verbs(pos):
 		if pos.startswith('V'):
@@ -376,7 +538,7 @@ def verb_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=Fals
 	name = 'Verb POS'
 	pos(a_set, name, only_verbs, exclude='OTHER', dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats)
 
-def nn_jj_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False):
+def nn_jj_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 
 	def only_nn_jj(pos):
 		if pos.startswith('NN') or pos.startswith('JJ'):
@@ -389,7 +551,7 @@ def nn_jj_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=Fal
 	
 
 
-def positional(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False):
+def positional(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 	labels = [i for i in range(a_set.sent_len)]
 
 	def colors():
@@ -502,3 +664,4 @@ tools['simple_pos'] = simple_pos
 tools['verb_pos'] = verb_pos
 tools['nn_jj_pos'] = nn_jj_pos
 tools['mcw'] = most_common_words
+tools['words'] = words

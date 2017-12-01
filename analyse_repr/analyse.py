@@ -23,12 +23,28 @@ def main():
         analyse.py <path> nn_jj_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> nn_jj_pos [--stats] [--filter=<filter_q>] [--save]
         analyse.py <path> mcw [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> mcw [--find=<q>] [--filter=<filter_q>]
+        analyse.py <path> mcw [--stats] [--filter=<filter_q>] [--save]
+        analyse.py <path> words --w=<w> [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --w=<w> [--find=<q>] [--filter=<filter_q>]
+        analyse.py <path> words --w=<w> [--stats] [--filter=<filter_q>] [--save]
+        analyse.py <path> words --w=<w> --group [--save]
+        analyse.py <path> words --g=<g> [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --g=<g> [--find=<q>] [--filter=<filter_q>]
+        analyse.py <path> words --g=<g> [--stats] [--filter=<filter_q>] [--save]
+        analyse.py <path> words --g=<g> --group [--save]
+        analyse.py <path> words --g=<g> [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --g=<g> [--find=<q>] [--filter=<filter_q>]
+        analyse.py <path> words --g=<g> [--stats] [--filter=<filter_q>] [--save]
+        analyse.py <path> words --g=<g> --group [--save]
+
 
         <path> = path to sentences with activation
         --details=<dim> = if set, plot details of dimension
         --find=q>		to find the most occurences of q
         --filter=<filter_q> only look in sentences containing filter_q
         --save  store to a file
+
     """)
 
     path = args['<path>']
@@ -42,10 +58,18 @@ def main():
     filter_q = args['--filter']
     save = args['--save']
     show_stats = args['--stats']
+    w = args['--w']
+    g = args['--g']
+    group = args['--group']
+
+    params = dict()
+    params['w_list'] = w
+    params['g_list'] = g
+    params['group'] = group
     if details == None:
-        analyse_lib.tools[fn](a_set, q=q, save=save, filter_q=filter_q, show_stats=show_stats)
+        analyse_lib.tools[fn](a_set, q=q, save=save, filter_q=filter_q, show_stats=show_stats, params=params)
     else:
-        analyse_lib.tools[fn](a_set, dim=int(details), save=save, filter_q=filter_q)
+        analyse_lib.tools[fn](a_set, dim=int(details), save=save, filter_q=filter_q,params=params)
 
 
 
