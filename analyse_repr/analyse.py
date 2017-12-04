@@ -116,11 +116,15 @@ class AnalyseSet:
 
 	def parse_sents(self, data_lines):
 		# list[start:stop:step]
-		self.sents = [sent.split(' ') for sent in data_lines[0::5]]
-		self.pos = [pos_sent.split(' ') for pos_sent in data_lines[1::5]]
-		self.parses = data_lines[2::5]
-		self.activations = [self.int_array(line) for line in data_lines[3::5]]
-		self.representations = [self.float_array(line) for line in data_lines[4::5]]
+		self.sents = [sent.split(' ') for sent in data_lines[0::7]]
+		self.lemmas = [lemma_sent.split(' ') for lemma_sent in data_lines[1::7]]
+		self.pos = [pos_sent.split(' ') for pos_sent in data_lines[2::7]]
+		self.dep_parse = [dep_parse_sent.split(' ') for dep_parse_sent in data_lines[3::7]]
+		self.parses = data_lines[4::7]
+		self.activations = [self.int_array(line) for line in data_lines[5::7]]
+		self.representations = [self.float_array(line) for line in data_lines[6::7]]
+
+		print(self.pos)
 		
 		self.sent_repr_dim = len(self.activations[0])
 
