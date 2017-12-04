@@ -13,6 +13,10 @@ import config
 from collections import Counter
 import numpy as np
 
+# POS tagging
+import spacy
+nlp = spacy.load('en')
+
 
 def extract_vocab(dataset_path):
     '''
@@ -175,6 +179,39 @@ def stats(representations):
 
     return (mean, sd, abs_min, abs_max)
 
+def pos_unique_sents(path):
+
+    with open(path) as f_in:
+        lines = f_in.readlines()
+
+    sents = lines[8::4]
+    # nltk
+    #pos_sents = [nltk.pos_tag(s.strip().split(' ')) for s in sents]
+
+    # spacy
+    pos_sents = [nlp.tagger(s.strip().split(' ')) for s in sents]
+    for i in range(20):
+        print(sents[i])
+        print(pos_sents[i])
+
+    1/0
+    pos = []
+    for ps in pos_sents:
+        pos.append(' '.join([p for w,p in ps]) + '\n')
+    
+    # write out
+    pos_idx = 0
+    content = lines[:8] # meta
+    for i, line in enumerate(lines[8:]):
+        content.append(line)
+        if i % 4 == 0: #every time it is the text
+            content.append(pos[pos_idx])
+            pos_idx += 1
+    
+    with open(path , 'w') as f_out:
+        for line in content:
+            f_out.write(line)
+
 
 def main():
     args = docopt("""Work with data.
@@ -182,17 +219,21 @@ def main():
     Usage:
         data_tools.py req_embeddings <embeddings> <data_train> <data_dev> <name_out>
         data_tools.py unique_sents <model_path> <data> <amount> <name_out>
+        data_tools.py pos_unique_sents <path>
 
         <embeddings>         Path to all embeddings.
         <data_train>         Path to train set.
         <data_dev>           Path to dev set.
         <name_out>           Name of the new embedding file.
+        <path>               Path to unique_sents.txt
     """)
 
     if args['req_embeddings']:
         req_embeddings(args)
     elif args['unique_sents']:
         unique_sents(args['<model_path>'], args['<data>'], int(args['<amount>']), args['<name_out>'])
+    elif args['pos_unique_sents']:
+        pos_unique_sents(args['<path>'])
     
 
 if __name__ == '__main__':

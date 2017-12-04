@@ -6,3 +6,6 @@ __pycache__/**
 *.traininfo
 *.log
 *.pyc
+*.tmp
+
+!analyse_repr_data/*

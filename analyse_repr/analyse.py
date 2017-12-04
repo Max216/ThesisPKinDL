@@ -11,32 +11,32 @@ def main():
 
     Usage:
         analyse.py <path> general
-        analyse.py <path> positional [--details=<dim>] [--save]
+        analyse.py <path> positional [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>][--save]
         analyse.py <path> positional [--find=<q>] 
-        analyse.py <path> simple_pos [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> simple_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> simple_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> simple_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> verb_pos [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> verb_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> verb_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> verb_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> nn_jj_pos [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> nn_jj_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> nn_jj_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> nn_jj_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> mcw [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> mcw [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> mcw [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> mcw [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> words --w=<w> [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --w=<w> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> words --w=<w> [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> words --w=<w> [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> words --w=<w> --group [--save]
-        analyse.py <path> words --g=<g> [--details=<dim>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --w=<w> --group [--filter=<filter_q>] [--save]
+        analyse.py <path> words --g=<g> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
         analyse.py <path> words --g=<g> [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> words --g=<g> [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> words --g=<g> --group [--save]
-        analyse.py <path> words --g=<g> [--details=<dim>] [--save] [--filter=<filter_q>]
-        analyse.py <path> words --g=<g> [--find=<q>] [--filter=<filter_q>]
-        analyse.py <path> words --g=<g> [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> words --g=<g> --group [--save]
+        analyse.py <path> words --g=<g> --group [--filter=<filter_q>] [--save]
+        analyse.py <path> pp --pos_pattern=<pos_pattern> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> pp --pos_pattern=<pos_pattern> [--find=<q>] [--filter=<filter_q>]
+        analyse.py <path> pp --pos_pattern=<pos_pattern> [--stats] [--filter=<filter_q>] [--save]
+        analyse.py <path> pp --pos_pattern=<pos_pattern> --group [--save]
 
 
         <path> = path to sentences with activation
@@ -44,6 +44,9 @@ def main():
         --find=q>		to find the most occurences of q
         --filter=<filter_q> only look in sentences containing filter_q
         --save  store to a file
+        --w=<w> 	supply a list of words separated by space as categories
+        --g=<g> 	supply groups of word with labels "label1=word1 word2;label2=..."
+        --pos_pattern=<pos_pattern>  supply POS patterns like "JJ|DET NN"
 
     """)
 
@@ -60,12 +63,19 @@ def main():
     show_stats = args['--stats']
     w = args['--w']
     g = args['--g']
+    num_clusters = args['--cluster']
+    cluster_labels = args['--l']
+    pos_pattern = args['--pos_pattern']
     group = args['--group']
+
 
     params = dict()
     params['w_list'] = w
     params['g_list'] = g
     params['group'] = group
+    params['pos_pattern'] = pos_pattern
+    params['num_clusters'] = num_clusters
+    params['cluster_labels'] = cluster_labels
     if details == None:
         analyse_lib.tools[fn](a_set, q=q, save=save, filter_q=filter_q, show_stats=show_stats, params=params)
     else:
