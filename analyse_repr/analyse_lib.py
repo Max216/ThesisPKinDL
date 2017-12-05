@@ -30,7 +30,7 @@ color_palette = [
 '#00ff00',
 '#0000ff',
 '#ff00ff',
-'#ffff00',
+'#234567',
 '#00ffff'
 ]
 
@@ -164,6 +164,84 @@ def plot_general_stats(a_set, name, settings, save):
 	if save:
 		plt.savefig('./plots/' + name +'.png')
 	plt.show()
+
+def plot_histogram(a_set, settings, name, save, histogram_bin, out_threshold, dim):
+	if dim == None:
+		print('Must specify dimension via --details <dim>')
+		return -1
+
+	def plot_distribution(x_axis, bins, title,width):
+		plt.figure(200)
+		y_offset = np.zeros((len(bins),), dtype=np.int)
+		#x_axis = np.arange(len(clusters))
+		#width = 0.35
+
+		plts = []
+		plt_lbls = [] 
+		for lbl in labels:
+			amounts = np.array([len([(v,l) for v,l,w in b if l == lbl]) for b in bins])	
+			p = plt.bar(x_axis, amounts, width, color=settings.colors()[lbl], bottom=y_offset)
+			y_offset += amounts
+
+			plts.append(p[0])
+			plt_lbls.append(lbl)
+
+		plt.ylabel('# sentences (' + str(len(working_sent_idx)) + ' / ' + str(len(a_set.sents)) + ')')
+		plt.xlabel('representation value')
+		plt.title(name)			
+		plt.legend(plts, plt_lbls,loc='center left', bbox_to_anchor=(1, 0.5))
+		plt.subplots_adjust(right=0.8)
+
+		if save:
+			plt.savefig('./plots/' + name +'.png')
+
+		plt.show()
+
+	# sort labels by values
+	labels = sorted(list(settings.colors().keys()))
+	colors = [settings.colors()[k] for k in labels]
+	filter_fn = None
+	if settings.filter_on:
+		filter_fn = settings.filter_fn
+
+	working_sent_idx = a_set.enum_sents(filter_fn)
+	dim_act, dim_repr = a_set.get_dim(working_sent_idx, dim)
+	activated_words = a_set.get_word_along_dim(working_sent_idx, dim_act)
+
+	labeled_data = [(dim_repr[i], settings.label_point(dim, sent_idx, dim_act[i]), activated_words[i]) for i, sent_idx in enumerate(working_sent_idx)]
+	labeled_data = sorted(labeled_data, key=lambda x: x[0])
+	if out_threshold != None:
+		out_threshold = float(out_threshold)
+		idx = 0
+		for i in range(len(labeled_data)):
+			if labeled_data[i][0] >= out_threshold:
+				idx = i
+				break
+		print_counter = Counter([w for v,l,w in labeled_data[idx:]])
+		print(print_counter.most_common())
+
+	# categorize into bins
+	min_val  = labeled_data[0][0]
+	max_val = labeled_data[-1][0] + float(histogram_bin) / 2
+	x_vals = np.arange(min_val, max_val, float(histogram_bin), dtype=float)
+	x_labels = [np.mean([x_vals[i], x_vals[i+1]]) for i in range(len(x_vals) - 1)]
+	x_vals = x_vals[1:]
+	
+	categorized_samples = [[] for i in range(len(x_vals))]
+	for i in range(len(x_vals)):
+		last_used_idx = 0
+		for j, (v, lbl, w) in enumerate(labeled_data):
+			if v < x_vals[i]:
+				categorized_samples[i].append((v,lbl,w))
+				last_used_idx = j
+		if last_used_idx == len(labeled_data) - 1:
+			labeled_data = []
+		else:
+			labeled_data = labeled_data[last_used_idx:]
+
+	width = (np.absolute(max_val - min_val) / len(x_vals)) /1.5
+	name = name + ' (histogram binsize=' + str(histogram_bin).replace(',', '.') + '[' + str(round(min_val, 4)) + ';' + str(round(max_val, 4)) + '])'
+	plot_distribution(x_labels, categorized_samples, name, width)
 
 def plot_cluster(a_set, settings, title, save, num_clusters, labels_clusters, dim):
 
@@ -392,6 +470,8 @@ def words_analysis(a_set, name, word_fn, labels, exclude=None, dim=None, save=Fa
 
 	num_clusters = params['num_clusters']
 	lbl_clusters = params['cluster_labels']
+	histogram_bin = params['histogram']
+	out_threshold= params['threshold']
 
 	def colors():
 		''' Map category to color '''
@@ -490,7 +570,9 @@ def words_analysis(a_set, name, word_fn, labels, exclude=None, dim=None, save=Fa
 		settings.filter(True)
 		name +='[filter=' + str(filter_q) + ']'
 
-	if num_clusters != None:
+	if histogram_bin != None:
+		plot_histogram(a_set, settings, name, save, histogram_bin, out_threshold, dim)
+	elif num_clusters != None:
 		plot_cluster(a_set, settings, name, save, num_clusters, lbl_clusters, dim)
 	elif ext_priority_fn != None:
 		plot_grid(a_set, ext_priority_fn, name + ' of 300 dimensions (most activations for group)', settings)
@@ -516,7 +598,7 @@ def words(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, 
 	name = None
 
 	if w_list != None:	
-		name = 'Lexical Analysis: ' + w_list
+		name = 'Lexical Analysis: wordlist'
 		labels = w_list.split(' ')
 		labels.append('OTHER')
 
@@ -592,6 +674,8 @@ def pos_fn(a_set, name, pos_fn, exclude=None, dim=None, save=False, q=None, filt
 	
 	num_clusters = params['num_clusters']
 	lbl_clusters = params['cluster_labels']
+	histogram_bin = params['histogram']
+	out_threshold= params['threshold']
 
 	if filter_q != None:
 		filter_q = filter_q.split(' ')
@@ -689,7 +773,9 @@ def pos_fn(a_set, name, pos_fn, exclude=None, dim=None, save=False, q=None, filt
 		settings.filter(True)
 		name +='[filter=' + str(filter_q) + ']'
 
-	if num_clusters != None:
+	if histogram_bin != None:
+		plot_histogram(a_set, settings, name, save, histogram_bin, out_threshold, dim)
+	elif num_clusters != None:
 		plot_cluster(a_set, settings, name, save, num_clusters, lbl_clusters, dim)
 	elif show_stats:
 		plot_general_stats(a_set, name + ' Overview', settings, save)
@@ -783,6 +869,173 @@ def pos_pattern_analysis(a_set, dim=None, save=False, q=None, filter_q=None, sho
 	pos_fn(a_set, name, to_label, exclude='OTHER', dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats, labels=labels, params=params)
 
 
+def dependency_parse(a_set, name, dep_fn, exclude=None, dim=None, save=False, q=None, filter_q=None, show_stats=False, labels=None, params=None):
+	num_clusters = params['num_clusters']
+	lbl_clusters = params['cluster_labels']
+	histogram_bin = params['histogram']
+	out_threshold= params['threshold']
+
+
+	if filter_q != None:
+		filter_q = filter_q.split(' ')
+
+	if labels == None:
+		labels = sorted(list(set([dep_fn(dep_lbl) for ds in a_set.dep_parse for dep_lbl in ds])))
+
+	def colors():
+		''' Map category to color '''
+		colors = {lbl : color_palette[i] for i, lbl in enumerate(labels)}
+		return colors
+
+	def color_sent(words, pos, parse, act, repr, indizes, sent_idx):
+		''' Create dict() for sent with k=category, v=[indizes] '''
+		dep_sent = a_set.dep_parse[sent_idx]
+		result = dict()
+		for lbl in labels:
+			result[lbl] = [idx for i, idx in enumerate(indizes) if dep_fn(dep_sent[act[i]], sent_idx, act[i]) == lbl]
+		return result
+
+	def distribution(sent_indizes, dim):
+		''' Create dict() for activations with k=category, v=len(activations) '''
+		act, _ = a_set.get_dim(sent_indizes, dim)
+		words = a_set.get_word_along_dim(sent_indizes, act)
+		deps = [dep_fn(dep, sent_indizes[i], act[i]) for i, dep in enumerate(a_set.get_dep_along_dim(sent_indizes, act))]
+		result = dict()
+		for lbl in labels:
+			result[lbl] = [(dep, words[i]) for i,dep in enumerate(deps) if dep == lbl]
+
+		# print words
+		print_dist(words, result)
+
+		for k in result.keys():
+			result[k] = len(result[k])
+
+		return result
+
+	def stats(dim, activations, representations, sent_indizes):
+		'''Create dict with k=category, v=(mean, sd, min, max)'''
+		result = dict()
+		deps = [dep_fn(d, sent_indizes[i], activations[i]) for i,d in enumerate(a_set.get_dep_along_dim(sent_indizes, activations))]
+
+		# remember repr values per category
+		for lbl in labels:
+			result[lbl] = [representations[i] for i in range(len(representations)) if lbl == deps[i]]
+
+		for lbl in labels:
+			r = np.array(result[lbl])
+			if r.shape[0] > 0:
+				mean = np.mean(r)
+				sd = np.std(r)
+				abs_min = np.amin(r)
+				abs_max = np.amax(r)
+
+				result[str(lbl)] = (mean, sd, abs_min, abs_max)
+			else:
+				# rm key
+				result.pop(str(lbl), None)
+
+		return result
+
+	def priority_fn(sent_indizes, activations):
+		'''return a score for the dimension for having one dominant category'''
+		deps = [dep_fn(d, sent_indizes[i], activations[i]) for i,d in enumerate(a_set.get_dep_along_dim(sent_indizes, activations))]	
+		if exclude != None:
+			deps = [dep for dep in deps if dep != exclude]	
+
+		_, most_freq = Counter(deps).most_common(1)[0]
+		return most_freq
+
+	def query_fn(sent_indizes, activations):
+		'''return a score for the dimension for containing the query'''
+		deps = [dep_fn(d, sent_indizes[i], activations[i]) for i,d in enumerate(a_set.get_dep_along_dim(sent_indizes, activations))]		
+		return len([d for d in deps if d == q])
+
+	def filter_fn(sent_idx):
+		dep_sent = [dep_fn(dep, sent_idx, act=dep_idx) for dep_idx, dep in enumerate(a_set.dep_parse[sent_idx])]
+		for filter_dep in filter_q:
+			if filter_dep in dep_sent:
+				return True
+		return False
+
+	def count_fn(working_sent_idx, labels):
+		'''Count Occurences for each'''
+		all_deps = [dep_fn(a_set.dep_parse[sent_idx][dep_idx], sent_idx, dep_idx) for sent_idx in working_sent_idx for dep_idx in range(len(a_set.dep_parse[sent_idx]))]
+		counter = Counter(all_deps)
+		return counter
+
+	def label_point(dim, sent_idx, act):
+		#pos, sent_idx, act=None
+		dep = a_set.dep_parse[sent_idx][act]
+		return dep_fn(dep, sent_idx, act)
+
+	settings = GridSettings(color_sent, colors, distribution, stats, label_point, filter_fn, count_fn)
+	if filter_q != None:
+		settings.filter(True)
+		name +='[filter=' + str(filter_q) + ']'
+
+	if histogram_bin != None:
+		plot_histogram(a_set, settings, name, save, histogram_bin, out_threshold, dim)
+	elif num_clusters != None:
+		plot_cluster(a_set, settings, name, save, num_clusters, lbl_clusters, dim)
+	elif show_stats:
+		plot_general_stats(a_set, name + ' Overview', settings, save)
+	elif dim == None and q == None:
+		plot_grid(a_set, 'positional',name + ' (first dimensions)', settings)
+		plot_grid(a_set, 'sd', name + ' (most SD)', settings)
+		plot_grid(a_set, priority_fn, name + ' (most activations per single position)', settings)
+	elif q != None:	
+		plot_grid(a_set, query_fn, name + ' (most of:' + q + ')', settings)
+	else:
+		plot_dim_details(a_set, settings, dim, name, save)
+
+
+def simple_dep(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
+
+	lemma_filter = params['lemma_filter']
+	labels = ['subject', 'object', 'ROOT', 'modifier', 'OTHER']
+
+	lemma_to_lbl_appendix = dict()
+	default_appendix = ''
+	if lemma_filter !=  None:
+		if '=' in lemma_filter:
+			# group of lemmas with label
+			groups = lemma_filter.split(';')
+			for g in groups:
+				splitted = g.split('=')
+				lbl_appendix = splitted[0].strip()
+				lemmas = [l.strip() for l in splitted[1].split(' ')]
+				for lemma in lemmas:
+					lemma_to_lbl_appendix[lemma] = '-' + lbl_appendix
+		else:
+			# group of words
+			for lemma in lemma_filter.split(' '):
+				lemma_to_lbl_appendix[lemma.strip()] = '-' + lemma.strip()
+
+		lemma_appendix = list(set(lemma_to_lbl_appendix.values())) + ['-?']
+		labels = [l + appendix for l in labels for appendix in lemma_appendix]
+		default_appendix = '-?'
+
+	
+
+	def simplify_dep(dep, sent_idx=None, act=None):
+		lbl_to_return = None
+		if 'subj' in dep:
+			lbl_to_return = 'subject'
+		elif 'obj' in dep:
+			lbl_to_return = 'object'
+		elif dep == 'ROOT':
+			lbl_to_return = 'ROOT'
+		elif 'mod' in dep:
+			lbl_to_return = 'modifier'
+		else:
+			lbl_to_return = 'OTHER'
+
+		lemma = a_set.lemmas[sent_idx][act]
+		return lbl_to_return + lemma_to_lbl_appendix.get(lemma, default_appendix)
+
+	name = 'Simplified Dependency parses'
+	dependency_parse(a_set, name, simplify_dep, exclude='other', dim=dim, save=save, q=q, filter_q=filter_q, show_stats=show_stats, params=params, labels=labels)
+
 def simple_pos(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=False, params=None):
 
 	def simplify(pos, sent_idx=None, act=None):
@@ -831,6 +1084,8 @@ def positional(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=Fa
 	labels = [i for i in range(a_set.sent_len)]
 	num_clusters = params['num_clusters']
 	lbl_clusters = params['cluster_labels']
+	histogram_bin = params['histogram']
+	out_threshold= params['threshold']
 
 	def colors():
 		''' Map category to color '''
@@ -897,8 +1152,9 @@ def positional(a_set, dim=None, save=False, q=None, filter_q=None, show_stats=Fa
 		return str(act)
 
 	settings = GridSettings(color_sent, colors, distribution, stats, label_point)
-
-	if num_clusters != None:
+	if histogram_bin != None:
+		plot_histogram(a_set, settings, 'Word position', save, histogram_bin, out_threshold, dim)
+	elif num_clusters != None:
 		plot_cluster(a_set, settings, 'Word position', save, num_clusters, lbl_clusters, dim)
 	elif dim == None and q == None:
 		plot_grid(a_set, 'positional', 'Word position (first dimensions)', settings)
@@ -950,3 +1206,4 @@ tools['nn_jj_pos'] = nn_jj_pos
 tools['mcw'] = most_common_words
 tools['words'] = words
 tools['pp'] = pos_pattern_analysis
+tools['simple_dep'] = simple_dep

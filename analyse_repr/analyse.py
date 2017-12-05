@@ -4,36 +4,40 @@ import matplotlib.pyplot as plt
 from docopt import docopt
 import numpy as np
 
-import analyse_lib
+import analyse_repr
+from analyse_repr import analyse_lib
 
 def main():
     args = docopt("""Analyse a model
 
     Usage:
         analyse.py <path> general
-        analyse.py <path> positional [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>][--save]
+        analyse.py <path> positional [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>][--save] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> positional [--find=<q>] 
-        analyse.py <path> simple_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> simple_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> simple_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> simple_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> verb_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> verb_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> verb_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> verb_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> nn_jj_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> nn_jj_pos [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> nn_jj_pos [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> nn_jj_pos [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> mcw [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> simple_dep [--details=<dim>] [--cluster=<num_clusters>] [--lemma=<lemma_filter>] [--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
+        analyse.py <path> simple_dep [--find=<q>] [--filter=<filter_q>] [--lemma=<lemma_filter>]
+        analyse.py <path> simple_dep [--stats] [--filter=<filter_q>] [--save] [--lemma=<lemma_filter>]
+        analyse.py <path> mcw [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> mcw [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> mcw [--stats] [--filter=<filter_q>] [--save]
-        analyse.py <path> words --w=<w> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --w=<w> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> words --w=<w> [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> words --w=<w> [--stats] [--filter=<filter_q>] [--save]
         analyse.py <path> words --w=<w> --group [--filter=<filter_q>] [--save]
-        analyse.py <path> words --g=<g> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> words --g=<g> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> words --g=<g> [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> words --g=<g> [--stats] [--filter=<filter_q>] [--save]
         analyse.py <path> words --g=<g> --group [--filter=<filter_q>] [--save]
-        analyse.py <path> pp --pos_pattern=<pos_pattern> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>]
+        analyse.py <path> pp --pos_pattern=<pos_pattern> [--details=<dim>] [--cluster=<num_clusters>][--l=<cluster_labels>] [--save] [--filter=<filter_q>] [--hist=<binsize>] [--t=<threshold>]
         analyse.py <path> pp --pos_pattern=<pos_pattern> [--find=<q>] [--filter=<filter_q>]
         analyse.py <path> pp --pos_pattern=<pos_pattern> [--stats] [--filter=<filter_q>] [--save]
         analyse.py <path> pp --pos_pattern=<pos_pattern> --group [--save]
@@ -76,6 +80,9 @@ def main():
     params['pos_pattern'] = pos_pattern
     params['num_clusters'] = num_clusters
     params['cluster_labels'] = cluster_labels
+    params['lemma_filter'] = args['--lemma']
+    params['histogram']  = args['--hist']
+    params['threshold'] = args['--t']
     if details == None:
         analyse_lib.tools[fn](a_set, q=q, save=save, filter_q=filter_q, show_stats=show_stats, params=params)
     else:
@@ -122,10 +129,7 @@ class AnalyseSet:
 		self.dep_parse = [dep_parse_sent.split(' ') for dep_parse_sent in data_lines[3::7]]
 		self.parses = data_lines[4::7]
 		self.activations = [self.int_array(line) for line in data_lines[5::7]]
-		self.representations = [self.float_array(line) for line in data_lines[6::7]]
-
-		print(self.pos)
-		
+		self.representations = [self.float_array(line) for line in data_lines[6::7]]		
 		self.sent_repr_dim = len(self.activations[0])
 
 	def get(self, sidx, repr_indizes=-1):
@@ -213,6 +217,9 @@ class AnalyseSet:
 	def get_pos_along_dim(self, sent_indizes, dim_activations):
 		return [self.pos[sent_idx][dim_activations[a_idx]] for a_idx, sent_idx in enumerate(sent_indizes)]
 		#return [self.pos[i][dim_activations[i]] for i in range(len(dim_activations))]
+
+	def get_dep_along_dim(self, sent_indizes, dim_activations):
+		return [self.dep_parse[sent_idx][dim_activations[a_idx]] for a_idx, sent_idx in enumerate(sent_indizes)]
 
 	def enum_sents(self, filter_fn=None):
 		indizes = np.arange(len(self.sents))
