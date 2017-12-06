@@ -151,7 +151,17 @@ def eval_mf(classifier, data_train, data_dev, padding_token, a_set):
 	('Invert mf(1) in hyp', t_h_mf1), ('Invert mf(2) in hyp', t_h_mf2), ('Invert mf(3) in hyp', t_h_mf3), ('Invert mf(4) in hyp', t_h_mf4),
 	('Invert mf(1) in both', t_ph_mf1), ('Invert mf(2) in both', t_ph_mf2), ('Invert mf(3) in both', t_ph_mf3), ('Invert mf(4) in both', t_ph_mf4)
 	]
-	run_twists(classifier, data_train, data_dev, padding_token, twister_queue)
+
+	t2_p_m1 = m.ModelTwister(flip_fn, (a_set, [89], []))
+	t2_p_m2 = m.ModelTwister(flip_fn, (a_set, [89, 280], []))
+	t2_p_m3 = m.ModelTwister(flip_fn, (a_set, [89, 280, 199], []))
+	t2_p_m4 = m.ModelTwister(flip_fn, (a_set, [89, 280, 199, 602], []))
+	twister_queue2 = [
+		('Invert male(1) in premise', t2_p_m1), ('Invert male(2) in premise', t2_p_m2), ('Invert male(3) in premise', t2_p_m3), ('Invert male(4) in premise', t2_p_m4),
+
+	]
+
+	run_twists(classifier, data_train, data_dev, padding_token, twister_queue2)
 	#evaluate.evaluate(model_path, data_path, embeddings_path, twister = twister)
 
 
@@ -161,35 +171,38 @@ def eval_outlier(classifier, data_train, data_dev, padding_token, a_set):
 		max([np.absolute(a_set.mean[i] - a_set.max[i]), np.absolute(a_set.mean[i] - a_set.max[i])])) for i in range(len(a_set.max))]
 	vals = [(i, mean, sd, vmin, vmax, meandiff, meandiff / sd) for i, mean, sd, vmin, vmax, meandiff in vals]
 
+	def crop_val(v, vmin, vmax):
+		if v > vmax:
+			return vmax
+		elif v < vmin:
+			return vmin
+		else:
+			return v
+
 	def crop_fn(rep, typ, tools):
-		crop_dimens = tools[0]
-		crop_vals = tools[1]
+		means = tools[0]
+		sd = tools[1]
+		factor = tools[2]
+
 		batch_size = rep.size()[0]
-		for i, dim in enumerate(crop_dimens):
-			new_vals = m.cuda_wrap(torch.FloatTensor(batch_size))
-			new_vals.fill_(crop_vals[i])
-			rep[:, dim] = new_vals
+		dimens = rep.size()[1]
+		for dim in range(dimens):
+			vmin = means[dim] - factor * sd[dim]
+			vmax = means[dim] + factor * sd[dim]
+			cropped_vals = m.cuda_wrap(torch.FloatTensor([crop_val(v, vmin, vmax) for v in rep[:, dim].data]))
+			rep[:, dim] = cropped_vals
 
 		return rep
 
-	dimens1 = [x[0] for x in vals if x[-1] >= 30]
-	crop_vals1 = np.take(a_set.mean, dimens1).tolist()
-	dimens2 = [x[0] for x in vals if x[-1] >= 26]
-	crop_vals2 = np.take(a_set.mean, dimens2).tolist()
-	dimens3 = [x[0] for x in vals if x[-1] >= 23]
-	crop_vals3 = np.take(a_set.mean, dimens3).tolist()
-	dimens4 = [x[0] for x in vals if x[-1] >= 21]
-	crop_vals4 = np.take(a_set.mean, dimens4).tolist()
-	dimens5 = [x[0] for x in vals if x[-1] >= 19]
-	crop_vals5 = np.take(a_set.mean, dimens5).tolist()
 	
 	twister_queue = [
-		('outlier=30SD', m.ModelTwister(crop_fn, (dimens1, crop_vals1))),
-		('outlier=26SD', m.ModelTwister(crop_fn, (dimens2, crop_vals2))),
-		('outlier=23SD', m.ModelTwister(crop_fn, (dimens3, crop_vals3))),
-		('outlier=21SD', m.ModelTwister(crop_fn, (dimens4, crop_vals4))),
-		('outlier=19SD', m.ModelTwister(crop_fn, (dimens5, crop_vals5)))
-
+		('outlier=15SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 15))),
+		('outlier=12SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 12))),
+		('outlier=10SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 10))),
+		('outlier=9SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 9))),
+		('outlier=8SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 8))),
+		('outlier=6SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 6))),
+		('outlier=5SD', m.ModelTwister(crop_fn, (a_set.mean, a_set.sd, 5)))
 	]
 
 	run_twists(classifier, data_train, data_dev, padding_token, twister_queue)
