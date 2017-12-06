@@ -138,7 +138,7 @@ class EntailmentClassifier(nn.Module):
         self.dropout1 = nn.Dropout(p=dropout)
         self.dropout2 = nn.Dropout(p=dropout)
 
-    def forward(self, sent1, sent2, output_sent_info=False):
+    def forward(self, sent1, sent2, output_sent_info=False, twister=None):
         batch_size = sent1.size()[1]
         
         # Map to embeddings
@@ -152,6 +152,10 @@ class EntailmentClassifier(nn.Module):
         # Max pooling
         sent1_representation, idxs1 = torch.max(sent1_representation, dim=0)
         sent2_representation, idxs2 = torch.max(sent2_representation, dim=0)
+
+        if twister != None:
+            sent1_representation = twister.twist_representation(sent1_representation, 'premise')
+            sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis')
         
         # Create feature tensor
         if self.sent_repr == "all":
@@ -251,3 +255,19 @@ def load_model(model_path, embedding_holder = None):
 
     model.eval()
     return model, model_name
+
+class ModelTwister:
+    '''
+    Manipulate dimensions of the sentence representation using this class.
+    '''
+
+    def __init__(self, twist, tools = None):
+        '''
+        :param twist - function(representation, ['premise'|'hypothesis'], tools) to twist the representation
+        :param tools - additional information to use in the twist function
+        '''
+        self.twist = twist
+        self.tools = tools
+
+    def twist_representation(self, representation, sent_type):
+        return self.twist(representation, sent_type, self.tools)

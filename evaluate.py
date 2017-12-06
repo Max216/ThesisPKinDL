@@ -24,7 +24,7 @@ def main():
     evaluate(model_path, data_path, embeddings_path)
 
 
-def evaluate(model_path, data_path, new_embeddings=None):
+def evaluate(model_path, data_path, new_embeddings=None, twister=None):
     # Load model
 
     embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
@@ -37,7 +37,8 @@ def evaluate(model_path, data_path, new_embeddings=None):
     print('Load model ...')
     classifier, _ = m.load_model(model_path, embedding_holder=embedding_holder)
 
-    if embeddings_diff.shape[1] != 0:
+    # todo look with merging ....
+    if len(embeddings_diff) != 0 and embeddings_diff.shape[1] != 0:
         # Merge into model
         classifier.inc_embedding_layer(embeddings_diff)
 
@@ -47,7 +48,7 @@ def evaluate(model_path, data_path, new_embeddings=None):
     print('Evaluate ...')
     classifier.eval()
     classifier = m.cuda_wrap(classifier)
-    print('Accuracy:', train.evaluate(classifier, [data], size=32, padding_token=embedding_holder.padding()))
+    print('Accuracy:', train.evaluate(classifier, [data], size=32, padding_token=embedding_holder.padding(), twister=twister))
 
 if __name__ == '__main__':
     main()

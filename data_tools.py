@@ -189,15 +189,23 @@ def pos_unique_sents(path):
     #pos_sents = [nltk.pos_tag(s.strip().split(' ')) for s in sents]
 
     # spacy
-    pos_sents = [nlp.tagger(s.strip().split(' ')) for s in sents]
-    for i in range(20):
-        print(sents[i])
-        print(pos_sents[i])
+    tokenized_sents = [(nlp.tokenizer.tokens_from_list(s.strip().split(' '))) for s in sents]
+    pos_sents = []
+    lemma_sents = []
+    parse_sents = []
+    for s in tokenized_sents:
+        # Pipeline parse the sentence
+        nlp.tagger(s)
+        nlp.parser(s)
+        pos_sents.append([t.tag_ for t in s])
+        lemma_sents.append([t.lemma_ for t in s])
+        parse_sents.append([t.dep_ for t in s])
 
-    1/0
-    pos = []
-    for ps in pos_sents:
-        pos.append(' '.join([p for w,p in ps]) + '\n')
+    print(len(sents), len(pos_sents), len(lemma_sents), len(parse_sents))
+    for i in range(len(sents)):
+        pos_sents[i] = ' '.join(pos_sents[i]) + '\n'
+        lemma_sents[i] = ' '.join(lemma_sents[i]) + '\n'
+        parse_sents[i]  = ' '.join(parse_sents[i]) + '\n'
     
     # write out
     pos_idx = 0
@@ -205,7 +213,9 @@ def pos_unique_sents(path):
     for i, line in enumerate(lines[8:]):
         content.append(line)
         if i % 4 == 0: #every time it is the text
-            content.append(pos[pos_idx])
+            content.append(lemma_sents[pos_idx])
+            content.append(pos_sents[pos_idx])
+            content.append(parse_sents[pos_idx])
             pos_idx += 1
     
     with open(path , 'w') as f_out:

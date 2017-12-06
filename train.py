@@ -55,7 +55,7 @@ class CollocateBatch(object):
         return (p, h, l)
 
 
-def evaluate(model, data, size, padding_token):
+def evaluate(model, data, size, padding_token, twister=None):
     """
     Evaluate the given model with the given data in terms of accuracy.
 
@@ -76,9 +76,10 @@ def evaluate(model, data, size, padding_token):
     for chunk in loader:
         for i_batch, (batch_p, batch_h, batch_lbl) in enumerate(chunk):
             predictions = model(autograd.Variable(cuda_wrap(batch_p)),
-                                     autograd.Variable(cuda_wrap(batch_h))
-                                    ).data
-                                     
+                                autograd.Variable(cuda_wrap(batch_h)),
+                                twister=twister
+                                ).data
+
             _, predicted_idx = torch.max(predictions, dim=1)
             correct += torch.sum(torch.eq(cuda_wrap(batch_lbl), predicted_idx))
     
