@@ -4,8 +4,12 @@ import matplotlib.pyplot as plt
 from docopt import docopt
 import numpy as np
 
-import analyse_repr
-from analyse_repr import analyse_lib
+if __name__ != '__main__':
+    import analyse_repr
+    from analyse_repr import analyse_lib
+else:
+    import analyse_lib
+
 
 def main():
     args = docopt("""Analyse a model
