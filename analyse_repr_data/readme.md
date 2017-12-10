@@ -15,6 +15,3 @@
 	* Dev: 85.196%
 	* Test: 84.782%
 
-### Learning curve of the Model by amount of data points seen.
-![Alt text](/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-11-26_22:13_glove.png?raw=true "Learning curve")
-

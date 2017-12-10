@@ -253,6 +253,10 @@ def load_model(model_path, embedding_holder = None):
     else:
         model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
 
+    # change padding since old models fine tune it
+    new_padding = cuda_wrap(torch.FloatTensor(embedding_holder.dim()).zero_())
+    model.embeddings.weight.data[embedding_holder.padding(),:] = new_padding
+
     model.eval()
     return model, model_name
 
