@@ -93,7 +93,7 @@ class EntailmentClassifier(nn.Module):
     followed by a FeedForward network of three layers.
     """
     
-    def __init__(self, pretrained_embeddings, dimen_hidden, dimen_out, dimen_sent_encoder = [64,128,256], nonlinearity=F.relu, dropout=0.1, sent_repr='all'):
+    def __init__(self, pretrained_embeddings, padding_idx, dimen_hidden, dimen_out, dimen_sent_encoder = [64,128,256], nonlinearity=F.relu, dropout=0.1, sent_repr='all'):
         """
         @param pretrained_embeddings - Already trained embeddings to initialize the embeddings layer
         @param dimen_sent_repr - Size of the learned representation of a single sentence
@@ -114,7 +114,7 @@ class EntailmentClassifier(nn.Module):
         self.nonlinearity = nonlinearity
         self.sent_repr = sent_repr
                 
-        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
+        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
         # Use pretrained values
         self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
                                                
@@ -241,6 +241,7 @@ def load_model(model_path, embedding_holder = None):
 
     # Create new model with correct dimensions
     model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+                                            embedding_holder.padding(),
                                             dimen_hidden=hidden_dim, 
                                             dimen_out=3, 
                                             dimen_sent_encoder=lstm_dim,
@@ -252,10 +253,6 @@ def load_model(model_path, embedding_holder = None):
         model.load_state_dict(torch.load(model_path))
     else:
         model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
-
-    # change padding since old models fine tune it
-    new_padding = cuda_wrap(torch.FloatTensor(embedding_holder.dim()).zero_())
-    model.embeddings.weight.data[embedding_holder.padding(),:] = new_padding
 
     model.eval()
     return model, model_name

@@ -208,7 +208,13 @@ def eval_outlier(classifier, data_train, data_dev, padding_token, a_set):
 	run_twists(classifier, data_train, data_dev, padding_token, twister_queue)
 
 
+def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token, a_set):
+	'''
+	Find all samples that have normally been classified correctly and now are classified wrong,
+	when inverting male/female dimensions.
+	'''
 
+	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609], [602, 199, 280, 89, 1730, 845, 311, 609]))
 
 
 

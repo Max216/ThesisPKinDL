@@ -259,7 +259,8 @@ def load_trained_model(model_path, embedding_holder=None):
         # use the one from config
         embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
     
-    model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+    model = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings,
+                                            embedding_holder.padding(),
                                             dimen_hidden=hidden_dim, 
                                             dimen_out=3, 
                                             dimen_sent_encoder=lstm_dim,
@@ -293,6 +294,7 @@ def search_best_model(train_data, dev_data, embedding_holder, lrs, dimens_hidden
                             print('Now running:', settings)
                             # create model
                             classifier = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+                                            embedding_holder.padding(),
                                             dimen_hidden=dim_hidden, 
                                             dimen_out=3, 
                                             dimen_sent_encoder=dim_sent_encoder,
