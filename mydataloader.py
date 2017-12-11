@@ -75,12 +75,20 @@ class SNLIDataset(Dataset):
     Load the SNLI dataset
     @param samples - loaded raw samples (premise, hypothesis, label)
     '''
-    def __init__(self, samples, embedding_holder):
-        self.converted_samples = [(
-                torch.LongTensor([embedding_holder.word_index(w) for w in s1]),
-                torch.LongTensor([embedding_holder.word_index(w) for w in s2]),
-                tag_to_index[lbl]
-            ) for (s1, s2, lbl) in samples]
+    def __init__(self, samples, embedding_holder, include_sent=False):
+        if not include_sent:
+            self.converted_samples = [(
+                    torch.LongTensor([embedding_holder.word_index(w) for w in s1]),
+                    torch.LongTensor([embedding_holder.word_index(w) for w in s2]),
+                    tag_to_index[lbl]
+                ) for (s1, s2, lbl) in samples]
+        else:
+            self.converted_samples = [(
+                    torch.LongTensor([embedding_holder.word_index(w) for w in s1]),
+                    torch.LongTensor([embedding_holder.word_index(w) for w in s2]),
+                    tag_to_index[lbl],
+                    s1, s2
+                ) for (s1, s2, lbl) in samples]
         
     def __len__(self):
         return len(self.converted_samples)
@@ -89,7 +97,7 @@ class SNLIDataset(Dataset):
         return self.converted_samples[idx]
 
 
-def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as=''):
+def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as='', include_sent=False):
     '''
     Divides the data into several chunks with the premise having approximately the same size of all examples
     to reduce padding.
@@ -104,4 +112,4 @@ def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as='')
     print('Loaded', len(raw_samples),'samples with valid labels.', mark_as)
     raw_samples = sorted(raw_samples, key=lambda sample: len(sample[0])) # 0 is premise
 
-    return [SNLIDataset(raw_samples[i:i + chunk_size], embedding_holder) for i in range(0, len(raw_samples), chunk_size)]
+    return [SNLIDataset(raw_samples[i:i + chunk_size], embedding_holder, include_sent) for i in range(0, len(raw_samples), chunk_size)]

@@ -10,6 +10,11 @@ import embeddingholder
 import mydataloader
 import sys
 
+from torch.utils.data import DataLoader
+import torch.autograd as autograd
+
+from train import CollocateBatchWithSents
+
 from docopt import docopt
 
 def run_twists(classifier, data_train, data_dev, padding_token, twister_queue):
@@ -66,8 +71,6 @@ def eval_mf(classifier, data_train, data_dev, padding_token, a_set):
 		flip_premise = tools[1]
 		flip_hyp = tools[2]
 
-		
-		
 
 		# Flip premise representations
 		if typ == 'premise':
@@ -214,7 +217,104 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 	when inverting male/female dimensions.
 	'''
 
-	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609], [602, 199, 280, 89, 1730, 845, 311, 609]))
+	IDX_GOLD = 6
+	IDX_PREDICTED = 7
+	IDX_PREDICTED_INV = 8
+
+	def flip_fn(rep, typ, tools):
+		a_set = tools[0]
+		flip_indizes = tools[1]
+
+		for idx in flip_indizes:
+			rep = flip_dimension(idx, rep, a_set)
+		
+		return rep
+
+	# do this for train/dev:
+	experiment_name = './analyses/invert_4m4f_'
+	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
+	#twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
+	for name, data_set in [('train', data_train), ('dev', data_dev)]:
+		loader = [
+			DataLoader(chunk, drop_last = False, batch_size=1, shuffle=False, collate_fn=CollocateBatchWithSents(padding_token)) 
+			for chunk in data_set
+		]
+
+		correct_before_correct_after = []
+		correct_before_incorrect_after = []
+		incorrect_before_correct_after = []
+		incorrect_before_incorrect_after = []
+
+		for chunk in loader:
+
+			# classify normally
+			for batch_p, batch_h, batch_lbl, batch_sent_p, batch_sent_h in chunk:
+				label_scores_normal, act_indizes, reprs = classifier(
+					autograd.Variable(m.cuda_wrap(batch_p)),
+					autograd.Variable(m.cuda_wrap(batch_h)),
+					output_sent_info = True)
+				
+				_, predicted_indizes_normal = torch.max(label_scores_normal, dim=1)
+				label_scores_normal = label_scores_normal.data
+				activation_p = act_indizes[0].data
+				activation_h = act_indizes[1].data
+				reprs_p = reprs[0].data
+				reprs_h = reprs[1].data
+
+				# classify with m/f dimensions inverted
+				label_scores_inverted = classifier(
+					autograd.Variable(m.cuda_wrap(batch_p)),
+					autograd.Variable(m.cuda_wrap(batch_h)),
+					twister = twist).data
+
+				_, predicted_indizes_inverted = torch.max(label_scores_inverted, dim=1)
+
+
+				# check for gold - classified_normally - classified_inverted
+				amount = label_scores_normal.size()[0]
+				# (premise repr, premise act, premise words, hyp repr, hyp act, hyp words, lbl gold, lbl predicted normal, lbl predicted inversed, confidence normal, confidence inverse)
+				processed_data = [(
+					reprs_p[i], activation_p[i], batch_sent_p[i],
+					reprs_h[i], activation_h[i], batch_sent_h[i],
+					batch_lbl[i], predicted_indizes_normal[i].data[0], predicted_indizes_inverted[i],
+					label_scores_normal[i], label_scores_inverted[i]
+				) for i in range(amount)]		
+
+
+				# sort 
+
+				correct_before_correct_after += [d for d in processed_data if d[IDX_GOLD] == d[IDX_PREDICTED] and d[IDX_GOLD] == d[IDX_PREDICTED_INV]]
+				correct_before_incorrect_after += [d for d in processed_data if d[IDX_GOLD] == d[IDX_PREDICTED] and d[IDX_GOLD] != d[IDX_PREDICTED_INV]]
+				incorrect_before_correct_after += [d for d in processed_data if d[IDX_GOLD] != d[IDX_PREDICTED] and d[IDX_GOLD] == d[IDX_PREDICTED_INV]]
+				incorrect_before_incorrect_after += [d for d in processed_data if d[IDX_GOLD] != d[IDX_PREDICTED] and d[IDX_GOLD] != d[IDX_PREDICTED_INV]]
+
+		# write to file
+		file_name = experiment_name + name
+		out_arr = [
+			('correct_correct', correct_before_correct_after),
+			('correct_incorrect', correct_before_incorrect_after),
+			('incorrect_correct', incorrect_before_correct_after),
+			('incorrect_incorrect', incorrect_before_incorrect_after)
+		]
+
+		def stringify_arr(arr):
+			return ' '.join([str(v) for v in arr]) + '\n'
+
+		for appendix, samples in out_arr:
+			with open(file_name + '-' + appendix + '.txt', 'w') as f_out:
+				for p_rep, p_act, p_words, h_rep, h_act, h_words, gold, predicted, predicted_inv, scores, scores_inv in samples:
+					f_out.write(stringify_arr(p_words))
+					f_out.write(stringify_arr(p_act))
+					f_out.write(stringify_arr(p_rep))
+					f_out.write(stringify_arr(h_words))
+					f_out.write(stringify_arr(h_act))
+					f_out.write(stringify_arr(h_rep))
+					f_out.write(stringify_arr([gold, predicted, predicted_inv]))
+					f_out.write(stringify_arr(scores))
+					f_out.write(stringify_arr(scores_inv))
+
+
+
 
 
 
@@ -222,6 +322,7 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 mapper = dict()
 mapper['mf'] = eval_mf
 mapper['ol'] = eval_outlier
+mapper['misclassified_sents_mf'] = find_mf_misclassified_sents
 
 
 def main():
@@ -252,11 +353,15 @@ def main():
 	classifier.eval()
 	a_set = analyse.AnalyseSet(stat_path)
 
+	include_sent = False
+	if eval_type in ['misclassified_sents_mf']:
+		include_sent = True
+
 	print('# Loading data train ...')
-	data_train = mydataloader.get_dataset_chunks(data_path_train, embedding_holder, chunk_size=32*400, mark_as='')
+	data_train = mydataloader.get_dataset_chunks(data_path_train, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
 
 	print('# Loading data dev ...')
-	data_dev = mydataloader.get_dataset_chunks(data_path_dev, embedding_holder, chunk_size=32*400, mark_as='')
+	data_dev = mydataloader.get_dataset_chunks(data_path_dev, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
 
 	print('# Evaluate ...')
 	mapper[eval_type](classifier, data_train, data_dev, embedding_holder.padding(), a_set)

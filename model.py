@@ -226,7 +226,6 @@ def load_model(model_path, embedding_holder = None):
     # Model params:
     model_name = model_path.split('/')[-1]
     splitted = model_name.split('-')
-
     lr = lbl_to_float(left_number(splitted[0]))
     hidden_dim = int(left_number(splitted[1]))
     lstm_dim = [int(i) for i in left_number(splitted[2]).split('_')]

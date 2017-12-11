@@ -7,5 +7,5 @@ __pycache__/**
 *.log
 *.pyc
 *.tmp
-
+analyses
 !analyse_repr_data/*
