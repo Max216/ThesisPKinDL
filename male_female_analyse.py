@@ -11,35 +11,67 @@ import numpy as np
 import mydataloader
 from mydataloader import index_to_tag
 
+import matplotlib.pyplot as plt
+
+
+FOLDER = './analyses/'
+FILE_BASE = 'invert_4m4f_'
+FILE_APX_DATA = ['train-', 'dev-']
+FILE_CATEGORIES = [
+	('Initially and inverted correct', 'correct_correct'),
+	('Initially correct and inverted incorrect', 'correct_incorrect'),
+	('Initially incorrect and inverted correct', 'incorrect_correct'),
+	('Initially and inverted incorrect', 'incorrect_incorrect')
+]
+FILE_OUT_TWIST_COUNTS = FOLDER + FILE_BASE + 'results.txt'
+
+def plot_correct_incorrect_bar():
+	pass
+
+def plot_findings(params):
+
+	if params == None:
+		params = 'train'
+
+	with open(FILE_OUT_TWIST_COUNTS) as f_in:
+		all_data = [(line.strip().split(' ')[0], int(line.strip().split(' ')[1])) for line in f_in.readlines()]
+
+	filtered_data = [(key.split('-')[1:], amount) for key, amount in all_data if key.split('-')[0] == params]
+	filtered_data = [(k[0], k[1], k[2], amount) for k, amount in filtered_data]
+	
+	# Plot basic results for normal model
+	
+
+	# plot basic results for inversed model
+
+	# Plot inversed model compared with nomal model
+	
 
 
 def print_sents(params):
 
-	FOLDER = './analyses/'
-	FILE_BASE = 'invert_4m4f_'
-	FILE_APX_DATA = ['train-', 'dev-']
-	FILE_CATEGORIES = [
-		('Initially and inverted correct', 'correct_correct'),
-		('Initially correct and inverted incorrect', 'correct_incorrect'),
-		('Initially incorrect and inverted correct', 'incorrect_correct'),
-		('Initially and inverted incorrect', 'incorrect_incorrect')
-	]
+	
 
 	if params == None:
 		num_sents=100
 	else:
 		num_sents = int(params)
 
+	counter = dict()
 	for data_type in FILE_APX_DATA:
 		for category_title, category in FILE_CATEGORIES:
 			file = FOLDER + FILE_BASE + data_type + category + '.txt'
 			print()
 			print('Reading:', file)
 			print('Showing sentences of', data_type + 'data:', category_title)
+			cnt_printed = 0
 			with open(file) as f_in:
 				line_idx = 0
 				premise = None
 				hypothesis = None
+				labels = None
+				confidences_normal = None
+
 				for line in f_in:
 					# check if premise
 					if line_idx % 9 == 0:
@@ -51,25 +83,57 @@ def print_sents(params):
 
 					# check if label
 					if line_idx % 9 == 6:
-						labels = [index_to_tag[int(v)] for v in line.strip().split(' ')]
-						print('premise:', premise)
-						print('hypothesis:', hypothesis)
-						print('labels:', labels)
-						print('-----')
+						labels = [int(v) for v in line.strip().split(' ')]
+
+					if line_idx % 9 == 7:
+						confidences_normal = line.strip().split(' ')
+
+					if line_idx % 9 == 7:
+						confidences_inv = line.strip().split(' ')
+						lbl_gold = index_to_tag[labels[0]]
+						lbl_predicted = index_to_tag[labels[1]]
+						lbl_predicted_inv = index_to_tag[labels[2]]
+						conf_norml = confidences_normal[labels[1]]
+						conf_inv = confidences_inv[labels[2]]
+
+						if cnt_printed < num_sents:
+							print('premise:', premise)
+							print('hypothesis:', hypothesis)
+							print('label-gold:', lbl_gold)
+							print('label-predicted:', lbl_predicted, '(' + conf_norml + ')')
+							print('label-predicted-inv:', lbl_predicted_inv + '(' + conf_inv + ')')
+							print('-----')
+							cnt_printed += 1
+
+						# count
+						key = data_type + lbl_gold + '-' + lbl_predicted + '-' + lbl_predicted_inv
+						if key in counter:
+							counter[key] += 1
+						else:
+							counter[key] = 1
 
 
 					line_idx += 1
+
+	print('Done.')
+	# write out overall statistics for plotting
+	print('Write statistics into', FILE_OUT_TWIST_COUNTS)
+	with open(FILE_OUT_TWIST_COUNTS, 'w') as f_out:
+		for key in counter.keys():
+			f_out.write(key + ' ' + str(counter[key]) + '\n')
 
 			
 
 
 mapper = dict()
 mapper['sents'] = print_sents
+mapper['plot'] = plot_findings
 
 def main():
     args = docopt("""Analyse male/female effects
 
-    Usage: male_female_analyse.py sents [<params>]
+    Usage: 	male_female_analyse.py sents [<params>]
+    		male_female_analyse.py plot
         
 
     """)

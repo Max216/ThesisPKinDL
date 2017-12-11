@@ -232,8 +232,8 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 
 	# do this for train/dev:
 	experiment_name = './analyses/invert_4m4f_'
-	#twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
-	twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
+	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
+	#twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
 	for name, data_set in [('train', data_train), ('dev', data_dev)]:
 
 		print('# Load data:', name)
@@ -276,22 +276,21 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 				amount = label_scores_normal.size()[0]
 				# (premise repr, premise act, premise words, hyp repr, hyp act, hyp words, lbl gold, lbl predicted normal, lbl predicted inversed, confidence normal, confidence inverse)
 				processed_data = [(
-					reprs_p[i], activation_p[i], batch_sent_p[i],
-					reprs_h[i], activation_h[i], batch_sent_h[i],
-					batch_lbl[i], predicted_indizes_normal[i].data[0], predicted_indizes_inverted[i],
-					label_scores_normal[i], label_scores_inverted[i]
-				) for i in range(amount)]		
+					reprs_p[i].cpu(), activation_p[i].cpu(), batch_sent_p[i],
+					reprs_h[i].cpu(), activation_h[i].cpu(), batch_sent_h[i],
+					batch_lbl.cpu()[i], predicted_indizes_normal[i].data.cpu()[0], predicted_indizes_inverted.cpu()[i],
+					label_scores_normal.cpu()[i], label_scores_inverted.cpu()[i]
+				) for i in range(amount)]	
 
 
 				# sort 
-
 				correct_before_correct_after += [d for d in processed_data if d[IDX_GOLD] == d[IDX_PREDICTED] and d[IDX_GOLD] == d[IDX_PREDICTED_INV]]
 				correct_before_incorrect_after += [d for d in processed_data if d[IDX_GOLD] == d[IDX_PREDICTED] and d[IDX_GOLD] != d[IDX_PREDICTED_INV]]
 				incorrect_before_correct_after += [d for d in processed_data if d[IDX_GOLD] != d[IDX_PREDICTED] and d[IDX_GOLD] == d[IDX_PREDICTED_INV]]
 				incorrect_before_incorrect_after += [d for d in processed_data if d[IDX_GOLD] != d[IDX_PREDICTED] and d[IDX_GOLD] != d[IDX_PREDICTED_INV]]
 
 		# write to file
-		print(correct_before_correct_after[0])
+		print('Write to file.')
 		file_name = experiment_name + name
 		out_arr = [
 			('correct_correct', correct_before_correct_after),
