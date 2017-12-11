@@ -232,9 +232,11 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 
 	# do this for train/dev:
 	experiment_name = './analyses/invert_4m4f_'
-	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
-	#twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
+	#twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
+	twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
 	for name, data_set in [('train', data_train), ('dev', data_dev)]:
+
+		print('# Load data:', name)
 		loader = [
 			DataLoader(chunk, drop_last = False, batch_size=1, shuffle=False, collate_fn=CollocateBatchWithSents(padding_token)) 
 			for chunk in data_set
@@ -246,12 +248,12 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 		incorrect_before_incorrect_after = []
 
 		for chunk in loader:
-
+			print('classify new chunk')
 			# classify normally
 			for batch_p, batch_h, batch_lbl, batch_sent_p, batch_sent_h in chunk:
 				label_scores_normal, act_indizes, reprs = classifier(
-					autograd.Variable(m.cuda_wrap(batch_p)),
-					autograd.Variable(m.cuda_wrap(batch_h)),
+					autograd.Variable(m.cuda_wrap(batch_p), requires_grad=False),
+					autograd.Variable(m.cuda_wrap(batch_h), requires_grad=False),
 					output_sent_info = True)
 				
 				_, predicted_indizes_normal = torch.max(label_scores_normal, dim=1)
@@ -263,8 +265,8 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 
 				# classify with m/f dimensions inverted
 				label_scores_inverted = classifier(
-					autograd.Variable(m.cuda_wrap(batch_p)),
-					autograd.Variable(m.cuda_wrap(batch_h)),
+					autograd.Variable(m.cuda_wrap(batch_p), requires_grad=False),
+					autograd.Variable(m.cuda_wrap(batch_h), requires_grad=False),
 					twister = twist).data
 
 				_, predicted_indizes_inverted = torch.max(label_scores_inverted, dim=1)
@@ -289,6 +291,7 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 				incorrect_before_incorrect_after += [d for d in processed_data if d[IDX_GOLD] != d[IDX_PREDICTED] and d[IDX_GOLD] != d[IDX_PREDICTED_INV]]
 
 		# write to file
+		print(correct_before_correct_after[0])
 		file_name = experiment_name + name
 		out_arr = [
 			('correct_correct', correct_before_correct_after),
