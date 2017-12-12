@@ -25,8 +25,18 @@ FILE_CATEGORIES = [
 ]
 FILE_OUT_TWIST_COUNTS = FOLDER + FILE_BASE + 'results.txt'
 
-def plot_correct_incorrect_bar():
-	pass
+def init_misclassification_dict(labels):
+	d = dict()
+	for label in labels:
+		d[label] = dict()
+		for label2 in labels:
+			d[label][label2] = 0
+	return d
+
+
+def plot_correct_incorrect_bar(x_labels, misclassification_dict):
+	num_groups = len(x_labels)
+	correct = [misclassification_dict[lbl][lbl] for lbl in x_labels]
 
 def plot_findings(params):
 
@@ -39,10 +49,18 @@ def plot_findings(params):
 	filtered_data = [(key.split('-')[1:], amount) for key, amount in all_data if key.split('-')[0] == params]
 	filtered_data = [(k[0], k[1], k[2], amount) for k, amount in filtered_data]
 	
+	x_labels = index_to_tag
 	# Plot basic results for normal model
-	
+	misclassification_dict = init_misclassification_dict(x_labels)
+	for gold, predicted, _, amount in filtered_data:
+		misclassification_dict[gold][predicted] = amount
+	plot_correct_incorrect_bar(x_labels, misclassification_dict)
 
 	# plot basic results for inversed model
+	misclassification_dict = init_misclassification_dict(x_labels)
+	for gold, _, predicted_inv, amount in filtered_data:
+		misclassification_dict[gold][predicted_inv] = amount
+
 
 	# Plot inversed model compared with nomal model
 	
