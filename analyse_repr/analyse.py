@@ -63,6 +63,7 @@ def main():
 
     fn = [k for k in args if args[k] == True][0]
     a_set = AnalyseSet(path)
+
     print('Script started.')
     details = args['--details']
     q = args['--find']

@@ -94,6 +94,33 @@ def plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=Tr
 	plt.subplots_adjust(top=0.8)
 	plt.show(block=block)
 
+def plot_diff_inversed_normal(x_labels, correct, inverse_model_dict, title, block=True):
+	num_groups = len(x_labels)
+	amounts = dict()
+	for lbl in x_labels:
+		amounts[lbl] = [inverse_model_dict[l][lbl] for l in x_labels]
+
+	fig, ax = plt.subplots()
+	index = np.arange(num_groups)
+	colors = [color_palette[i] for i in index]
+	bar_width = .1
+
+	# plot normal model
+	plt.bar(index, correct, bar_width, color=color_palette[num_groups], label='Correct by std model')
+
+	# plot inversed
+	for i, lbl in enumerate(x_labels):
+		plt.bar(index + (i+1) * bar_width, amounts[lbl], bar_width, color=color_palette[i], label=lbl)
+
+	plt.xlabel('Gold label')
+	plt.ylabel('# samples')
+	plt.xticks(index +  bar_width * 1.5, x_labels)
+	plt.title(title)
+	plt.legend(title='Classified as:', bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
+                mode="expand", borderaxespad=0, ncol=2)
+	plt.subplots_adjust(top=0.7)
+	plt.show(block=block)
+
 def plot_findings(params):
 
 	if params == None:
@@ -107,24 +134,29 @@ def plot_findings(params):
 	
 	x_labels = index_to_tag
 	# Plot basic results for normal model
-	misclassification_dict = init_misclassification_dict(x_labels)
+	misclassification_dict_normal = init_misclassification_dict(x_labels)
 	for gold, predicted, _, amount in filtered_data:
-		misclassification_dict[gold][predicted] += amount
+		misclassification_dict_normal[gold][predicted] += amount
 
 	title = 'Classification (normal model) in ' + params
-	plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=False)
+	#plot_correct_incorrect_bar(x_labels, misclassification_dict_normal, title, block=False)
 
 	# plot basic results for inversed model
-	misclassification_dict = init_misclassification_dict(x_labels)
+	misclassification_dict_inv = init_misclassification_dict(x_labels)
 	for gold, _, predicted_inv, amount in filtered_data:
-		misclassification_dict[gold][predicted_inv] += amount
+		misclassification_dict_inv[gold][predicted_inv] += amount
 	title = 'Classification (inversed male/female model) in ' + params
-	plot_correct_incorrect_bar(x_labels, misclassification_dict, title)
+	#plot_correct_incorrect_bar(x_labels, misclassification_dict_inv, title)
 
 
 	# Plot inversed model compared with nomal model
-	
-
+	correct_normal = [misclassification_dict_normal[lbl][lbl] for lbl in x_labels]
+	misclassification_dict_inv_normal = init_misclassification_dict(x_labels)
+	for gold, predicted, predicted_inv, amount in filtered_data:
+		if gold == predicted:
+			misclassification_dict_inv_normal[gold][predicted_inv] += amount
+	title = 'M/F inversed where normal model was correct'
+	plot_diff_inversed_normal(x_labels, correct_normal, misclassification_dict_inv_normal, title, block=True)
 
 def print_sents(params):
 
