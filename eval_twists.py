@@ -225,8 +225,9 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 		a_set = tools[0]
 		flip_indizes = tools[1]
 
-		for idx in flip_indizes:
-			rep = flip_dimension(idx, rep, a_set)
+		if typ == 'hypothesis':
+			for idx in flip_indizes:
+				rep = flip_dimension(idx, rep, a_set)
 		
 		return rep
 

@@ -25,6 +25,35 @@ FILE_CATEGORIES = [
 ]
 FILE_OUT_TWIST_COUNTS = FOLDER + FILE_BASE + 'results.txt'
 
+color_palette = [
+'#e6194b', 
+'#3cb44b', 
+'#ffe119', 
+'#0082c8', 
+'#f58231', 
+'#911eb4', 
+'#46f0f0', 
+'#000000', 
+'#f032e6', 
+'#d2f53c', 
+'#fabebe', 
+'#008080', 
+'#aa6e28', 
+'#800000', 
+'#808000', 
+'#000080', 
+'#808080', 
+'#e6beff',
+'#aaffc3',
+'#fffac8',
+'#ff0000',
+'#00ff00',
+'#0000ff',
+'#ff00ff',
+'#234567',
+'#00ffff'
+]
+
 def init_misclassification_dict(labels):
 	d = dict()
 	for label in labels:
@@ -34,9 +63,36 @@ def init_misclassification_dict(labels):
 	return d
 
 
-def plot_correct_incorrect_bar(x_labels, misclassification_dict):
+def plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=True):
 	num_groups = len(x_labels)
-	correct = [misclassification_dict[lbl][lbl] for lbl in x_labels]
+	
+	amounts = dict()
+	for lbl in x_labels:
+		amounts[lbl] = [misclassification_dict[l][lbl] for l in x_labels]
+	
+	# calculate accuracy
+	amount_data = [sum(amounts[lbl]) for lbl in x_labels]
+	correct = [amounts[lbl][i] for i, lbl in enumerate(x_labels)]
+	accuracy = round(sum(correct) / sum(amount_data) * 100, 2)
+	lbl_accuracies = [round(correct[i] / amount_data[i] * 100, 2) for i in range(len(x_labels))]
+
+	fig, ax = plt.subplots()
+	index = np.arange(num_groups)
+	colors = [color_palette[i] for i in index]
+	bar_width = .1
+
+	for i, lbl in enumerate(x_labels):
+		plt.bar(index + i * bar_width, amounts[lbl], bar_width, color=color_palette[i], label=lbl)
+
+	plt.xlabel('Gold label')
+	plt.ylabel('# samples')
+	x_labels = [lbl + ' (' + str(lbl_accuracies[i]) + ')' for i, lbl in enumerate(x_labels)]
+	plt.xticks(index +  bar_width, x_labels)
+	plt.title(title + ' (' + str(accuracy) + ')')
+	plt.legend(title='Classified as:', bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
+                mode="expand", borderaxespad=0, ncol=3)
+	plt.subplots_adjust(top=0.8)
+	plt.show(block=block)
 
 def plot_findings(params):
 
@@ -53,13 +109,17 @@ def plot_findings(params):
 	# Plot basic results for normal model
 	misclassification_dict = init_misclassification_dict(x_labels)
 	for gold, predicted, _, amount in filtered_data:
-		misclassification_dict[gold][predicted] = amount
-	plot_correct_incorrect_bar(x_labels, misclassification_dict)
+		misclassification_dict[gold][predicted] += amount
+
+	title = 'Classification (normal model) in ' + params
+	plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=False)
 
 	# plot basic results for inversed model
 	misclassification_dict = init_misclassification_dict(x_labels)
 	for gold, _, predicted_inv, amount in filtered_data:
-		misclassification_dict[gold][predicted_inv] = amount
+		misclassification_dict[gold][predicted_inv] += amount
+	title = 'Classification (inversed male/female model) in ' + params
+	plot_correct_incorrect_bar(x_labels, misclassification_dict, title)
 
 
 	# Plot inversed model compared with nomal model
@@ -151,7 +211,7 @@ def main():
     args = docopt("""Analyse male/female effects
 
     Usage: 	male_female_analyse.py sents [<params>]
-    		male_female_analyse.py plot
+    		male_female_analyse.py plot [<params>]
         
 
     """)
