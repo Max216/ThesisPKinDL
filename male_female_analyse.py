@@ -196,7 +196,7 @@ def print_sents(params):
 				size = len(lines) // 9
 				random_smpl_indizes = [idx * 9 + 8 for idx in random.sample(range(size), num_sents)]
 
-				for line in f_in:
+				for line in lines:
 					# check if premise
 					if line_idx % 9 == 0:
 						premise = line.strip()
