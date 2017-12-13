@@ -13,6 +13,8 @@ from mydataloader import index_to_tag
 
 import matplotlib.pyplot as plt
 
+import random
+
 
 FOLDER = './analyses/'
 FILE_BASE = 'invert_4m4f_'
@@ -66,13 +68,22 @@ def init_misclassification_dict(labels):
 def plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=True):
 	num_groups = len(x_labels)
 	
+	# how many classified as label as array for plotting
 	amounts = dict()
 	for lbl in x_labels:
 		amounts[lbl] = [misclassification_dict[l][lbl] for l in x_labels]
 	
+	# how many of gold label for acc
+	amounts_gold = dict()
+	for lbl in x_labels:
+		amounts_gold[lbl] = sum([misclassification_dict[lbl][l] for l in x_labels])
+
 	# calculate accuracy
-	amount_data = [sum(amounts[lbl]) for lbl in x_labels]
+	amount_data = [amounts_gold[lbl] for lbl in x_labels]
 	correct = [amounts[lbl][i] for i, lbl in enumerate(x_labels)]
+	print(title)
+	print(amount_data)
+	print(correct)
 	accuracy = round(sum(correct) / sum(amount_data) * 100, 2)
 	lbl_accuracies = [round(correct[i] / amount_data[i] * 100, 2) for i in range(len(x_labels))]
 
@@ -139,14 +150,14 @@ def plot_findings(params):
 		misclassification_dict_normal[gold][predicted] += amount
 
 	title = 'Classification (normal model) in ' + params
-	#plot_correct_incorrect_bar(x_labels, misclassification_dict_normal, title, block=False)
+	plot_correct_incorrect_bar(x_labels, misclassification_dict_normal, title, block=False)
 
 	# plot basic results for inversed model
 	misclassification_dict_inv = init_misclassification_dict(x_labels)
 	for gold, _, predicted_inv, amount in filtered_data:
 		misclassification_dict_inv[gold][predicted_inv] += amount
 	title = 'Classification (inversed male/female model) in ' + params
-	#plot_correct_incorrect_bar(x_labels, misclassification_dict_inv, title)
+	plot_correct_incorrect_bar(x_labels, misclassification_dict_inv, title, block=False)
 
 
 	# Plot inversed model compared with nomal model
@@ -174,13 +185,16 @@ def print_sents(params):
 			print()
 			print('Reading:', file)
 			print('Showing sentences of', data_type + 'data:', category_title)
-			cnt_printed = 0
 			with open(file) as f_in:
 				line_idx = 0
 				premise = None
 				hypothesis = None
 				labels = None
 				confidences_normal = None
+
+				lines = f_in.readlines()
+				size = len(lines) / 9
+				random_smpl_indizes = [idx + 8 for idx in random.sample(range(size), num_sents)]
 
 				for line in f_in:
 					# check if premise
@@ -206,14 +220,13 @@ def print_sents(params):
 						conf_norml = confidences_normal[labels[1]]
 						conf_inv = confidences_inv[labels[2]]
 
-						if cnt_printed < num_sents:
+						if line_idx in random_smpl_indizes:
 							print('premise:', premise)
 							print('hypothesis:', hypothesis)
 							print('label-gold:', lbl_gold)
 							print('label-predicted:', lbl_predicted, '(' + conf_norml + ')')
 							print('label-predicted-inv:', lbl_predicted_inv + '(' + conf_inv + ')')
 							print('-----')
-							cnt_printed += 1
 
 						# count
 						key = data_type + lbl_gold + '-' + lbl_predicted + '-' + lbl_predicted_inv
