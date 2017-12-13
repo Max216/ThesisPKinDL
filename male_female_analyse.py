@@ -194,7 +194,7 @@ def print_sents(params):
 
 				lines = f_in.readlines()
 				size = len(lines) // 9
-				random_smpl_indizes = [idx + 8 for idx in random.sample(range(size), num_sents)]
+				random_smpl_indizes = [idx * 9 + 8 for idx in random.sample(range(size), num_sents)]
 
 				for line in f_in:
 					# check if premise
