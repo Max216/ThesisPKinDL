@@ -193,7 +193,7 @@ def print_sents(params):
 				confidences_normal = None
 
 				lines = f_in.readlines()
-				size = len(lines) / 9
+				size = len(lines) // 9
 				random_smpl_indizes = [idx + 8 for idx in random.sample(range(size), num_sents)]
 
 				for line in f_in:
