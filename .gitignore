@@ -8,5 +8,6 @@ __pycache__/**
 *.log
 *.pyc
 *.tmp
+*representation_samples_450_150_150_150.txt
 analyses
 !analyse_repr_data/*

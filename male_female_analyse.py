@@ -10,6 +10,12 @@ from docopt import docopt
 import numpy as np
 import mydataloader
 from mydataloader import index_to_tag
+from sent_representation_classify import load_simple_model, load_data
+
+import torch
+from torch.utils.data import DataLoader
+import torch.autograd as autograd
+import model as m
 
 import matplotlib.pyplot as plt
 
@@ -171,8 +177,6 @@ def plot_findings(params):
 
 def print_sents(params):
 
-	
-
 	if params == None:
 		num_sents=100
 	else:
@@ -245,18 +249,57 @@ def print_sents(params):
 		for key in counter.keys():
 			f_out.write(key + ' ' + str(counter[key]) + '\n')
 
-			
+
+def print_stats_simple_model(params):
+	'''
+	prints the statistics needed to plot details of the model
+
+	:params  need to be "path dims=dim1,dim2,dim3"
+	'''
+	splitted_params = params.split(' ')
+	path = splitted_params[0]
+	dimensions = [int(d) for d in splitted_params[1].split('=')[1].split(',')]
+	input_dim = len(dimensions)
+	classifier = load_simple_model(path, input_dim)
+
+	# load data
+	data_train = DataLoader(load_data(FOLDER, 'train', dimensions), drop_last=False, batch_size=1, shuffle=False)
+	data_dev = DataLoader(load_data(FOLDER, 'dev', dimensions), drop_last=False, batch_size=1, shuffle=False)	
+	 
+
+	# go through data
+	for name, dataset in [('train', data_train), ('dev', data_dev)]:
+		misclassification_dict = init_misclassification_dict([i for i in range(len(index_to_tag))])
+		for p, h, lbl in dataset:
+			var_p = m.cuda_wrap(autograd.Variable(p))
+			var_h = m.cuda_wrap(autograd.Variable(h))
+			var_lbl = m.cuda_wrap(autograd.Variable(lbl))
+
+			prediction = classifier(var_p, var_h)
+			_, predicted_idx = torch.max(prediction, dim=1)
+			predicted_idx = predicted_idx.data[0]
+			lbl = lbl[0]
+			misclassification_dict[lbl][predicted_idx] += 1
+
+		# output misclassicication dict
+		for lbl_idx_gold in range(len(index_to_tag)):
+			for lbl_idx_predicted in range(len(index_to_tag)):
+				# add dummy duplicate to have same format as when dimensions are inversed
+				print(name + '-' + index_to_tag[lbl_idx_gold] + '-' + index_to_tag[lbl_idx_predicted] + '-' + index_to_tag[lbl_idx_predicted] + ' ' + str(misclassification_dict[lbl_idx_gold][lbl_idx_predicted]))
+	# count predictions for gold - predicted pairs
 
 
 mapper = dict()
 mapper['sents'] = print_sents
 mapper['plot'] = plot_findings
+mapper['print_stats_simple_model'] = print_stats_simple_model
 
 def main():
     args = docopt("""Analyse male/female effects
 
     Usage: 	male_female_analyse.py sents [<params>]
     		male_female_analyse.py plot [<params>]
+    		male_female_analyse.py print_stats_simple_model <params>
         
 
     """)
