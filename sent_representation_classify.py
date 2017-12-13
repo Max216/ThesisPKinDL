@@ -1,4 +1,5 @@
 import os; 
+import sys
 
 import torch
 import torch.autograd as autograd
@@ -152,6 +153,7 @@ def train(data_train, data_dev, iterations, dropout, lr, dim_hidden, name, batch
 
 				print('Accuracy on train:', train_acc)
 				print('Accuracy on dev:', dev_acc)
+				sys.stdout.flush()
 
 
 		# Half lr decay

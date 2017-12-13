@@ -198,7 +198,7 @@ def print_sents(params):
 					if line_idx % 9 == 7:
 						confidences_normal = line.strip().split(' ')
 
-					if line_idx % 9 == 7:
+					if line_idx % 9 == 8:
 						confidences_inv = line.strip().split(' ')
 						lbl_gold = index_to_tag[labels[0]]
 						lbl_predicted = index_to_tag[labels[1]]
