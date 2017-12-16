@@ -405,7 +405,7 @@ def eval_output_twist(classifier, experiment_name, twister, dataset, padding_tok
 
 
 
-def eval_male_female_to_neutral_plural(classifier, data, padding_token):
+def eval_male_female_to_neutral_plural(appendix, classifier, data, padding_token):
 
 	def change_repr(rep, typ, tools):
 		gender_dims = tools[0]
@@ -423,7 +423,7 @@ def eval_male_female_to_neutral_plural(classifier, data, padding_token):
 		
 		return copied_rep 
 
-	experiment_name = 'match mf to genderless combined'
+	experiment_name = 'match mf to genderless combined' + appendix
 	twister = m.ModelTwister(change_repr, ([602, 199, 280, 89, 1730, 845, 311, 609], [1449, 821]))
 	#twister = m.ModelTwister(change_repr, ([3,4,5,6,7], [1,2]))
 	eval_output_twist(classifier, experiment_name, twister, data, padding_token)
@@ -443,7 +443,7 @@ def main():
 
 	Usage:
 		eval_twist.py <model> <data_train> <data_dev> <statpath> <type> [<embeddings>]
-		eval_twist.py output <model> <data> <type>
+		eval_twist.py output <model> <data> <type> <appendix>
 
 		<model> = Path to trained model
 		<data>  = Path to data to test model with 
@@ -457,6 +457,7 @@ def main():
 	embeddings_path = args['<embeddings>']
 	eval_type = args['<type>']
 	stat_path = args['<statpath>']
+	appendix = args['<appendix>']
 
 	print('# Loading model ...')
 	if embeddings_path == None:
@@ -469,7 +470,7 @@ def main():
 
 	if args['output'] != None:
 		data = mydataloader.get_dataset_chunks(data_path_single, embedding_holder, chunk_size=32*400, include_sent=True)
-		output_mapper[eval_type](classifier, data, embedding_holder.padding())
+		output_mapper[eval_type](appendix, classifier, data, embedding_holder.padding())
 	else:
 		a_set = analyse.AnalyseSet(stat_path)
 
