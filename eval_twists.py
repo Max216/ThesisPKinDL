@@ -442,7 +442,7 @@ def main():
 	args = docopt("""Evaluate on given dataset in terms of accuracy.
 
 	Usage:
-		eval_twist.py <model> <data_train> <data_dev> <statpath> <type> [<embeddings>]
+		eval_twist.py normal <model> <data_train> <data_dev> <statpath> <type> [<embeddings>]
 		eval_twist.py output <model> <data> <type> <appendix>
 
 		<model> = Path to trained model
