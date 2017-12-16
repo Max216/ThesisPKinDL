@@ -114,7 +114,8 @@ class EntailmentClassifier(nn.Module):
         self.nonlinearity = nonlinearity
         self.sent_repr = sent_repr
                 
-        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
+        #self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
+        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
         # Use pretrained values
         self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
                                                

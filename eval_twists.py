@@ -9,6 +9,7 @@ import analyse_repr.analyse as analyse
 import embeddingholder
 import mydataloader
 import sys
+import os
 
 from torch.utils.data import DataLoader
 import torch.autograd as autograd
@@ -232,8 +233,8 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 
 	# do this for train/dev:
 	experiment_name = './analyses/invert_4m4f_'
-	#twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
-	twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
+	twist = m.ModelTwister(flip_fn, (a_set, [602, 199, 280, 89, 1730, 845, 311, 609]))
+	#twist = m.ModelTwister(flip_fn, (a_set, [1, 2, 3, 4, 5, 6, 7, 8]))
 	for name, data_set in [('train', data_train), ('dev', data_dev)]:
 
 		print('# Load data:', name)
@@ -315,10 +316,117 @@ def find_mf_misclassified_sents(classifier, data_train, data_dev, padding_token,
 					f_out.write(stringify_arr(scores))
 					f_out.write(stringify_arr(scores_inv))
 
+def create_misclassification_dict(labels):
+	md = dict()
+	for lbl_gold in labels:
+		md[lbl_gold] = dict()
+		for lbl_predicted_normal in labels:
+			md[lbl_gold][lbl_predicted_normal] = dict()
+			for lbl_predicted_twisted in labels:
+				md[lbl_gold][lbl_predicted_normal][lbl_predicted_twisted] = []
+	return md
+
+def eval_output_twist(classifier, experiment_name, twister, dataset, padding_token, labels=[0,1,2]):
+	'''
+	This will evaluate and output the results of a twist done to the models sentence representation.
+	All results will be stored in s specific folder, containing the counting results and samples for 
+	each category <gold-label> - <predicted-label-normal> <predicted-label-twisted>
+
+	:param experiment_name 		will result in the folder name where everything will be stored.
+	:param twister 				how to change the sentence representation
+	:param dataset 				The data that gets evaluated
+	'''
+
+	print('# Load data')
+	sys.stdout.flush()
+	loader = [
+		DataLoader(chunk, drop_last = False, batch_size=1, shuffle=False, collate_fn=CollocateBatchWithSents(padding_token)) 
+		for chunk in dataset
+	]
+
+	print('# Start training')
+	sys.stdout.flush()
+	classification_dict = create_misclassification_dict(labels)
+	for chunk in loader:
+		print('# Train new chunk')
+		sys.stdout.flush()
+		for batch_p, batch_h, batch_lbl, batch_sent_p, batch_sent_h in chunk:
+				# Get label scores
+				label_scores_normal, act_indizes, reprs = classifier(
+					autograd.Variable(m.cuda_wrap(batch_p), requires_grad=False),
+					autograd.Variable(m.cuda_wrap(batch_h), requires_grad=False),
+					output_sent_info = True)
+				_, predicted_indizes_normal = torch.max(label_scores_normal, dim=1)
+				label_scores_normal = label_scores_normal.data
+
+				label_scores_twisted = classifier(
+						autograd.Variable(m.cuda_wrap(batch_p), requires_grad=False),
+						autograd.Variable(m.cuda_wrap(batch_h), requires_grad=False),
+						twister = twister).data
+				_, predicted_indizes_twisted = torch.max(label_scores_twisted, dim=1)
+
+				gold_label = batch_lbl.cpu()[0]
+				predicted_normal_label = predicted_indizes_normal.data.cpu()[0]
+				predicted_twisted_label = predicted_indizes_twisted.cpu()[0]
+
+				sample = (' '.join(batch_sent_p[0]), ' '.join(batch_sent_h[0]))
+				classification_dict[gold_label][predicted_normal_label][predicted_twisted_label].append(sample)
+
+	# write out samples
+	directory = './analyses/' + experiment_name
+	if not os.path.exists(directory):
+		os.makedirs(directory)
+
+	count_results = []
+	for lbl_gold in classification_dict.keys():
+		for lbl_pred in classification_dict[lbl_gold].keys():
+			for lbl_pred_twist in classification_dict[lbl_gold][lbl_pred].keys():
+				name_gold = mydataloader.index_to_tag[lbl_gold]
+				name_pred = mydataloader.index_to_tag[lbl_pred]
+				name_pred_twisted = mydataloader.index_to_tag[lbl_pred_twist]
+				name = '-'.join([name_gold, name_pred, name_pred_twisted])
+				count_results.append((name, len(classification_dict[lbl_gold][lbl_pred][lbl_pred_twist])))
+
+				# write samples
+				with open(directory + '/' + name + '.txt', 'w') as f_out:
+					for p, h in classification_dict[lbl_gold][lbl_pred][lbl_pred_twist]:
+						f_out.write(p + '\n')
+						f_out.write(h + '\n')
+
+	# write our stats
+	with open(directory + '/results.txt', 'w') as f_out:
+		for name, cnt in count_results:
+			f_out.write(name + ' ' + str(cnt) + '\n')
 
 
 
 
+
+
+
+
+def eval_male_female_to_neutral_plural(classifier, data, padding_token):
+
+	def change_repr(rep, typ, tools):
+		gender_dims = tools[0]
+		genderless_plural_dims = tools[1]
+
+		# get min of gender dims
+		rep_vals = rep[0]
+		min_gender = torch.min((torch.Tensor([rep_vals[dim].data[0] for dim in gender_dims])))
+
+		# change plural dims appropriately
+		copied_rep = autograd.Variable(rep.data.clone().copy_(rep.data))
+		for plural_dim in genderless_plural_dims:
+			new_val = torch.max(m.cuda_wrap(torch.Tensor((rep_vals[plural_dim].data[0], min_gender))))
+			copied_rep[:,plural_dim] = new_val
+		
+		return copied_rep 
+
+	experiment_name = 'match mf to genderless combined'
+	twister = m.ModelTwister(change_repr, ([602, 199, 280, 89, 1730, 845, 311, 609], [1449, 821]))
+	#twister = m.ModelTwister(change_repr, ([3,4,5,6,7], [1,2]))
+	eval_output_twist(classifier, experiment_name, twister, data, padding_token)
 
 
 mapper = dict()
@@ -326,12 +434,16 @@ mapper['mf'] = eval_mf
 mapper['ol'] = eval_outlier
 mapper['misclassified_sents_mf'] = find_mf_misclassified_sents
 
+output_mapper = dict()
+output_mapper['mfn'] = eval_male_female_to_neutral_plural
+
 
 def main():
 	args = docopt("""Evaluate on given dataset in terms of accuracy.
 
 	Usage:
 		eval_twist.py <model> <data_train> <data_dev> <statpath> <type> [<embeddings>]
+		eval_twist.py output <model> <data> <type>
 
 		<model> = Path to trained model
 		<data>  = Path to data to test model with 
@@ -341,6 +453,7 @@ def main():
 	model_path = args['<model>']
 	data_path_train = args['<data_train>']
 	data_path_dev = args['<data_dev>']
+	data_path_single = args['<data>']
 	embeddings_path = args['<embeddings>']
 	eval_type = args['<type>']
 	stat_path = args['<statpath>']
@@ -353,20 +466,25 @@ def main():
 	classifier, _ = m.load_model(model_path, embedding_holder=embedding_holder)
 	m.cuda_wrap(classifier)
 	classifier.eval()
-	a_set = analyse.AnalyseSet(stat_path)
 
-	include_sent = False
-	if eval_type in ['misclassified_sents_mf']:
-		include_sent = True
+	if args['output'] != None:
+		data = mydataloader.get_dataset_chunks(data_path_single, embedding_holder, chunk_size=32*400, include_sent=True)
+		output_mapper[eval_type](classifier, data, embedding_holder.padding())
+	else:
+		a_set = analyse.AnalyseSet(stat_path)
 
-	print('# Loading data train ...')
-	data_train = mydataloader.get_dataset_chunks(data_path_train, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
+		include_sent = False
+		if eval_type in ['misclassified_sents_mf']:
+			include_sent = True
 
-	print('# Loading data dev ...')
-	data_dev = mydataloader.get_dataset_chunks(data_path_dev, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
+		print('# Loading data train ...')
+		data_train = mydataloader.get_dataset_chunks(data_path_train, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
 
-	print('# Evaluate ...')
-	mapper[eval_type](classifier, data_train, data_dev, embedding_holder.padding(), a_set)
+		print('# Loading data dev ...')
+		data_dev = mydataloader.get_dataset_chunks(data_path_dev, embedding_holder, chunk_size=32*400, mark_as='', include_sent=include_sent)
+
+		print('# Evaluate ...')
+		mapper[eval_type](classifier, data_train, data_dev, embedding_holder.padding(), a_set)
 
 
 

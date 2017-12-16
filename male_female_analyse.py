@@ -250,6 +250,34 @@ def print_sents(params):
 			f_out.write(key + ' ' + str(counter[key]) + '\n')
 
 
+def plot_stats_at_path(params):
+	'''
+	plot the accuracies of a model. file must have the following lines:
+	<dataset>-<goldlabel>-<predicted label>-<dummy> <amount>
+
+	:params 	like "<path to file> <dataset>"
+	'''
+	path = params.split(' ')[0]
+	dataset = params.split(' ')[1]
+
+	print(path)
+	print(dataset)
+
+	with open(path) as f_in:
+		all_data = [(line.strip().split(' ')[0], int(line.strip().split(' ')[1])) for line in f_in.readlines()]
+
+	filtered_data = [(key.split('-')[1:], amount) for key, amount in all_data if key.split('-')[0] == dataset]
+	filtered_data = [(k[0], k[1], k[2], amount) for k, amount in filtered_data]
+	
+	x_labels = index_to_tag
+	# Plot basic results for normal model
+	misclassification_dict_normal = init_misclassification_dict(x_labels)
+	for gold, predicted, _, amount in filtered_data:
+		misclassification_dict_normal[gold][predicted] += amount
+
+	title = 'Classification (normal model) in ' + dataset
+	plot_correct_incorrect_bar(x_labels, misclassification_dict_normal, title)
+
 def print_stats_simple_model(params):
 	'''
 	prints the statistics needed to plot details of the model
@@ -293,6 +321,7 @@ mapper = dict()
 mapper['sents'] = print_sents
 mapper['plot'] = plot_findings
 mapper['print_stats_simple_model'] = print_stats_simple_model
+mapper['plot_simple_model'] = plot_stats_at_path
 
 def main():
     args = docopt("""Analyse male/female effects
@@ -300,6 +329,7 @@ def main():
     Usage: 	male_female_analyse.py sents [<params>]
     		male_female_analyse.py plot [<params>]
     		male_female_analyse.py print_stats_simple_model <params>
+    		male_female_analyse.py plot_simple_model <params>
         
 
     """)
