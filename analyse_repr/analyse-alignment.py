@@ -353,7 +353,7 @@ def plt_confusion_matrix(matrix, sample, title):
 
 	ax.xaxis.tick_top()
 	ax.set_xlabel('hypothesis')    
-	ax.xaxis.set_label_position('top') 
+	#ax.xaxis.set_label_position('top') 
 	width, height = matrix.shape
 
 	for x in range(width):

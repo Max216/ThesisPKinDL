@@ -400,6 +400,16 @@ def eval_output_twist(classifier, experiment_name, twister, dataset, padding_tok
 
 
 
+def eval_no_negative_values(appendix, classifier, data, padding_token):
+	def change_repr(rep, typ, tools):
+		mask = tools
+		new_rep = autograd.Variable(m.cuda_wrap(torch.max(rep.data, tools)))
+		return new_rep
+
+	experiment_name = 'No negative values' + appendix
+	mask = m.cuda_wrap(torch.zeros(1, classifier.dimen_sent_repr).float())
+	twister = m.ModelTwister(change_repr, mask)
+	eval_output_twist(classifier, experiment_name, twister, data, padding_token)
 
 
 
@@ -436,6 +446,7 @@ mapper['misclassified_sents_mf'] = find_mf_misclassified_sents
 
 output_mapper = dict()
 output_mapper['mfn'] = eval_male_female_to_neutral_plural
+output_mapper['noneg'] = eval_no_negative_values
 
 
 def main():

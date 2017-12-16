@@ -124,6 +124,7 @@ class EntailmentClassifier(nn.Module):
                 
         # 3 layer Feedforward 
         dimen_sent_repr = dimen_sent_encoder[2] * 2 # multiplication because bidirectional
+        self.dimen_sent_repr = dimen_sent_repr
 
         if sent_repr == "all":
             features = 4

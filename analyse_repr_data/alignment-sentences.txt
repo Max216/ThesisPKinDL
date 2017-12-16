@@ -1,0 +1,1812 @@
+-----
+All correct
+-----
+
+[0]
+[premise] 3 men on stage wearing black shirts , one with long hair is playing the trumpet .
+[Entailment] 3 people on stage wearing black shirts , one with long hair is playing the trumpet .
+[Contradiction] 3 women on stage wearing black shirts , one with long hair is playing the trumpet .
+[Neutral] 3 sad men on stage wearing black shirts , one with long hair is playing the trumpet .
+
+[1]
+[premise] A baby laughing on the floor .
+[Entailment] A baby is amused .
+[Contradiction] A toddler is crying .
+[Neutral] A baby is being tickled .
+
+[2]
+[premise] A barefoot little girl in shorts and a t-shirt running towards a receding tide .
+[Entailment] The girl is outside .
+[Contradiction] The girl is sleeping .
+[Neutral] The girl is going for a swim .
+
+[3]
+[premise] A basketball player in white squats while a player in red moves toward him .
+[Entailment] The person squats
+[Contradiction] The men play with sand
+[Neutral] The game is almost over
+
+[4]
+[premise] A bicyclist rides by pedestrians and buildings in late evenings .
+[Entailment] A person is on a bicycle .
+[Contradiction] E.T . is riding a bicycle in front of the moon .
+[Neutral] The bicycle is red .
+
+[5]
+[premise] A black dog emerges from the water onto the sand , holding a white object in its mouth .
+[Entailment] A dog is playing in the water and found a white object .
+[Contradiction] A man is sitting on his couch petting his dog , while it snows outside .
+[Neutral] A dog is playing fetch with his owner and found the white ball in the water .
+
+[6]
+[premise] A boy eating at a table .
+[Entailment] A boy eating .
+[Contradiction] A boy coloring at a table .
+[Neutral] At home , a boy eats his lunch .
+
+[7]
+[premise] A bride and groom stand in front of a brick building with others .
+[Entailment] A married couple are outside
+[Contradiction] a baby is in her moms arms
+[Neutral] A bride in a vera wang gown is by her groom
+
+[8]
+[premise] A bride is brushing her teeth while a woman in a floral dress checks the bride 's veil .
+[Entailment] A woman is fixing a bride 's veil .
+[Contradiction] A woman is taking a bubble bath .
+[Neutral] A bride is removing lipstick from her teeth before her wedding .
+
+[9]
+[premise] A chef tastes his food over a boiling pot .
+[Entailment] A chef is working .
+[Contradiction] A baby plays in the sand at the beach .
+[Neutral] A chef is leading a cooking class .
+
+[10]
+[premise] A child in a harness laying on the sidewalk .
+[Entailment] A child with straps on him is on the pavement .
+[Contradiction] A dog wearing a harness runs on the pavement .
+[Neutral] A child with a harness and a leash attached to his mother has fainted on the sidewalk .
+
+[11]
+[premise] A child plays Frisbee in a park .
+[Entailment] A child is playing at the park
+[Contradiction] The child is sitting in the living room .
+[Neutral] The little girl is playing Frisbee outside
+
+[12]
+[premise] A crowded sidewalk with people on it separated from the street by metal barriers .
+[Entailment] A sidewalk with people on it separated from the street by metal barriers .
+[Contradiction] A crowded sidewalk with people on it separated from the street by wooden barriers .
+[Neutral] A crowded sidewalk with sad people on it separated from the street by metal barriers .
+
+[13]
+[premise] A dark-haired man with a mustache is looking to his right .
+[Entailment] The man has a mustache .
+[Contradiction] There is a large boat filled with people .
+[Neutral] The man is looking at the dogs playing in the yard .
+
+[14]
+[premise] A dog fetching a stick .
+[Entailment] There is a dog .
+[Contradiction] A pack of vicious dogs terrifies the inhabitants of a small neighborhood .
+[Neutral] A dog retrieves a stick his owner threw for him .
+
+[15]
+[premise] A dog walking along a snow drift .
+[Entailment] An animal is outside
+[Contradiction] A cat is sitting on the porch
+[Neutral] A german shepard is looking for his owner
+
+[16]
+[premise] A four piece string band performing .
+[Entailment] A string quartet perform
+[Contradiction] A guitarist smashes his guitar on stage
+[Neutral] A talent show features a string band performing
+
+[17]
+[premise] A girl in pink polka dots looks at a horse .
+[Entailment] A child is looking at an animal .
+[Contradiction] A man is writing in a book .
+[Neutral] A child is about to ride a horse .
+
+[18]
+[premise] A girl is being splashed by water in a pool .
+[Entailment] A child plays in water .
+[Contradiction] A girl is drying off in the locker room .
+[Neutral] The Splash War was escalating , but the threat of parenting forestalled any Atomic Dive-bombs .
+
+[19]
+[premise] A girl reaching down into the water while standing at the edge of a river .
+[Entailment] The girl is outside .
+[Contradiction] She is taking a nap .
+[Neutral] She is looking for fish .
+
+[20]
+[premise] A goth woman goes shopping .
+[Entailment] A woman is shopping .
+[Contradiction] A woman is doing laundry .
+[Neutral] A woman is shopping for dinner .
+
+[21]
+[premise] A group of kite surfers are busy surfing some waves .
+[Entailment] There are kite surfers out on the water .
+[Contradiction] A group of surfers are sitting on the beach .
+[Neutral] The kite surfers are participating in a race .
+
+[22]
+[premise] A group of people in a dome like building .
+[Entailment] A gathering inside a building .
+[Contradiction] Cats are having a party .
+[Neutral] People are gathered for a birthday party .
+
+[23]
+[premise] A group of people in standing outside a building .
+[Entailment] A group is loitering outside .
+[Contradiction] A person is sitting alone at home .
+[Neutral] A group of people are talking outside .
+
+[24]
+[premise] A group of people sit outdoors together at night .
+[Entailment] People are sitting outside .
+[Contradiction] Group of people sit indoors .
+[Neutral] People are having dinner outside .
+
+[25]
+[premise] A gymnast with a painted face is suspended in the air .
+[Entailment] The gymnast has a painted face .
+[Contradiction] The person is laying flat on the ground .
+[Neutral] The gymnast has her face painted red .
+
+[26]
+[premise] A little boy in a hat picking up Easter eggs .
+[Entailment] a boy picking up easter eggs
+[Contradiction] a girl picking up easter eggs
+[Neutral] a white boy picking up easter eggs
+
+[27]
+[premise] A little boy is surrounded by many pigeons .
+[Entailment] A little boy is being circled .
+[Contradiction] A little boy is by himself .
+[Neutral] A little boy is at the Zoo .
+
+[28]
+[premise] A little brown dog is running in the snow .
+[Entailment] An animal in snow .
+[Contradiction] Dogs barking at a man .
+[Neutral] Puppy playing in the snow .
+
+[29]
+[premise] A little girl with a pink cast dives off a diving board into a pool .
+[Entailment] The little girl is near a pool .
+[Contradiction] The little girl is wearing a blue cast .
+[Neutral] The little girl is wearing a lifevest .
+
+[30]
+[premise] A male in a dark colored sweatshirt and standing behind a chair .
+[Entailment] A man is standing near a chair .
+[Contradiction] The man is dancing .
+[Neutral] The man is holding the chair for someone else .
+
+[31]
+[premise] A man and a woman are riding on a motorized scooter .
+[Entailment] A man and woman are riding a scooter .
+[Contradiction] A man and woman are in a car .
+[Neutral] A man and woman are riding a blue scooter .
+
+[32]
+[premise] A man and woman in formal dress smile at each other as they dance at a party .
+[Entailment] A man and woman are dancing at a party .
+[Contradiction] A man is dancing with another man .
+[Neutral] A man and woman are dancing at a wedding reception .
+
+[33]
+[premise] A man and woman pose for the camera while another man looks on .
+[Entailment] A person is taking a picture .
+[Contradiction] A child is posing for a picture .
+[Neutral] A couple asks the person to take a photo .
+
+[34]
+[premise] A man in a baseball cap and sunglasses in standing inside a candy kiosk .
+[Entailment] a couple was there
+[Contradiction] the child was 18 years old
+[Neutral] the boy was listening
+
+[35]
+[premise] A man in a black shirt , and black shorts is walking down the street , holding hands with a woman in a black sundress .
+[Entailment] A person is holding hands with another person .
+[Contradiction] A group of friends are at the club .
+[Neutral] A husband is walking with his wife to the party .
+
+[36]
+[premise] A man in a black shirt eating delicious food .
+[Entailment] A man wearing black eats a delicious meal .
+[Contradiction] A man is starving .
+[Neutral] A man wearing black is eating a taco salad .
+
+[37]
+[premise] A man in a dark green jacket is talking on the phone .
+[Entailment] The man is wearing green
+[Contradiction] The man is wearing pink
+[Neutral] The man is talking to a lawyer
+
+[38]
+[premise] A man in a green shirt playing a guitar is singing through a microphone .
+[Entailment] A man is playing music .
+[Contradiction] A man is watching TV .
+[Neutral] A person is giving a concert .
+
+[39]
+[premise] A man in a hat standing outside of his green jeep rangler .
+[Entailment] A man stands near his car .
+[Contradiction] A man poses with his red VW bug .
+[Neutral] A man takes his jeep off-road for some exploring .
+
+[40]
+[premise] A man in a trench coat stands on walkway close to a pier with a boat that has landed .
+[Entailment] A man is standing near the water .
+[Contradiction] A man is in a sailboat .
+[Neutral] A man is waiting for his friend to get off the boat .
+
+[41]
+[premise] A man in a white shirt and jeans using a chainsaw to cut down a tree
+[Entailment] A man is cutting a tree down with a chainsaw .
+[Contradiction] A man is feeding tree limbs into a mulcher .
+[Neutral] A man is cutting a Christmas tree .
+
+[42]
+[premise] A man in a white t-shirt and black pants is standing in front of a organ playing it in a room with a piano sitting to his left .
+[Entailment] A man stands near instruments .
+[Contradiction] A man is sitting on a piano bench .
+[Neutral] A conductor stands on stage .
+
+[43]
+[premise] A man in front of a cafe and bakery using his cellphone .
+[Entailment] A man is talking on his phone outside .
+[Contradiction] A man is lying asleep on the street .
+[Neutral] A man is in front of a shop that sells only cupcakes .
+
+[44]
+[premise] A man is holding up an exercise ball in the gym .
+[Entailment] A man is exercising .
+[Contradiction] A man is taking a nap .
+[Neutral] A man is leading an exercise class .
+
+[45]
+[premise] A man is ladling gravy over a pan of food in a commercial kitchen .
+[Entailment] a man pours gravy
+[Contradiction] a man pours his soul out to a woman
+[Neutral] a man pours gravy that he just made
+
+[46]
+[premise] A man is on the ground while a person on a skateboard talks to them .
+[Entailment] A man speaks with a person on a skateboard .
+[Contradiction] Two men are riding skateboards .
+[Neutral] A man on a skateboard checks to see if a man on the ground is ok .
+
+[47]
+[premise] A man is squatting in front of a canoe and kayak rental display .
+[Entailment] A man in front of a canoe and kayak rental display .
+[Contradiction] A woman is squatting in front of a canoe and kayak rental display .
+[Neutral] A sad man is squatting in front of a canoe and kayak rental display .
+
+[48]
+[premise] A man playing with a ball toy with his brown dog .
+[Entailment] The man is playing with his dog .
+[Contradiction] The man is playing with his cat .
+[Neutral] The man is having fun playing with his dog .
+
+[49]
+[premise] A man wearing a suit is walking his dog by a green streetlight post .
+[Entailment] A man is walking his dog .
+[Contradiction] A man is petting his cat .
+[Neutral] A man is walking his dog to the store .
+
+[50]
+[premise] A man wearing jeans and a red plaid shirt stands inside of a phone booth .
+[Entailment] A man wearing jeans
+[Contradiction] A man not wearing jeans
+[Neutral] A man happily wearing jeans
+
+[51]
+[premise] A man with a grimaced face forces himself to eat an unusual food with chopsticks .
+[Entailment] There is a male eating food .
+[Contradiction] The man is eating with a fork and spoon .
+[Neutral] The man is eating food that he does not like .
+
+[52]
+[premise] A man with white hair and a full beard is eating food wrapped in aluminum foil .
+[Entailment] A bearded person is ingesting nutrition .
+[Contradiction] A clean shaven man is cutting wood .
+[Neutral] A guy is enjoying his chipotle burrito .
+
+[53]
+[premise] A man works on the wheel of a bicycle in a workshop , likely to repair a broken one .
+[Entailment] the repair man is working on a bicycle .
+[Contradiction] The man is working on a car .
+[Neutral] The man is repairing his own bike .
+
+[54]
+[premise] A middle-aged man in a white dress shirt conversing with a man in a pink dress shirt .
+[Entailment] Two men speak together .
+[Contradiction] Two nude men hide from each other .
+[Neutral] A father in a white dress shirt talks to his nephew .
+
+[55]
+[premise] A middle-aged man is squinting through his glasses while playing pool and trying to shoot the orange and white striped ball into the hole .
+[Entailment] The man wearing glasses is playing pool .
+[Contradiction] The young man is looking through his glasses while playing pool .
+[Neutral] The man is wearing sunglasses while playing pool .
+
+[56]
+[premise] A muddy male adult soccer player , wearing red shorts and a light blue and red shirt , is bouncing a soccer ball off of his chest .
+[Entailment] The male is bouncing a soccer ball .
+[Contradiction] The man is throwing a football .
+[Neutral] He is getting ready for a soccer game .
+
+[57]
+[premise] A musician on stage reaches out to a fan in the audience .
+[Entailment] Musician reaching to a fan in the audience , during a performance .
+[Contradiction] Musician sitting on a couch after performing .
+[Neutral] The musician is holding a microphone .
+
+[58]
+[premise] A pageant girl posing in a black dress and black heels in front of a run downtown .
+[Entailment] A girl is in a pageant
+[Contradiction] A male is posing for a senior photo .
+[Neutral] A girl is posing for a photo in a pageant she won .
+
+[59]
+[premise] A person is sleeping under a table covered in a yellow blanket .
+[Entailment] Someone is asleep .
+[Contradiction] A cat is drinking milk .
+[Neutral] A man is sleeping after staying up all night .
+
+[60]
+[premise] A person is wearing a vest that the word paramedic on the back .
+[Entailment] a person wearing inners
+[Contradiction] A person is driving a motorcycle .
+[Neutral] a person enjoy the time in outdoor
+
+[61]
+[premise] A person washing their hands in a white sink .
+[Entailment] A person washes their hands .
+[Contradiction] A person cleans a potato in the sink .
+[Neutral] A person washes their hands after using the bathroom .
+
+[62]
+[premise] A photographer is having a conversation with a woman .
+[Entailment] A photographer is speaking to a woman .
+[Contradiction] A photographer is having a conversation with a man .
+[Neutral] A photographer is giving posing direction to a woman .
+
+[63]
+[premise] A round , white-bearded man with glasses surveys a paper from a meeting table which bears other papers and glasses and pitchers of water .
+[Entailment] There is a man .
+[Contradiction] The beard is blue .
+[Neutral] The glasses are thick .
+
+[64]
+[premise] A teenage boy does a skateboard trick on a half pipe while another boy watches from the top .
+[Entailment] There is a teenage boy doing a skateboard trick .
+[Contradiction] There is a teenage girl doing a snowboard trick .
+[Neutral] The teenage boy is showing off his skills .
+
+[65]
+[premise] A woman , a man , and a clown laughing on stage in front of a microphone .
+[Entailment] People laughing on stage in front of a microphone .
+[Contradiction] A dog , a man , and a clown laughing on stage in front of a microphone .
+[Neutral] A fat woman , a man , and a clown laughing on stage in front of a microphone .
+
+[66]
+[premise] A woman and man are posing on a beach in front of a landmark .
+[Entailment] Two people are outside .
+[Contradiction] Two people are having dinner .
+[Neutral] Two people are getting their picture taken for a photo album .
+
+[67]
+[premise] A woman dressed in lingerie poses in a glamorous photo shoot .
+[Entailment] a person takes some photos
+[Contradiction] a kinky crossdresser takes some pics
+[Neutral] a sexy cougar takes some naughty pics for her husband
+
+[68]
+[premise] A woman in a green jacket and glasses shopping .
+[Entailment] A woman is shopping .
+[Contradiction] A man cries about his credit card bill .
+[Neutral] A woman shops for expensive shoes .
+
+[69]
+[premise] A woman in a red shirt is riding an all white horse that is galloping along the trees .
+[Entailment] The woman is on top of a horse .
+[Contradiction] The woman is walking in the hallway .
+[Neutral] The woman is wearing brown pants .
+
+[70]
+[premise] A woman in a scarf fiddles with her phone on Badge Street .
+[Entailment] A woman on Badge Street is has her phone in her hand .
+[Contradiction] A man in scarf is talking with someone on his phone , on Badge Street .
+[Neutral] A woman in a scarf is calling someone on her phone on Badge Street .
+
+[71]
+[premise] A woman in a white robe is preparing a table for a meal .
+[Entailment] A woman in a robe getting a meal ready .
+[Contradiction] A man in robes at a church .
+[Neutral] A woman preparing for a Christmas feast .
+
+[72]
+[premise] A woman is walking with her young son .
+[Entailment] A young boy and his mother are walking .
+[Contradiction] A woman is sitting on a bench with her daughter .
+[Neutral] A woman is outside walking with her son .
+
+[73]
+[premise] A woman riding a horse in a show jumping competition .
+[Entailment] A person is competing at a show
+[Contradiction] A man is riding a bull at a rodeo .
+[Neutral] A woman riding a black horse in a show jumping competition
+
+[74]
+[premise] A woman sitting in the dirt .
+[Entailment] There is a woman sitting outside .
+[Contradiction] A woman standing in the sand .
+[Neutral] A dirty woman sitting in the dirt .
+
+[75]
+[premise] A woman with a brown jacket reaches into a cupboard .
+[Entailment] A woman getting something .
+[Contradiction] A man looking in oven .
+[Neutral] A woman looking in a cupboard for tea .
+
+[76]
+[premise] A woman with pink hair is in the kitchen preparing food .
+[Entailment] A woman is in a kitchen .
+[Contradiction] A woman is at the gym working out .
+[Neutral] A woman is making pasta in a kitchen .
+
+[77]
+[premise] A young African American boy sitting on a wooden bench in a library , looking through a book .
+[Entailment] The boy is literate .
+[Contradiction] He is standing .
+[Neutral] He is going to check the book out .
+
+[78]
+[premise] A young family sits on steps enjoying the day
+[Entailment] A family is outdoors
+[Contradiction] The family is old
+[Neutral] The family is three people strong
+
+[79]
+[premise] A young man jumps high while riding a skateboard .
+[Entailment] Sports happen outside .
+[Contradiction] Skateboard do not have wheels
+[Neutral] Some sports only involve skateboarding .
+
+[80]
+[premise] A young woman wearing glasses and a black blouse holds a ladle in one hand , a bowl in the other and a fork in her mouth .
+[Entailment] there is a woman holding something
+[Contradiction] the woman is tying her shoes
+[Neutral] the woman is making food
+
+[81]
+[premise] An Asian lady is a preparing a meal with various ingredients before her ; behind her is a brick wall .
+[Entailment] The lady is Asian
+[Contradiction] The lady is white
+[Neutral] The lady is old
+
+[82]
+[premise] An Asian lady on the street pushing a food cart .
+[Entailment] A woman is outside .
+[Contradiction] A woman is sleeping .
+[Neutral] A woman is selling food .
+
+[83]
+[premise] An old man smiling and making pottery .
+[Entailment] The elderly man is smiling making potter
+[Contradiction] the elderly man smoke weed before sitting down .
+[Neutral] The elderly man is smiling and making pottery after screaming at the kids
+
+[84]
+[premise] Asian woman with baskets of colorful vegetables .
+[Entailment] A woman has food .
+[Contradiction] The woman is Indian .
+[Neutral] A woman is picking vegetables in the garden .
+
+[85]
+[premise] Black , brown and white dog crouches on three legs in the grass .
+[Entailment] There is a dog crouching in the grass outside .
+[Contradiction] The dog is using the bathroom on the kitchen floor .
+[Neutral] The dog is about to pounce on it 's target .
+
+[86]
+[premise] Boys and girls from an Eastern nation smiling in a field .
+[Entailment] the children are outside
+[Contradiction] the children from the west are crying inside
+[Neutral] the children are playing
+
+[87]
+[premise] Construction workers engaging in a day of outdoor work .
+[Entailment] Some people are outdoors .
+[Contradiction] The construction workers are lying on hammocks .
+[Neutral] The construction workers are buliding a new school .
+
+[88]
+[premise] Couple posing for picture with white and yellow flowers in the background .
+[Entailment] There are white and yellow flowers behind the two people .
+[Contradiction] There are purple flowers behind the woman .
+[Neutral] The couple are smiling and holding hands for the picture .
+
+[89]
+[premise] Family sitting on a bench near the beach .
+[Entailment] Family near the beach sitting on a bench .
+[Contradiction] A man is mowing his yard in the rain .
+[Neutral] Family near the beach sitting on a bench while on vacation .
+
+[90]
+[premise] Group of sitting asian children all dressed in white polos and navy blue pants .
+[Entailment] A group of children are sitting , wearing identical clothing .
+[Contradiction] A group of asian children are wearing brown polos .
+[Neutral] A group of asian children are wearing school uniforms .
+
+[91]
+[premise] Indian barber waiting for customers .
+[Entailment] The barber was Indian and had several customers .
+[Contradiction] The American barber was waiting on customers .
+[Neutral] The barber did a good job .
+
+[92]
+[premise] Man on a motorcycle performing a trick in the air .
+[Entailment] A m an is riding a motorcycle .
+[Contradiction] A man fell off a unicycle .
+[Neutral] The man on the motorcycle is part of the circus .
+
+[93]
+[premise] Men are cutting a large opening through the ice on a frozen lake .
+[Entailment] Men cutting through ice on a frozen lake .
+[Contradiction] Men ice skating .
+[Neutral] Men going ice fishing .
+
+[94]
+[premise] Men with hats on stand outside of a white tent .
+[Entailment] Men are near a tent .
+[Contradiction] The men are sitting inside the tent .
+[Neutral] The men are related .
+
+[95]
+[premise] People are relaxing on the side of the road .
+[Entailment] The people are outside .
+[Contradiction] The people are screaming and running for their lives .
+[Neutral] The people are very comfortable .
+
+[96]
+[premise] People at a park with a public waterspout area .
+[Entailment] A group at a park .
+[Contradiction] A group sits in a coffee shop .
+[Neutral] A group sits in the park on a sunny day .
+
+[97]
+[premise] People cheer on football teams at a football game in a stadium .
+[Entailment] There are people making noise .
+[Contradiction] The people are at a tennis match .
+[Neutral] They are at a NFL game .
+
+[98]
+[premise] People in quaint customs walk along a road .
+[Entailment] The people walked along the road .
+[Contradiction] They sat beside the road .
+[Neutral] They walked along the road to the Opera house .
+
+[99]
+[premise] People on a snowy hill .
+[Entailment] people on a hill
+[Contradiction] the people are in the club
+[Neutral] the people are women
+
+[100]
+[premise] People with walking sticks hiking near the beach .
+[Entailment] People strolling with sticks near the beach .
+[Contradiction] People with walking sticks hiking near Compton .
+[Neutral] People are hiking on the beach with sticks to keep the sand crabs away .
+
+[101]
+[premise] Several people , sitting in a park on the grass , grilling .
+[Entailment] There are people outside .
+[Contradiction] People are running around trying to catch someone .
+[Neutral] People are cooking steaks for a picnic .
+
+[102]
+[premise] Silhouette of two people sitting on a dock at sunset
+[Entailment] There are two people on a dock .
+[Contradiction] Silhouette of two people sitting on a dock at sunrise .
+[Neutral] The people on the dock are white .
+
+[103]
+[premise] Silver and blue car marked 104 raises dust on road as two background people watch .
+[Entailment] The people are outside .
+[Contradiction] The people are inside eating popcorn .
+[Neutral] The car is racing around the track .
+
+[104]
+[premise] Sisters laughing about something ridiculous .
+[Entailment] Sisters laugh together .
+[Contradiction] Brothers laugh about something serious .
+[Neutral] A group of girls laugh together at a clown who just walked by .
+
+[105]
+[premise] Six individuals are seated outdoors on steps and ledges .
+[Entailment] six people sitting on the steps
+[Contradiction] couple sitting at a cafe
+[Neutral] a group of friends sitting together
+
+[106]
+[premise] Small Korean war honor guard getting ready for the parade as a small group of onlookers sit on the sidewalk .
+[Entailment] A group of people sit on a sidewalk .
+[Contradiction] The onlookers are walking away because the parade is over .
+[Neutral] There is a parade for Memorial Day .
+
+[107]
+[premise] The BMX biker rides through the forest .
+[Entailment] A bike is moving through the trees .
+[Contradiction] A bike sits untouched in the garage .
+[Neutral] The biker riding through the forest is going to grandma 's house .
+
+[108]
+[premise] The man in the black shirt is pointing his camera at the arena .
+[Entailment] A man points a camera .
+[Contradiction] A woman in black points her fingers at the arena .
+[Neutral] The man films an arena full of people .
+
+[109]
+[premise] The motorcycle racer in a yellow uniform is in midair .
+[Entailment] A person wears a yellow uniform on a motorcycle .
+[Contradiction] A motorcycle racer washes his bike in his driveway .
+[Neutral] A motorcycle racer is in midair after just maneuvering away from a horrific crash .
+
+[110]
+[premise] The skateboarder is in the air while holding his board .
+[Entailment] The skateboarder is outside .
+[Contradiction] The person is riding a surfboard .
+[Neutral] The skateboarder has been doing tricks all day .
+
+[111]
+[premise] The skier moves down the hill on a beautiful day .
+[Entailment] The person skis down the slope .
+[Contradiction] The skier is relaxing in the lounge .
+[Neutral] The skier is smiling while moving down the hill .
+
+[112]
+[premise] The teenagers in a crowded area playing with toys .
+[Entailment] there was a group of teenagers
+[Contradiction] the teenagers went to the movies
+[Neutral] they are there for a party
+
+[113]
+[premise] The wet brown dog is running in the water .
+[Entailment] The dog is moving .
+[Contradiction] The dog is sleeping .
+[Neutral] The dog is outdoors .
+
+[114]
+[premise] There are several people outside looking at acorn squash .
+[Entailment] People are looking at squash .
+[Contradiction] The woman cuts the squash in half .
+[Neutral] People are looking at their garden .
+
+[115]
+[premise] There are tables full of people with paperwork who are discussing things .
+[Entailment] A meeting of people is taking place
+[Contradiction] A group of people sit at a picnic table and eat lunch
+[Neutral] a high level boardroom meeting at a major company takes place
+
+[116]
+[premise] Three boys row a boat in a tropical setting .
+[Entailment] Boys rowing a boat .
+[Contradiction] One girl builds a snowman .
+[Neutral] Three brothers rowing a boat to an island .
+
+[117]
+[premise] Three children on diving board , with one jumping off .
+[Entailment] Someone is jumping through the air .
+[Contradiction] Someone is bungee jumping .
+[Neutral] Someone is jumping into a pool .
+
+[118]
+[premise] Three helmeted bikers examining a bike 's wheel outdoors in the gravel at a recreational area .
+[Entailment] Three people are wearing helmets .
+[Contradiction] Three people are looking at a skateboard .
+[Neutral] Three people are checking out while their friend 's tire went out .
+
+[119]
+[premise] Three men in bright clothing work on street with railroad tracks .
+[Entailment] People working in the street .
+[Contradiction] Workers gathering for an office party .
+[Neutral] Workers fix the railroad tracks .
+
+[120]
+[premise] Three men in caps sit at fireside near cabin , reading at night .
+[Entailment] Three men by a cabin are sitting by a fire and reading while it 's night time .
+[Contradiction] Two girls are swimming in a pool .
+[Neutral] Three men are reading porn by a fire at night , near a cabin .
+
+[121]
+[premise] Three officers arresting someone on the corner of a street .
+[Entailment] someone is getting aressted
+[Contradiction] the man is inside
+[Neutral] someone is getting aressted for dui
+
+[122]
+[premise] Three people chatting underneath an umbrella .
+[Entailment] Three people are standing with an umbrella .
+[Contradiction] Three people are standing under an umbrella on a bus .
+[Neutral] Three people are waiting for the rain to stop .
+
+[123]
+[premise] Three people stand in front of a store with a white sofa .
+[Entailment] There are people in front of a store .
+[Contradiction] Three people loiter in front of a store with a black sofa .
+[Neutral] Three people are considering buying a white sofa .
+
+[124]
+[premise] Two Asian men and two Asian women wait impatiently on shiny , metallic , red chairs .
+[Entailment] People are sitting and waiting .
+[Contradiction] They are dancing .
+[Neutral] They are waiting for the bus .
+
+[125]
+[premise] Two boys are watching another boy in green sneakers play on a skateboard .
+[Entailment] Two young males are outdoors
+[Contradiction] Two males are sleeping in bed .
+[Neutral] Two males are watching a skateboarder do awesome tricks .
+
+[126]
+[premise] Two little kids are on a production set with seven adults .
+[Entailment] Two kids are on a set .
+[Contradiction] The sun is setting .
+[Neutral] Two kid actors are on a set .
+
+[127]
+[premise] Two male children cleaning up leaves in a parking lot .
+[Entailment] Two people clean a parking lot .
+[Contradiction] A lone warrior readies himself to face a dragon .
+[Neutral] Two children are being punished .
+
+[128]
+[premise] Two male firefighters working on the firetruck
+[Entailment] Two firefighters work on the firetruck .
+[Contradiction] Two female firefighters work on the firetruck .
+[Neutral] Two firefighters work on the firetruck as ladies ogle .
+
+[129]
+[premise] Two men outside looking at metalwork objects .
+[Entailment] Two men observing objects .
+[Contradiction] two men doing their taxes
+[Neutral] Two men looking through a scrapyard .
+
+[130]
+[premise] Two nuns stand on the street .
+[Entailment] The street has two nuns standing on it .
+[Contradiction] Two kids playing in a park .
+[Neutral] Two nuns stand on a street after laving a bar .
+
+[131]
+[premise] Two overweight people are eating some fried food outside in the street in front of the restaurant .
+[Entailment] Two fat persons are found eating in the street
+[Contradiction] Two man are fighting
+[Neutral] Two people bought some fried food from the retaurant
+
+[132]
+[premise] Two people are in a park with boxing gear on .
+[Entailment] a park is being used by people with boxing gear
+[Contradiction] two people are swimming in the creek
+[Neutral] two people are sparring each other
+
+[133]
+[premise] Two woman are walking by discussing something seriously .
+[Entailment] There are women having a conversation .
+[Contradiction] The women are smiling and laughing .
+[Neutral] The women are talking and walking through a cemetery .
+
+[134]
+[premise] Two woman wearing jackets are looking at a board .
+[Entailment] A board is being observed .
+[Contradiction] Two men are looking at a board , naked .
+[Neutral] Two women at a snowboard shop are looking at items .
+
+[135]
+[premise] Two women are looking at pink flowers inside of a store .
+[Entailment] Two women are looking at flowers .
+[Contradiction] Two women are looking at pigs .
+[Neutral] Two women are thinking about buying flowers .
+
+[136]
+[premise] Two women in blue suits sitting on the pavement .
+[Entailment] two nicely dressed woman sitting on the pavement
+[Contradiction] two business women arguing in a coffee shop
+[Neutral] two business women sitting on the pavement
+
+[137]
+[premise] Woman and child enjoy the view from te lakeside .
+[Entailment] A woman and child enjoy the lakeside view .
+[Contradiction] A woman and her child are walking along the beach .
+[Neutral] A woman and her child are sitting along the lake enjoying the view .
+
+[138]
+[premise] Woman smiles as man moves her scarf to see her tattoo .
+[Entailment] A man has asked to see the body art on a woman .
+[Contradiction] A child is carrying a baseball bat to the park .
+[Neutral] A man is checking to see if the new tattoo has healed completely .
+
+[139]
+[premise] Young adults are seated at a restaurant table , smiling .
+[Entailment] Young adults sitting at a table .
+[Contradiction] Young boys standing outside around a fire waiting for their food to arrive .
+[Neutral] Young teenage boys sitting at a restaurant table waiting for their food .
+
+[140]
+[premise] Young boy leaps from a swing
+[Entailment] A boy flies off a swing .
+[Contradiction] A girl climbs on the monkey bars .
+[Neutral] A boy flies off a swing at a park .
+
+[141]
+[premise] Young girls gathered around a man blowing large bubbles .
+[Entailment] Male human entertaining .
+[Contradiction] Man tap dancing while being watched by young girls .
+[Neutral] Man blowing bubbles large enough to surround the girls in .
+
+[142]
+[premise] a boy does a gymnastic trick under a tree .
+[Entailment] A boy shows off his gymnastic skills under a tree .
+[Contradiction] A girl does a somersault under a tree .
+[Neutral] A boy does a cartwheel under a tree .
+
+[143]
+[premise] a green John Deere tractor in a field pulling a red trailer .
+[Entailment] The John Deere tractor pulls the red trailer through the field .
+[Contradiction] The blue John Deere tractor is different from all the others .
+[Neutral] A tractor pulls a red trailer hauling corn .
+
+[144]
+[premise] a man and a woman sit before a large tarp with a drawing illustrating communist china
+[Entailment] Two people are near a picture of China .
+[Contradiction] Two people are standing .
+[Neutral] The man and woman are married .
+
+[145]
+[premise] black guy trying to make some fresh barbecue .
+[Entailment] The guy is black .
+[Contradiction] The guy is white .
+[Neutral] The barbecue has burned .
+
+[146]
+[premise] bull rider in texas getting thrown from a bull
+[Entailment] Bull rider falling off a bull
+[Contradiction] A guy riding a pony
+[Neutral] A bull rider breaking his bones
+
+[147]
+[premise] closeup of bartender ( women ) grabbing a glass inside the bar .
+[Entailment] A woman inside a bar .
+[Contradiction] A man throwing an empty glass .
+[Neutral] The owner of a bar grabs her favorite glass .
+
+[148]
+[premise] man kicking a soccer ball on the field .
+[Entailment] A man is playing with a ball
+[Contradiction] A woman is kicking a soccer ball .
+[Neutral] A goalie is kicking a soccer ball .
+
+[149]
+[premise] three children running barefooted in a gym
+[Entailment] The three children are inside .
+[Contradiction] The children are sitting in a circle .
+[Neutral] Three children are playing tag in the gym .
+-----
+Entailment incorrect
+-----
+
+[150]
+[premise] A Cirque de Solei performer shows off his impressive strength and balance .
+[Entailment] The picture is of a circus performer
+[Contradiction] The hobo is riding on a train
+[Neutral] The performer is juggling
+
+[151]
+[premise] A brunette woman is standing on the sidewalk looking down the road .
+[Entailment] The woman is walking to work .
+[Contradiction] The woman is in a wheelchair .
+[Neutral] The woman is lost in the city .
+
+[152]
+[premise] A child , wearing blue jeans and a purple shirt , stacks up suitcases for a trip .
+[Entailment] A child in a purple shirt is packing a suitcase .
+[Contradiction] The child is asleep on the floor .
+[Neutral] The child is going to Disney World .
+
+[153]
+[premise] A child jumps up near a body of water .
+[Entailment] A child jumps into a lake .
+[Contradiction] A man works on a construction site .
+[Neutral] A child jumps into a lake with his friends .
+
+[154]
+[premise] A child skis across the snowy ground .
+[Entailment] A child learning how to ski .
+[Contradiction] A woman sitting on a bench .
+[Neutral] A father teaching his child how to ski .
+
+[155]
+[premise] A crowd of people in workout clothes at a `` Run For Haiti '' event .
+[Entailment] The crowd of people are wearing running shoes .
+[Contradiction] The crowd of people is preparing to swim .
+[Neutral] The crowd of people is on tarmac .
+
+[156]
+[premise] A group of people are discussing what they need to buy from Walmart
+[Entailment] A group of people are shopping together in Walmart .
+[Contradiction] One person is shopping all alone in Walmart .
+[Neutral] A group of friends are shopping together in Walmart .
+
+[157]
+[premise] A group of people sit on an outdoor patio with lots of potted plants .
+[Entailment] Friends are sitting on a patio enjoying coffee
+[Contradiction] Running for president is a cat
+[Neutral] Friends are sitting on a patio enjoying coffee while talking
+
+[158]
+[premise] A group of young Asian people wave their hands in the air .
+[Entailment] The Asians were waving their hands .
+[Contradiction] The Asians hands were on fire .
+[Neutral] The Asians were dancing at the concert .
+
+[159]
+[premise] A large brown dog is looking at a medium sized black dog .
+[Entailment] A dog looks at a second dog .
+[Contradiction] A cat looks at a dog .
+[Neutral] A dog looks at his friend .
+
+[160]
+[premise] A little boy wearing sunglasses and pointing .
+[Entailment] the boy points
+[Contradiction] the boy is sleeping at home
+[Neutral] the boys is white
+
+[161]
+[premise] A man and young boy in waders stand in very shallow water .
+[Entailment] The people are outside .
+[Contradiction] The man and young boy are in the car .
+[Neutral] The man and young boy are fishing .
+
+[162]
+[premise] A man in a hat leaves a store , walking past carts and cars .
+[Entailment] a man was in the store
+[Contradiction] a man was bowling
+[Neutral] the man bought a gift in the store
+
+[163]
+[premise] A man in a woman in dance outfits are performing stretching maneuvers on a stage .
+[Entailment] A man and a woman are warming up their muscles before dancing .
+[Contradiction] A man and a woman are hanging out on a couch watching a movie .
+[Neutral] A man and a woman are in a dance competition .
+
+[164]
+[premise] A man in blue shirt is surrounded by football players .
+[Entailment] All the people know eachother .
+[Contradiction] The football players are watching an opera .
+[Neutral] The man in blue is the coach .
+
+[165]
+[premise] A man in plaid shirt hits a tree with an Axe .
+[Entailment] A man is chopping a tree .
+[Contradiction] A man is burning a fire in his back yard .
+[Neutral] A man is cutting down a tree to make a table .
+
+[166]
+[premise] A man is doing art on a sidewalk while many other people walk by .
+[Entailment] A street artist uses chalk on the sidewalk .
+[Contradiction] A man paints in a studio .
+[Neutral] A street artist uses chalk on the sidewalk for tips .
+
+[167]
+[premise] A man is walking in front of an older home without any paint on it
+[Entailment] The old house needs paint .
+[Contradiction] A man poses in front of a freshly painted building .
+[Neutral] A man is walking in his neighborhood .
+
+[168]
+[premise] A man on a street corner works on a drawing .
+[Entailment] A man is drawing a picture .
+[Contradiction] The man is rapping in times square .
+[Neutral] He is making a picture for some tourists .
+
+[169]
+[premise] A person in a uniform riding a horse near water .
+[Entailment] A person is in a saddle
+[Contradiction] A person is skating
+[Neutral] A person is having fun
+
+[170]
+[premise] A person riverrafting .
+[Entailment] a person is rafting on the river
+[Contradiction] 4 people river rafting
+[Neutral] a man is river rafting down the mississippi
+
+[171]
+[premise] A rock climber leans out from a crag against a deep blue sky .
+[Entailment] The climber is learning out of the crag .
+[Contradiction] The man is on a roof top .
+[Neutral] The man is trying not to fall .
+
+[172]
+[premise] A snowboarder flies through the air above the snow .
+[Entailment] The man has his feet on the snowboard .
+[Contradiction] The snowboard is on the ground .
+[Neutral] The man is doing a trick .
+
+[173]
+[premise] A snowboarder is doing a trick .
+[Entailment] The snowboarder is in the snow .
+[Contradiction] The snowboarder sat by the fireplace .
+[Neutral] The snowboarder did a flip .
+
+[174]
+[premise] A street that is full of shops .
+[Entailment] There are many places to buy .
+[Contradiction] Hagrid does water ballet .
+[Neutral] Some shops have display windows .
+
+[175]
+[premise] A woman cleaning up a park .
+[Entailment] A person is performing janitorial duties .
+[Contradiction] The old man is sweeping his driveway .
+[Neutral] The woman with the red shirt is cleaning the park .
+
+[176]
+[premise] A woman in a floral dress walks down the street past her reflection .
+[Entailment] A woman enjoys outdoor walking
+[Contradiction] A lady is driving the car
+[Neutral] A woman is going to spa
+
+[177]
+[premise] A woman in tights dances .
+[Entailment] Class will be taught .
+[Contradiction] Food will be taught .
+[Neutral] Mamba will be practiced .
+
+[178]
+[premise] A woman is riding a bicycle towards a red light .
+[Entailment] A women is riding her bike on the road
+[Contradiction] A women is dinning at a fancy restaurant
+[Neutral] A women is riding her bike on the wrong side of the road .
+
+[179]
+[premise] A woman standing outside on a large circle with numbers and lines around the edges .
+[Entailment] There is one woman inside the circle .
+[Contradiction] A woman is sitting outside .
+[Neutral] A woman is painting in the circle .
+
+[180]
+[premise] A woman wearing red sneakers walking a black dog .
+[Entailment] A lady is walking her pet .
+[Contradiction] A woman is wearing green sneakers .
+[Neutral] The dog has a red collar .
+
+[181]
+[premise] An Asian women competing in the winter Olympics .
+[Entailment] A woman competing for her country .
+[Contradiction] A woman is in bad shape .
+[Neutral] A woman is losing in a competition .
+
+[182]
+[premise] An older couple enjoying a Christmas meal .
+[Entailment] Two people are eating Christmas dinner .
+[Contradiction] A man is drinking alone in a bar .
+[Neutral] A couple is eating a Christmas dinner at a restaurant .
+
+[183]
+[premise] An older person is reading a French newspaper on a bench .
+[Entailment] Someone is reading a publication from France .
+[Contradiction] A young boy is busy building a Lego structure .
+[Neutral] A retiree is catching up on news from Europe .
+
+[184]
+[premise] Asian children eating together .
+[Entailment] The kids are getting nutrition
+[Contradiction] Children are outside playing
+[Neutral] Children are eating rice
+
+[185]
+[premise] Black dog chasing an orange Frisbee .
+[Entailment] the dog is outside
+[Contradiction] the dog is looking out the car window
+[Neutral] the owner is playing with the dog
+
+[186]
+[premise] In what appears to be a patriotic parade , a man riding a vehicle is holding a little girl and American flags abound .
+[Entailment] The little girl is in the car .
+[Contradiction] The little girl is asleep on the couch .
+[Neutral] The little girl is waving at the crowd .
+
+[187]
+[premise] Indian man wearing white cloth around waist bathes out of an orange bucket .
+[Entailment] a man is taking a bath
+[Contradiction] a man is swiming in a large pool
+[Neutral] a man might not have running water in his home
+
+[188]
+[premise] Little girl lying in many colored plastic balls .
+[Entailment] A little girl is buried in colored plastic balls .
+[Contradiction] A little girl is playing baseball .
+[Neutral] A little girl is in a ball pit .
+
+[189]
+[premise] Man looking at a computer screen in a lab coat .
+[Entailment] martial arts demonstration
+[Contradiction] the boy was listening to music
+[Neutral] the child is black
+
+[190]
+[premise] Men in dark sunglasses sit suspiciously in white lawn chairs .
+[Entailment] The men look like spies .
+[Contradiction] The men are spies for Mars .
+[Neutral] The men are spies for Israel .
+
+[191]
+[premise] Some young boys hang out around their car .
+[Entailment] The boys are listening to the music in the car .
+[Contradiction] Some young boys are in the library .
+[Neutral] The males are outside talking .
+
+[192]
+[premise] This rodeo athlete is trying to ride this wild horse .
+[Entailment] The horse is reluctant to be rode .
+[Contradiction] The horse was raised on a farm .
+[Neutral] The horse is a stallion .
+
+[193]
+[premise] Three male students , one in red peering through a microscope .
+[Entailment] Three boys are looking into a science instrument .
+[Contradiction] Three boy are arranging flowers .
+[Neutral] Three boys are doing a science experiment .
+
+[194]
+[premise] Two girls holding car wash signs .
+[Entailment] Girls advertise for a car wash .
+[Contradiction] Students are attending a football game .
+[Neutral] The students are holding a car wash fundraiser at the bank .
+
+[195]
+[premise] Two small dogs facing a third dog .
+[Entailment] two animals looking at a third animal .
+[Contradiction] three dogs are running through a field .
+[Neutral] three dogs looking at each other .
+
+[196]
+[premise] Two woman sitting under a L.E.D . sign of a person walking .
+[Entailment] The women are sitting
+[Contradiction] The women are standing
+[Neutral] The LED is green
+
+[197]
+[premise] Two women sitting on a blanket on the lawn while sharing a book .
+[Entailment] Women enjoying a beautiful day .
+[Contradiction] A woman plays fetch with her dog at the park .
+[Neutral] Women relaxing after a picnic .
+
+[198]
+[premise] Young girl walking on beach at sunset .
+[Entailment] The sun is reflecting a mixture of warm colors on the water .
+[Contradiction] The young girl is inside playing a video game .
+[Neutral] The young girl is walking barefoot .
+
+[199]
+[premise] kids straggle behind father in graffiti covered alleyway
+[Entailment] Kids follow the lead .
+[Contradiction] A family sits in their living room .
+[Neutral] A family takes a shortcut home .
+-----
+Contradiction incorrect
+-----
+
+[200]
+[premise] 3 women walking down the road in a busy city .
+[Entailment] Some women are walking in the city .
+[Contradiction] Some ladies are taking the bus to work .
+[Neutral] Some ladies are walking to a service station after their car broke down .
+
+[201]
+[premise] A baby holding onto a handle .
+[Entailment] A baby is grabbing something .
+[Contradiction] A toddler is holding his mother 's hand .
+[Neutral] A baby is trying to open a cabinet .
+
+[202]
+[premise] A band is practicing for their next gig .
+[Entailment] The band has another gig .
+[Contradiction] The band is on stage .
+[Neutral] The band is rehearsaling a new song .
+
+[203]
+[premise] A bride standing in the middle of four men in tuxedos and three girls in teal dresses standing in front of the ocean .
+[Entailment] A bride stood inbetween four men and three girls at a wedding .
+[Contradiction] A bride is talking to four men and three women .
+[Neutral] A bride is standing by a group of people after marriage .
+
+[204]
+[premise] A child wearing gray pants , green winter coat and black ski cap feeding geese in a lake .
+[Entailment] A child is feeding the geese .
+[Contradiction] A child is afraid of fowl .
+[Neutral] A child is feeding the geese at the park by the lake .
+
+[205]
+[premise] A couple enjoying the night lights together .
+[Entailment] A couple is enjoying an evening outside
+[Contradiction] A couple is at a night baseball game
+[Neutral] A couple is sitting together under the stars
+
+[206]
+[premise] A dessert mountain with a man wearing a hat standing on the hillside .
+[Entailment] A dessert mountain with a person standing on it .
+[Contradiction] A dessert mountain litered with peolple in hats .
+[Neutral] A dessert mountain with a tall man in a green hat standing on the hillside .
+
+[207]
+[premise] A group of people watching a man reach for a swing .
+[Entailment] The people are watching a man .
+[Contradiction] The man is working on a construction site .
+[Neutral] The man is in a park .
+
+[208]
+[premise] A lady and a guy are sitting down wrapping gifts .
+[Entailment] The people are wrapping gifts .
+[Contradiction] The people are opening presents .
+[Neutral] The people are wrapping birthday gifts .
+
+[209]
+[premise] A lonely bicycle rider going through town before the busy day begins .
+[Entailment] Bicycle rider riding in town
+[Contradiction] Bicycle rider carrying his bike
+[Neutral] Bicycle meeting his co workers
+
+[210]
+[premise] A man and a woman kissing outdoors .
+[Entailment] A couple are expressing affection .
+[Contradiction] A homosexual couple are kissing .
+[Neutral] A couple are in a lustful embrace .
+
+[211]
+[premise] A man and a woman standing outside a house next to an audio speaker .
+[Entailment] A man and woman are next to a speaker .
+[Contradiction] A man and woman go shopping for a speaker .
+[Neutral] A man and woman are getting ready to install an audio speaker into their home .
+
+[212]
+[premise] A man in a blue jacket working under construction equipment .
+[Entailment] a person working construction
+[Contradiction] a man gets ready for work
+[Neutral] a construction worker at work
+
+[213]
+[premise] A man in a blue shirt stands on a tall ladder and inspects wires .
+[Entailment] A man inspects wires on a tall ladder wearing a blue shirt .
+[Contradiction] A man in a blue shirt is standing on a wire inspecting the tall ladder .
+[Neutral] An electrician in a blue shirt is fixing the power transformer .
+
+[214]
+[premise] A man in a gray overshirt and brown pants plays pool with a woman in a black and white striped shirt whose head can not be seen .
+[Entailment] The man is playing with the woman .
+[Contradiction] The man is playing alone .
+[Neutral] The man and woman are married .
+
+[215]
+[premise] A man in a purple shirt is bending over backwards at the waist while a group of barefoot onlookers clap .
+[Entailment] The man is contorting his body .
+[Contradiction] The man is practicing his performance alone .
+[Neutral] The onlookers are impressed .
+
+[216]
+[premise] A man sitting on a couch and a little boy holding up his Christmas candy .
+[Entailment] Two person is on the couch .
+[Contradiction] Two person is on the couch eating easter candy .
+[Neutral] Two person is on the couch eating christmas candy .
+
+[217]
+[premise] A man with a yellow jacket walks his bicycle past a bicycle shop .
+[Entailment] There is a male outside of a shop .
+[Contradiction] The man enters the bicycle shop .
+[Neutral] The man 's bicycle is broken .
+
+[218]
+[premise] A party with green balls bouncing in the air and a DJ at what appears to be a live performance .
+[Entailment] The party has music .
+[Contradiction] The balls bouncing are yellow .
+[Neutral] The party is a rave .
+
+[219]
+[premise] A woman harvesting her crops in a marshy area .
+[Entailment] A woman is harvesting crops .
+[Contradiction] A woman is planting crops .
+[Neutral] A woman is harvesting soybeans .
+
+[220]
+[premise] A woman in a blue shirt is speaking with two other women and a man , who is wearing glasses .
+[Entailment] A woman is speaking to another two woman and a man
+[Contradiction] The woman is speaking to three other men .
+[Neutral] A woman is lecturing to three other people
+
+[221]
+[premise] A young girl with a painted face runs in a backyard .
+[Entailment] there is a little girl doing artistic activities in his backyard
+[Contradiction] there is a female who is allergen to painting colours
+[Neutral] there are many colours
+
+[222]
+[premise] A young man is playing an organ while an old man in a yellow shirt watches .
+[Entailment] The man is playing an instrument .
+[Contradiction] The man in yellow is hitting the organ player .
+[Neutral] he man in yellow is the organ players father .
+
+[223]
+[premise] An old man is holding up one dog while his other dog climbs on his lap .
+[Entailment] There is an old man and a dog .
+[Contradiction] The dog bit his owner .
+[Neutral] The dog loves his owner .
+
+[224]
+[premise] An old man with long hair playing the trumpet .
+[Entailment] A man is playing an instrument .
+[Contradiction] An orchestra plays on a brightly lit stage .
+[Neutral] A trumpet player is playing requests from listeners .
+
+[225]
+[premise] Asian people dressed in costumes and some holding orange signs .
+[Entailment] Asians holding signs in costume .
+[Contradiction] People on Halloween .
+[Neutral] Asians practicing tradition .
+
+[226]
+[premise] Family sitting on tractor loaded with hay near the water .
+[Entailment] There is a tractor near the water .
+[Contradiction] Family sitting in a truck on the way to the farm .
+[Neutral] A family rests under a tree as they take a break from haying .
+
+[227]
+[premise] Four men and two women , most with ear protectors , are sitting in the hold of a boat .
+[Entailment] There are some people outside in this picture
+[Contradiction] They are all getting ready to go to Santa 's house .
+[Neutral] they are being smuggled to the country
+
+[228]
+[premise] Group of people sitting on beach , facing the ocean .
+[Entailment] There are people on the beach .
+[Contradiction] The lonely man stares into the ocean .
+[Neutral] The group of people are wanting to swim .
+
+[229]
+[premise] One boy skateboarding on a rail and three boys watching .
+[Entailment] The boys are outside
+[Contradiction] The boys are all skateboarding
+[Neutral] The boy skateboarding is teaching the others how to do a trick
+
+[230]
+[premise] Several men and women in rollerskates , with a man in the center and a woman on either side of him in the foreground .
+[Entailment] There are multiple people wearing rollerskates .
+[Contradiction] A woman is in the center .
+[Neutral] The people are skating down a sidewalk .
+
+[231]
+[premise] Surfer leaning back on surfboard .
+[Entailment] Rider laying rearward on board
+[Contradiction] Guy holding surfboard on shore .
+[Neutral] Surf rider beginning to enter a trick .
+
+[232]
+[premise] The marquee of movies now playing .
+[Entailment] A sign is showing movie names .
+[Contradiction] The marquee of coming attraction movies .
+[Neutral] A sign for Gone With the Wind is up at the movies .
+
+[233]
+[premise] The staff of a DHL pose outside of the building for a group photo .
+[Entailment] People are posing for a photo .
+[Contradiction] The staff members are busy at work .
+[Neutral] The staff members are standing outside in the rain .
+
+[234]
+[premise] Three men sit atop a tank turret .
+[Entailment] Three men sit atop a turret .
+[Contradiction] Twomen sit atop a tank turret .
+[Neutral] Three men sit atop an old tank turret .
+
+[235]
+[premise] Two boys are playing on scaffolding .
+[Entailment] There is more than one boy playing .
+[Contradiction] Two boys are playing on a rock climbing wall .
+[Neutral] The two boys are high in the air playing on the scaffolding .
+
+[236]
+[premise] Two boys playing football on opposing teams .
+[Entailment] There are two boys playing football .
+[Contradiction] Two boys on the same team passed the ball back and forth to each other .
+[Neutral] The two captains from opposite teams slide for the ball at the same time .
+
+[237]
+[premise] Two children playing with a ball on the grass .
+[Entailment] Two children playing outside
+[Contradiction] The two kids are running around talking to each other
+[Neutral] Two children having fun together
+
+[238]
+[premise] Two children sitting on disks in the snow .
+[Entailment] Two children outside in the snow .
+[Contradiction] Two kids stare sadly out the window as the snow melts .
+[Neutral] Two children play in the snow as their dads watch .
+
+[239]
+[premise] Two dogs are standing next to each other , and the white dog has a stick in its mouth .
+[Entailment] Two dogs are near eachother .
+[Contradiction] The white dog is black .
+[Neutral] The white dog likes sticks .
+
+[240]
+[premise] Two men are sitting by a campfire .
+[Entailment] there are two men by a fire .
+[Contradiction] there are two people on fire .
+[Neutral] there are people watching a fire .
+
+[241]
+[premise] Two men trying to build a fire .
+[Entailment] There are two men starting to building a fire .
+[Contradiction] The two men are putting out a fire .
+[Neutral] The two men are trying to build a fire in a fireplace .
+
+[242]
+[premise] Two middle-aged Asian men with mustaches working with animal hides in a shop .
+[Entailment] 2 middle-aged asian men are working with animal hides
+[Contradiction] the asian men are robbers
+[Neutral] 2 middle-aged asian men are hunters
+
+[243]
+[premise] Two people overlook a body of water during the day .
+[Entailment] The people are looking at the water .
+[Contradiction] The people are jumping in the water .
+[Neutral] The people are looking over a lake .
+
+[244]
+[premise] Two young people hold each other closely as they walk down the sidewalk .
+[Entailment] Two young people are on a stroll .
+[Contradiction] Two young people are playing hopscotch on the sidewalk .
+[Neutral] Two young people are walking to dinner .
+
+[245]
+[premise] Woman and child walk a wooded path
+[Entailment] The people walk down the path .
+[Contradiction] The extended family is all taking a walk together .
+[Neutral] The mother is walking with her son .
+
+[246]
+[premise] a woman in a black shirt and purple pants is bending over reaching into a dishwasher .
+[Entailment] Someone is doing dishes .
+[Contradiction] The dishwasher has had the front panel taken off .
+[Neutral] Someone is taking dishes out of the dishwasher .
+
+[247]
+[premise] people watching at the arts in exhibition .
+[Entailment] Some people are at an arts exhibition .
+[Contradiction] A group of elementary school students are watching their teacher write on the chalkboard .
+[Neutral] Some art students are watching a performance arts piece being performed at the arts exhibition .
+
+[248]
+[premise] three black dogs and a white dog are standing in the snow .
+[Entailment] Four dogs are standing together outdoors .
+[Contradiction] Two Irish Setters are playing in the snow .
+[Neutral] Four dogs are waiting to be harnessed to a sled .
+
+[249]
+[premise] two men in orange attire are cleaning up garbage on the street .
+[Entailment] Two men wear orange clothing .
+[Contradiction] Two men trash the street .
+[Neutral] Two men clean garbage on a Thursday .
+-----
+Neutral incorrect
+-----
+
+[250]
+[premise] A bald man is standing in a crowd .
+[Entailment] The man is being surrounded .
+[Contradiction] The man is sitting in the crowd .
+[Neutral] The man knows the crowd .
+
+[251]
+[premise] A barefooted African American woman is cleaning a rug outdoors .
+[Entailment] A woman is barefoot outside .
+[Contradiction] A woman is sleeping in bed .
+[Neutral] A woman is sitting and cleaning a rug .
+
+[252]
+[premise] A black dog and a brown dog are smelling each others noses .
+[Entailment] Two dogs smelling each others noses and they were black and brown color respectively
+[Contradiction] Dogs sleeping on the road side since it was raining
+[Neutral] Dogs smelling each other
+
+[253]
+[premise] A blond girl in a funky hat turns around to look at the camera in a sidewalk scene .
+[Entailment] A blond girl in a weird hat looks at the camera .
+[Contradiction] A skinny girl drinks to much and pukes in her hat .
+[Neutral] A skinny girl in a funky hat looks at the camera .
+
+[254]
+[premise] A boy in a helmet is riding his tricycle down a grassy gravel path beside a fence .
+[Entailment] A boy is riding a tricycle down a path
+[Contradiction] A boy crashed his bikee
+[Neutral] A boy is riding a bike
+
+[255]
+[premise] A cat lays on a wall with shrubbery behind him .
+[Entailment] a cat laying on a wall in front of bushes
+[Contradiction] a dog walks in front of pine trees
+[Neutral] a cat lay in front of shrubbery
+
+[256]
+[premise] A group if kids giving a demonstration in a classroom .
+[Entailment] Kids are doing a demonstration .
+[Contradiction] Kids are putting on a play .
+[Neutral] Kids are doing a volcano demonstration .
+
+[257]
+[premise] A group of individuals are standing in the middle of a room while others are sitting around them and watching .
+[Entailment] There are people watching the standing individuals .
+[Contradiction] Everyone is sitting down .
+[Neutral] The group of individuals standing are performing .
+
+[258]
+[premise] A group of white male sailors , senior officers in tan and black shirts , and a lower ranked , black sailor , dressed in the traditional white pants suit with blue tie , walking past a sushi restaurant .
+[Entailment] a group of sailors walk past a restaurant
+[Contradiction] some sailors sleep
+[Neutral] a group of sailors walk
+
+[259]
+[premise] A little boy kisses a little girl on the side of the road .
+[Entailment] One litle boy kisses a little girl on nearby the road
+[Contradiction] A boy are playing with some other childrens
+[Neutral] The childrens are standing on the side of the road
+
+[260]
+[premise] A man at work is doing a small welding job with a soldering tool .
+[Entailment] A man is working .
+[Contradiction] A man is sleeping .
+[Neutral] A man is making something .
+
+[261]
+[premise] A man in a suit is reading the paper while he walks down the street .
+[Entailment] A man in a suit is reading the newspaper on the street .
+[Contradiction] A man is running down the street reading is cell phone text message .
+[Neutral] A man walking on the street is reading something .
+
+[262]
+[premise] A man in a tight orange shirt is surrounded by many people .
+[Entailment] A person is in a crowd
+[Contradiction] A person is alone in a log cabin
+[Neutral] There are many people in one area
+
+[263]
+[premise] A man in a white shirt kneels in the doorway of a building while two men behind him look on .
+[Entailment] Three men look in the doorway of a building
+[Contradiction] Three men sit in a restaurant booth
+[Neutral] Three men are walking into a store
+
+[264]
+[premise] A man sitting at a computer .
+[Entailment] A man is sitting down in front of a computer .
+[Contradiction] The man is doing jumping jacks in the back yard .
+[Neutral] The man is shopping on Amazon .
+
+[265]
+[premise] A man wearing a hat and goggles is looking at his hand .
+[Entailment] There is a man wearing a hat and goggles looking at his hand .
+[Contradiction] There is a lady wearing a hat and googles looking at her feet .
+[Neutral] There is a man wearing a hat and goggles looking at his feet .
+
+[266]
+[premise] A man with hat on builds a house .
+[Entailment] a man builds a house
+[Contradiction] a man engineers a car
+[Neutral] a man builds a sea side house
+
+[267]
+[premise] A number of children enjoy themselves on the coast of a city .
+[Entailment] A number of chilfren enjoy themselves on the coast of a city
+[Contradiction] The number of children were not having fun at all
+[Neutral] There were a lot of children enjoying themself on the coast
+
+[268]
+[premise] A person on a snowmobile .
+[Entailment] A person is sitting on a snowmobile .
+[Contradiction] A person is skiing .
+[Neutral] A person is riding a snowmobile .
+
+[269]
+[premise] A person with shopping bags crosses the street behind a bus , while two others stand next to the curb .
+[Entailment] Someone crosses a street while other people stand and a bus is nearby .
+[Contradiction] There is an empty street with no one nearby .
+[Neutral] Someone jaywalks behind a bus while others watch .
+
+[270]
+[premise] A pilot leans out the open window the cockpit to clean the window of his plane .
+[Entailment] A pilot cleans the plane window from the cockpit .
+[Contradiction] A pilot walks down the ramp .
+[Neutral] A man cleans a plane window .
+
+[271]
+[premise] A small boy is chewing on a pen .
+[Entailment] A young child has a pen in his mouth .
+[Contradiction] A small boy is chewing a pacifier .
+[Neutral] A small boy is holding and chewing a pen .
+
+[272]
+[premise] A talented male artist is drawing caricatures from photographs outside , under an umbrella .
+[Entailment] A male caricature artist sits under an umbrella and draws outside .
+[Contradiction] The artist in working at a kiosk inside the shopping mall .
+[Neutral] The artist is shielding himself from the bright sun .
+
+[273]
+[premise] A white race car drives through a puddle .
+[Entailment] The car has wet tires .
+[Contradiction] The race car is on a truck .
+[Neutral] The race car has a numbers on the side of it .
+
+[274]
+[premise] A woman is observing a sample through a microscope .
+[Entailment] A woman have microphone
+[Contradiction] A woman watching through a telescope
+[Neutral] A woman looking for something
+
+[275]
+[premise] A woman wearing a pink hat nods off while sitting on a bench surrounded by pigeons .
+[Entailment] There are several birds near a bench .
+[Contradiction] The woman is wearing a red helmet .
+[Neutral] The woman is wearing a pink top .
+
+[276]
+[premise] A young boy swings a golf club with an open field in front of him .
+[Entailment] The young boy is using a golf club .
+[Contradiction] A boy is playing basketball on a court .
+[Neutral] A boy is playing golf near an open field .
+
+[277]
+[premise] At some sort of carnival , a man is making cotton candy .
+[Entailment] A man is making cotton candy
+[Contradiction] A man is making popcorn
+[Neutral] A man is outside
+
+[278]
+[premise] Construction workers in orange and yellow vests working on a city street .
+[Entailment] Construction workers are on the city street working .
+[Contradiction] The street is empty .
+[Neutral] The construction workers wear vests .
+
+[279]
+[premise] Large turkeys and deer stand in the snow .
+[Entailment] It is cold outside .
+[Contradiction] It is the middle of summer .
+[Neutral] The animals are not in a city .
+
+[280]
+[premise] Man wearing sack mask in suit .
+[Entailment] Man wearing a mask
+[Contradiction] Man has no mask on
+[Neutral] Man in suit is a costume
+
+[281]
+[premise] Person works on metal-working project involving wheels and chains .
+[Entailment] The person is working .
+[Contradiction] The person is working with wood .
+[Neutral] The person is making a contraption .
+
+[282]
+[premise] The man is throwing a tennis ball for the brown dog to fetch .
+[Entailment] A dog is playing fetch .
+[Contradiction] A dog is chasing down a frisbee .
+[Neutral] A dog is chasing a ball around .
+
+[283]
+[premise] The old man stabs his wooden rake into a small pile of cut grass .
+[Entailment] The rake is in a pile of cut grass .
+[Contradiction] The old man stabs his wooden stake into the heart of a vampire .
+[Neutral] There are several small piles of cut grass .
+
+[284]
+[premise] This is a group on young men participating in volleyball .
+[Entailment] Men are playing a game outside .
+[Contradiction] A woman is sitting in a hair salon .
+[Neutral] Men are standing on a sand field enjoying themselves .
+
+[285]
+[premise] This lady go for a jogging in the morning .
+[Entailment] This woman jogs early in the day .
+[Contradiction] This person is in a wheelchair .
+[Neutral] This female exercises everyday .
+
+[286]
+[premise] Three boys pose on sidewalk , one boy holding a camera .
+[Entailment] The boys are outside .
+[Contradiction] The boys are sleeping in a plane on their way to a rugby match in Rome .
+[Neutral] The boys are skipping school to finish their art project .
+
+[287]
+[premise] Three children are playing on the shoreline with a ferry docked in the background .
+[Entailment] The children are near the water .
+[Contradiction] The children are unable to move .
+[Neutral] The children are wet .
+
+[288]
+[premise] Three women tourists take pictures of an object .
+[Entailment] The three lady tourists are photgraphing the object .
+[Contradiction] Two lady tourists are photgraphing an object , while the third lady is not .
+[Neutral] The three women tourists are photographing an object outdoors .
+
+[289]
+[premise] Two boys on ice skates race on an outdoor ice rink .
+[Entailment] Two boys are outside .
+[Contradiction] Two boys are fighting .
+[Neutral] Two boys are playing hockey .
+
+[290]
+[premise] Two kids ride their bikes by the ocean , in the evening .
+[Entailment] Children ride bikes .
+[Contradiction] Curious George is a Yeti .
+[Neutral] A beach is nearby .
+
+[291]
+[premise] Two older gentlemen having coffee or tea and a serious discussion .
+[Entailment] Two men are drinking and having a talk .
+[Contradiction] The men are drinking soda .
+[Neutral] Both of the men are drinking tea .
+
+[292]
+[premise] Two players face off in a basketball game .
+[Entailment] People play basketball .
+[Contradiction] The basketball players are playing 3-on-3 .
+[Neutral] The players play on a court .
+
+[293]
+[premise] Two white dogs chase after a red ball in a yard in front of a white fence .
+[Entailment] Two dogs are outdoors .
+[Contradiction] There is a cat playing indoors .
+[Neutral] There are two dogs playing with each other .
+
+[294]
+[premise] Young girl hanging on a vine .
+[Entailment] Young girl on a vine .
+[Contradiction] Young girl is sleeping in .
+[Neutral] Young girl is near a vine .
+
+[295]
+[premise] a group enjoying a day at the park in their trekkies
+[Entailment] A group is at the park .
+[Contradiction] A group of zombies is roaming the streets .
+[Neutral] A group of trekkies is at the park .
+
+[296]
+[premise] a man on a bike in the city area .
+[Entailment] A man rides a bike outdoors .
+[Contradiction] A man gets into a car .
+[Neutral] A man rides down a city street .
+
+[297]
+[premise] a young child throwing stones into a shallow stream .
+[Entailment] A child throws stones .
+[Contradiction] A child looks for his mother in the store .
+[Neutral] A child sits next to a stream .
+
+[298]
+[premise] man in black jacket holding a guitar .
+[Entailment] A man in black .
+[Contradiction] A naked man playing guitar .
+[Neutral] A man in black holding a guitar .
+
+[299]
+[premise] women holding child looking at a fish tank .
+[Entailment] a child is looking at a fish takn
+[Contradiction] a man is holding a child looking at a fish tank
+[Neutral] they are at a zoo
