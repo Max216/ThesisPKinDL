@@ -1,5 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from matplotlib import colors
 import numpy as np
 import random
@@ -393,23 +394,39 @@ def plt_bars(bars, title, x_labels, block=True):
 	'''
 	Plot a bar chart for each bar in bars.
 
-	:param bars : list of tuples: [(label of datatype, [values])]
+	:param bars : list of tuples: [([labels], [values])]. Tuples will have the same bar-position per x value.
 	:param title title of the bar chart
 	:param x_labels appear on the x-axis
 	'''
+
+
 	
-	labels = [lbl for lbl, values in bars]
-	values = [values for lbl, values in bars]
-	num_groups = len(values[0])
+	labels = list(set([lbl for labels, values in bars for lbl in labels]))
 
 	fig, ax = plt.subplots()
+	bar_width = .1 
+
+	# for each group create plots
+	for i_bar, (bar_labels, values) in enumerate(bars):
+		# for each label create indizes and values
+		for i_lbl, lbl in enumerate(labels):
+			plt_indizes = np.asarray([i for i in range(len(values)) if bar_labels[i] == lbl])
+			plt_values = [values[i] for i in plt_indizes]
+			plt.bar(plt_indizes + i_bar * bar_width * 2, plt_values, bar_width, color=color_palette[i_lbl], label=lbl)
+
+
+
+	#values = [values for lbl, values in bars]
+	#num_groups = len(values[0])
+
+	#fig, ax = plt.subplots()
+	num_groups = len(bars[1][0])
 	index = np.arange(num_groups)
-	colors = [color_palette[i] for i in index]
-	bar_width = .1
+	#bar_width = .1
 
 
-	for i, lbl in enumerate(labels):
-		plt.bar(index + i * bar_width * 2, values[i], bar_width, color=color_palette[i], label=lbl)
+	#for i, lbl in enumerate(labels):
+	#	plt.bar(index + i * bar_width * 2, values[i], bar_width, color=color_palette[i], label=lbl)
 
 	plt.xlabel('Dimensions')
 	plt.ylabel('Representation value')
@@ -420,17 +437,50 @@ def plt_bars(bars, title, x_labels, block=True):
 		tick.set_rotation(90)
 		tick.set_fontsize(6)
 
-	plt.legend(bbox_to_anchor=(0,1.12,1,0.2), loc="lower left", mode="expand", borderaxespad=0, ncol=2)
-	plt.subplots_adjust(top=0.8, bottom=0.2)
+	patches = [mpatches.Patch(color=color_palette[i], label=labels[i]) for i in range(len(labels))]
+
+	plt.legend(bbox_to_anchor=(0,1.2,1,0.2), loc="lower left", mode="expand", borderaxespad=0, ncol=3, handles=patches)
+	plt.subplots_adjust(top=0.8, bottom=0.4)
 	plt.show(block=block)
 
 def to_dim_labels(dims):
 	def appendix(dim):
-		known_dims = dict([(602, 'male'),(199, 'male'),(280, 'male'),(89, 'male'),
-			(1730, 'female'),(845, 'female'),(311, 'female'),(609, 'female'), (757, 'subj w/ gender'),
-			(258, 'subj w/ gender'), (1878, 'subj w/ gender'), (713, 'ROOT+sport'), (1840, 'Location'),
-			(630, 'playable+?'), (250, 'location'), (2007, 'movement'), (1341, 'sport-evt'), (1381, 'get-somewhere+rest+?'),
-			(188, 'community'), (2020, 'adj-to-person'), (86, 'food/animal/comfy')])
+		known_dims = dict([(757, 'subj w/ gender'), (258, 'subj w/ gender'), (35, 'in/outdoor place+sport?'),
+			(713, 'ROOT+sport'),(602, 'male'), (630, 'playable+?'), (199, 'male'), (1787, 'obj?:sport+car+animal+food?'),
+			(1730, 'female'), (280, 'male'), (89, 'male'),(845, 'female'), (1840, 'obj:Location'), (311, 'female'),
+			(825, 'children+play?'), (809, 'subj:m/f?'), (250, 'location'), (184, 'POS:IN/TO/(vb)'), (698, 'female?'),
+			(1480, 'children+play?'), (1232, 'clothes+color'), (817, 'OBJ+(location?)?'), (1987, 'sit/eat/read/ride+=NNs?'), 
+			(2007, 'action/movement VBs?'), (609, 'female'), (186, 'children+sleep?'), (1381, 'get-somewhere+rest+?'),
+			(1170, 'female?'), (107, 'OBJ:/evt/sport?'), (587, 'subj:family members?'),
+			(818, '1st position: The+CD'), (1878, 'subj w/ gender'), (377, 'person?'), (475, 'VB sit/ride/eat/sleep'),
+			(527, 'movmentVB/NN+music'), (1341, 'sport event'), (1663, 'outsideNN+rest/walking?'), (480, 'nature/alone'),
+			(262, 'man+male-assoziated'), (284, 'outside-loction'), (274, 'female+pl.persons?'), (1949, '??DT+water?'),
+			(1268, 'children+/activity'), (1890, 'his/her/their?'), (778, 'run+sad/without'), (813, 'obj:water assoziated?'),
+			(1893, 'CD+ads'), (977, 'male?'), (1466, 'ROOT:walk/sit/stand/+'), (1307, '???POS:DET/IN?'),
+			(1251, 'ROOT:get/stay somewhere?'), (1608, 'OBJ:place?'), (513, 'POS:IN/TO'), (2037, '??POS:DET(more a)??'),
+			(1903, 'POS:JJ? (city)??'), (804, '?place city?+sport'), (646, 'colors?'), (1822, '?obj?'),(1963, 'nature+activity?') ,
+			(1049, 'play/dance/art?'), (140, 'places+POS:IN?'), (229, 'shopping+POS:IN'), (713, 'POS:VB, play stay(get somewhere+sport'),
+			(731, 'POS:VB for sport'), (263, 'food+dogs?'), (1882, 'POS:DT+JJ(for consume?)'), (1634, 'lazy verb?'),
+			(965, 'beach/water assoziated'), (980, 'POS:VB (jumpl/play/dance)'), (742, 'VB:sit/walk/stand?'),
+			(495, 'ADJ to person?'), (1627, 'dog/run/police?'), (188, 'community'), (266, 'run+sport?'), (1745, 'fast running'),
+			(1520, 'family:members/education/work'), (1657, '?dog/sport/food/fire?'), (45, 'city/indoor/water place'),
+			(1156, 'alone/away/sad+POS:CD+JJ+RB'), (1393, 'clothing'), (1032, 'play/game/sport'), (1238, 'non-moving/emotion/commnication verbs'),
+			(2044, 'water assoziated'), (756, 'location?'), (1175, 'POS:JJ'), (882, 'walk/stand:outdoor'), (2029, 'water assoziated'),
+			(1223, 'indoor items/verbs'), (1370, 'water+X??'), (1174, 'JJ to (children?)'), (2020, 'adj-to-person'), 
+			(957, 'children+skateboard'), (1849, 'female'), (86, 'food/animal/comfy'), (1687, 'traffic stuff??'),
+			(542, 'VB: run/sleep/jump??'), (1606, 'dog/swim/run'), (1631, 'walk/sit/run/stand?'), (1812, 'water associated+food?'),
+			(1329, 'dog+animals/run'), (350, 'inside+relax'), (1276, 'inside+shops/clubs'), (826, 'children+skating'),
+			(1082, 'VB:work/do/perform/sing+NNs'), (1392, 'beach&biking?'), (138, 'VB:play/swim/run+sport,clown'), 
+			(384, 'places:city/building/+??'), 
+
+			(1990, 'sit+eat?'), (1449, 'people-group-genderless?'), (821, 'genderless people?'), (402, 'genderless people?'),
+			(616, 'female, only few'), (1327, 'm/f subj'), (1131, 'female+children(inkl boy)'), (707, 'girl>boy>woman>man?'),
+			(467, 'discuss/meet/interview??'), (1661, 'outdoor:area/weather/+?'), (2001, 'resting VBs+NNs/+?'),
+			(1658, 'POS:IN+stand*'), (366, 'standing/leaning'), (941, 'standing+feet'), (1549, 'POS:DT(a/A)+CD'),
+			(363, 'community/friends/events'), (828, 'SUBJ: professions'), (134, 'animals+JJ for animals'), (1607, 'people+interaction VB+NN'),
+			(1720, 'crowd-ish'), (569, 'family members(female+neutral)'), (798, 'male'), (472, 'male'), (830, 'male+police+fight'),
+			(842, 'male+male professions'), (1423, 'animals/people/food')
+			])
 
 
 		if dim in known_dims:
@@ -443,6 +493,40 @@ def to_dim_labels(dims):
 def get_shared(idx_p, idx_h, sample):
 	return [dim for dim in sample.dims if sample.p_act[dim] == idx_p and sample.h_act[dim] == idx_h]
 
+# This is used when checking for not-shared dimensions. The plot will not show any information about 
+# words that do not encode relevant information in terms of encoding both values >= blindthreshold
+# This assumes that related words do share some dimensions with value
+global blind_threshold
+
+# This assumes that we need at least this many meaningful dimensions shared between both sentences
+# Meaningful sentences are defined by reaching at least blind_threshold for both values.
+global blind_threshold_min
+
+# Of all unshared dimensions that arise from a meaningful relation defined by both thresholds above
+# only those will be shown reaching a t least this threshold for one value (this value must arise from the
+# word).
+global min_unshared_threshold
+blind_threshold = None
+blind_threshold_min = None
+min_unshared_threshold = None
+
+def get_not_shared(idx_p, idx_h, sample):
+
+	# Check if sharing enough value to be interesting
+	shared_dims = get_shared(idx_p, idx_h, sample)
+	interesting_shared_dims = [dim for dim in shared_dims if sample.p_rep[dim] >= blind_threshold and sample.h_rep[dim] >= blind_threshold]
+	print(sample.p[idx_p], sample.h[idx_h], len(interesting_shared_dims))
+	if len(interesting_shared_dims) < blind_threshold_min:
+		return []
+
+	dims_p = set([dim for dim in sample.dims if sample.p_act[dim] == idx_p and sample.p_rep[dim] >= min_unshared_threshold])
+	dims_h = set([dim for dim in sample.dims if sample.h_act[dim] == idx_h and sample.h_rep[dim] >= min_unshared_threshold])
+	combined = dims_p | dims_h
+	# remove shared
+	unshared_dims = list(combined - set(shared_dims))
+	return unshared_dims
+
+
 def analyse_word_alignment(params):
 	idx_p = int(params['<idx_p>'])
 	idx_h = int(params['<idx_h>'])
@@ -450,13 +534,27 @@ def analyse_word_alignment(params):
 	label = dict([('e', 'entailment'), ('n', 'neutral'), ('c', 'contradiction')])[params['<label>']]
 	sample = load_sent(sent_idx, label, params)
 	
-	dims = get_shared(idx_p, idx_h, sample)
+	get_dims = get_shared
+	if params['--not'] != None:
+		get_dims = get_not_shared
+		global blind_threshold
+		global blind_threshold_min
+		global min_unshared_threshold
+
+		splitted = params['--not'].split(' ')
+		blind_threshold = float(splitted[0])
+		blind_threshold_min = int(splitted[1])
+		min_unshared_threshold = float(splitted[2])
+
+	dims = get_dims(idx_p, idx_h, sample)
 	p_rep = sorted([(dim, sample.p_rep[dim]) for dim in dims], key=lambda x: -x[-1])
 	h_rep = [sample.h_rep[dim] for dim, _ in p_rep]
 	dims = [dim for dim, _ in p_rep]
+	
+	labels_p = ['[p' + str(sample.p_act[dim]) + ']' + sample.p[sample.p_act[dim]] for dim,_ in p_rep]
+	labels_h = ['[h' + str(sample.h_act[dim]) + ']' + sample.h[sample.h_act[dim]] for dim,_ in p_rep]
 	p_rep = [v for dim, v in p_rep]
-
-	bars = [('premise', p_rep), ('hypothesis', h_rep)]
+	bars = [(labels_p, p_rep), (labels_h, h_rep)]
 	x_labels = to_dim_labels(dims)
 	title = '[premise=' + str(idx_p) + ']' + sample.p[idx_p] + '  --  [hypothesis=' + str(idx_h) + ']' + sample.h[idx_h]
 	plt_bars(bars, title, x_labels, block=True)
@@ -470,32 +568,18 @@ def analyse_sent_alignment(params):
 	sample = load_sent(sent_idx, label, params)
 	conf_type = params['<conf_type>']
 	print_top = int(params['--pt'] or 1)
-	
-	# This is used when checking for not-shared dimensions. The plot will not show any information about 
-	# words that do not encode relevant information in terms of encoding any shared value >= blindthreshold
-	# This assumes that related words do share some dimensions with value
-	blind_threshold = None
-
-	def get_not_shared(idx_p, idx_h, sample):
-
-		shared_dims = get_shared(idx_p, idx_h, sample)
-		values_p = [sample.p_rep[dim] for dim in shared_dims]
-		values_h = [sample.h_rep[dim] for dim in shared_dims]
-		max_rep = -1 if len(shared_dims) == 0 else max(values_p + values_h)
-		if max_rep < blind_threshold:
-			return []
-
-		dims_p = set([dim for dim in sample.dims if sample.p_act[dim] == idx_p])
-		dims_h = set([dim for dim in sample.dims if sample.h_act[dim] == idx_h])
-		shared = dims_p & dims_h
-		combined = dims_p | dims_h
-		# remove shared
-		return list(combined - shared)
 
 	get_dims = get_shared
 	if params['--not'] != None:
 		get_dims = get_not_shared
-		blind_threshold = float(params['--not'])
+		global blind_threshold
+		global blind_threshold_min
+		global min_unshared_threshold
+
+		splitted = params['--not'].split(' ')
+		blind_threshold = float(splitted[0])
+		blind_threshold_min = int(splitted[1])
+		min_unshared_threshold = float(splitted[2])
 
 	def score_num_act(idx_p, idx_h, sample, print_out=False):
 		'''Score each index by the amount of activation they share.'''
@@ -634,7 +718,7 @@ def main():
 		analyse-alignment.py print <folder>
 		analyse-alignment.py sd <folder>		
 		analyse-alignment.py cm <sent_idx> <label> <conf_type> [--pt=<print_top>] [--t=<threshold>] [--tb=<threshold_both>] [--tsd=<top_sd>] [--not=<blind_threshold>]
-		analyse-alignment.py plt <sent_idx> <label> <conf_type> <idx_p> <idx_h> [--t=<threshold>] [--tb=<threshold_both>] [--tsd=<top_sd>]
+		analyse-alignment.py plt <sent_idx> <label> <conf_type> <idx_p> <idx_h> [--t=<threshold>] [--tb=<threshold_both>] [--tsd=<top_sd>] [--not=<blind_threshold>]
 	""")
 
 	fn = [k for k in args if args[k] == True][0]

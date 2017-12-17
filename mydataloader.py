@@ -70,6 +70,16 @@ def simple_load(path, embedding_holder=None):
 
     return SNLIDataset(load_snli(path), embedding_holder)
 
+def load_test_pair(premise, hypothesis, embedding_holder):
+    '''Load a test pair for label checking'''
+    dummy_label='neutral'
+    return (
+        torch.LongTensor([embedding_holder.word_index(w) for w in word_tokenize(premise)]),
+        torch.LongTensor([embedding_holder.word_index(w) for w in word_tokenize(hypothesis)]),
+        tag_to_index[dummy_label]
+        )
+
+
 class SNLIDataset(Dataset):
     '''
     Load the SNLI dataset

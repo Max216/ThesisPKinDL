@@ -1,0 +1,13 @@
+Evaluate sorted batched:
+Train: 89.40
+Dev: 85.93
+
+Evaluate unsorted batched:
+Train: 89.38
+Dev: 86.01
+Test: 85.37
+
+Evaluate not-batched:
+Train: 89.14
+Dev: 85.63
+Test: 84.98
