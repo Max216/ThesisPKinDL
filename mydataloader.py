@@ -31,7 +31,7 @@ def extract_snli(raw_instance):
     parsed_data = json.loads(raw_instance)
     return (word_tokenize(parsed_data['sentence1']), word_tokenize(parsed_data['sentence2']), parsed_data['gold_label'])
 
-def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
+def load_snli(path, valid_labels=['neutral','contradiction','entailment'], filter_fn=None):
     """
     @param path - Path to the *.jsonl file of the SNLI dataset
     @param valid_labels -  only samples with one of these labels will be considered.
@@ -41,7 +41,10 @@ def load_snli(path, valid_labels=['neutral','contradiction','entailment']):
     with open(path) as file:
         all_lines = [extract_snli(line) for line in file]
 
-    return [(p, h, lbl) for (p, h, lbl) in all_lines if lbl in valid_labels]
+    if filter_fn != None:
+        return [(p, h, lbl) for (p, h, lbl) in all_lines if lbl in valid_labels and filter_fn(p, h, lbl)]
+    else:
+        return [(p, h, lbl) for (p, h, lbl) in all_lines if lbl in valid_labels]
 
 def load_snli_with_parse(path, valid_labels=['neutral','contradiction','entailment']):
     '''
@@ -107,7 +110,7 @@ class SNLIDataset(Dataset):
         return self.converted_samples[idx]
 
 
-def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as='', include_sent=False):
+def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as='', include_sent=False, filter_fn=None):
     '''
     Divides the data into several chunks with the premise having approximately the same size of all examples
     to reduce padding.
@@ -118,7 +121,7 @@ def get_dataset_chunks(filepath, embedding_holder, chunk_size=10000, mark_as='',
     '''
 
     # sort by length
-    raw_samples = load_snli(filepath) 
+    raw_samples = load_snli(filepath, filter_fn=filter_fn) 
     print('Loaded', len(raw_samples),'samples with valid labels.', mark_as)
     raw_samples = sorted(raw_samples, key=lambda sample: len(sample[0])) # 0 is premise
 

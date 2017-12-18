@@ -479,7 +479,7 @@ def to_dim_labels(dims):
 			(1658, 'POS:IN+stand*'), (366, 'standing/leaning'), (941, 'standing+feet'), (1549, 'POS:DT(a/A)+CD'),
 			(363, 'community/friends/events'), (828, 'SUBJ: professions'), (134, 'animals+JJ for animals'), (1607, 'people+interaction VB+NN'),
 			(1720, 'crowd-ish'), (569, 'family members(female+neutral)'), (798, 'male'), (472, 'male'), (830, 'male+police+fight'),
-			(842, 'male+male professions'), (1423, 'animals/people/food')
+			(842, 'male+male professions'), (1423, 'animals/people/food'), (872, 'wilderness/Nature?')
 			])
 
 
