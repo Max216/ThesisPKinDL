@@ -32,7 +32,7 @@ def find(classifier_path, data_path, gold_label, find_predicted_label, t):
     print('Results for gold label =', gold_label, '; predicted=', find_predicted_label)
 
     def filter_fn(p, h, lbl):
-        if lbl == 'contradiction':
+        if lbl == gold_label:
             abs_overlap = len([w for w in p if w in h])
             rel_overlap = abs_overlap / min([len(p), len(h)])
             if rel_overlap >= t:
