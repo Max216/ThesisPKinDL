@@ -4,6 +4,7 @@ import train
 import embeddingholder
 import config
 from torch.utils.data import DataLoader
+import sys
 
 import torch
 import torch.autograd as autograd
@@ -60,6 +61,7 @@ def find(classifier_path, data_path, gold_label, find_predicted_label, t):
                 print()
                 print('[premise]' + ' '.join(sent_p[0]))
                 print('[hypothesis]' + ' '.join(sent_h[0]))
+                sys.stdout.flush()
     
     
 
