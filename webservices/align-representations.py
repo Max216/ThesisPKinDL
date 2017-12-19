@@ -12,8 +12,7 @@ import evaluate as evaluate_lib
 import nltk
 from nltk import word_tokenize
 
-import analyse_repr
-from analyse_repr import analyse_alignment as aa
+import analyse_alignment as aa
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
