@@ -29,7 +29,6 @@ class EmbeddingHolder:
         unk = np.random.random_sample((wv.shape[1],))
         padding = np.zeros(self.dimen)
         wv = np.vstack((wv, unk, padding))
-
         
         self.words = words
         self.embeddings = wv
