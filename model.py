@@ -3,7 +3,7 @@
 
 # For running on cluster
 import os; 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 import torch
 import torch.autograd as autograd
@@ -114,8 +114,8 @@ class EntailmentClassifier(nn.Module):
         self.nonlinearity = nonlinearity
         self.sent_repr = sent_repr
                 
-        #self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
-        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
+        self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
+        #self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1])
         # Use pretrained values
         self.embeddings.weight.data.copy_(torch.from_numpy(pretrained_embeddings))
                                                
@@ -151,14 +151,21 @@ class EntailmentClassifier(nn.Module):
         sent1_representation = self.sent_encoder(embedded1)
         sent2_representation = self.sent_encoder(embedded2)
         
+
+
         # Max pooling
         sent1_representation, idxs1 = torch.max(sent1_representation, dim=0)
         sent2_representation, idxs2 = torch.max(sent2_representation, dim=0)
 
+        sent1_representation = sent1_representation.view(batch_size, -1)
+        sent2_representation = sent2_representation.view(batch_size, -1)
+        idxs1 = idxs1.view(batch_size, -1)
+        idxs2 = idxs2.view(batch_size, -1)
+
+
         if twister != None:
             sent1_representation = twister.twist_representation(sent1_representation, 'premise')
             sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis')
-        
         # Create feature tensor
         if self.sent_repr == "all":
             feedforward_input = torch.cat((

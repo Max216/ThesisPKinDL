@@ -29,17 +29,26 @@ def main():
     if args['eval']:
         evaluate(model_path, data_path, embeddings_path)
     else:
-        test(model_path, args['<premise>'], args['<hypothesis>'])
+        test(model_path, args['<premise>'], args['<hypothesis>'], print_out=True)
 
-def test(model_path, p, h):
+def test(model_path, p, h, print_out=False):
     embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
     vec_p, vec_h, _ = mydataloader.load_test_pair(p, h, embedding_holder)
     classifier, _ = m.load_model(model_path, embedding_holder=embedding_holder)
+    classifier.eval()
+    classifier = m.cuda_wrap(classifier)
     var_p = autograd.Variable(m.cuda_wrap(vec_p.view(-1, 1)))
     var_h = autograd.Variable(m.cuda_wrap(vec_h).view(-1, 1))
-    out = classifier(var_p, var_h)
+    out, activations, representations = classifier(var_p, var_h, output_sent_info=True)
     _, predicted_idx = torch.max(out, dim=1)
-    print('Predict:', mydataloader.index_to_tag[predicted_idx.data[0]])
+    predicted_lbl = mydataloader.index_to_tag[predicted_idx.data[0]]
+    if print_out:
+        print('Predict:', predicted_lbl)
+    return predicted_lbl, activations, representations
+
+
+
+
 
 def evaluate(model_path, data_path, new_embeddings=None, twister=None):
     # Load model
