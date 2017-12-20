@@ -1,6 +1,6 @@
 """
 Usage:
-    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
+    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
     train_single_model.py continue <file>
 
 Options:
@@ -20,6 +20,7 @@ Options:
     --appendix=<appendix>               Appendix to add to the name.
     --relative                          Only use |p-h|, p*h for classification if set
     --directsave                        If set, always the best performing model on dev is written to the file while training, else only at the end.
+    --embeddings=<embeddings>           Path to pretrained embeddings
 """
 from docopt import docopt
 
@@ -63,6 +64,8 @@ def main():
         appendix = args.get('--appendix') or ''
         directsave = args.get('--directsave') or False
         relative = args.get('--relative')
+        embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
+        print(embedding_path)
 
         if relative:
             sent_repr = 'relative'
@@ -73,7 +76,7 @@ def main():
         print('Start training a new model:')
         
 
-        embedding_holder = embeddingholder.EmbeddingHolder(PATH_WORD_EMBEDDINGS)
+        embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
         snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
         snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
 

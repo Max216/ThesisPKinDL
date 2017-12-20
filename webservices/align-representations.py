@@ -63,6 +63,8 @@ def evaluate():
 	lbl, activations, representations = evaluate_lib.test(model_path, premise, hypothesis)
 
 	# plotting
+
+	# create sample with dummy labels
 	sample = aa.Sample(
 		word_tokenize(premise), activations[0].data[0], representations[0].data[0], 
 		word_tokenize(hypothesis), activations[1].data[0], representations[1].data[0], 
