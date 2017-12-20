@@ -49,7 +49,7 @@ def create_embeddings(data, name, dimensions):
         vocab_out.write('\n'.join(vocab))
 
     
-    np.save(name + 'npy', embedding_matrix.numpy())
+    np.save(name + 'npy', embedding_matrix.cpu().numpy())
     print('Done.')
 
 
