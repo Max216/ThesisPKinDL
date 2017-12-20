@@ -135,6 +135,137 @@ def to_name(lr, dim_hidden, dim_sent_encoder, batch_size, data_size_train, data_
         '_' + end_time + '_' + 'opts:' + sent_repr + '_' + \
         appendix
 
+class PKIntegrator:
+    def __init__(self, loss_fn, params_fn, res, params):
+        self.loss_fn = loss_fn
+        self.params_fn = params_fn
+        self.res = res
+        self.params = params
+
+    def loss(self, prediction, label, act_p, act_h, rep_p, rep_h):
+        return self.loss_fn(prediction, label, act_p, act_h, rep_p, rep_h, self.params, self.res)
+
+    def iteration(self, iteration):
+        self.params = self.params_fn(iteration, self.params)
+
+def train_model_with_res(model, train_set, dev_set, padding_token, pk_integrator, lr, epochs, batch_size, validate_after=2000, store_intermediate_name=None):
+    # remember best params
+    best_model = None
+    best_dev_acc = 0
+    best_train_acc = 0
+    best_data_amount = 0
+
+    loader_train = [DataLoader(chunk_train, 
+                        drop_last = True,    # drops last batch if it is incomplete
+                        batch_size=batch_size, 
+                        shuffle=True, 
+                        #num_workers=0, 
+                        collate_fn=CollocateBatch(padding_token)) for chunk_train in train_set]
+
+    # remember for weight decay
+    start_lr = lr
+    
+    # switch between train/eval mode due to dropout
+    model.train()
+    start = time.time()
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    # if this is <= 0, validate model
+    until_validation = 0
+    amount_trained = 0
+    
+    all_amount_trained = []
+    all_acc_train = []
+    all_acc_dev = []
+    all_err = []
+
+    train_acc = -1
+    dev_acc = -1
+    for epoch in range(epochs):
+        pk_integrator.iteration(epoch)
+
+        total_loss = 0
+        number_batches = 0
+
+        # Shuffle data chunks
+        chunk_idxs =  [i for i in range(len(loader_train))]
+        shuffle(chunk_idxs)
+
+        for chunk_idx in chunk_idxs:
+            chunk = loader_train[chunk_idx]
+            # go through all minibatches of chunk
+            for i_batch, (batch_p, batch_h, batch_lbl) in enumerate(chunk):
+                number_batches += 1
+                model.zero_grad()
+                optimizer.zero_grad()
+                
+                var_p = autograd.Variable(cuda_wrap(batch_p))
+                var_h = autograd.Variable(cuda_wrap(batch_h))
+                var_label = autograd.Variable(cuda_wrap(batch_lbl))
+                
+                prediction, activations, representations = model(var_p, var_h, output_sent_info=True)
+
+                # calculates mean loss over whole batch
+                #loss = loss_fn(prediction, var_label)
+                loss = pk_integrator.loss(prediction, var_label, activations[0], activations[1], representations[0], representations[1])
+                
+                total_loss += loss.data
+                
+                loss.backward()
+                optimizer.step()
+
+                until_validation -= batch_size
+                amount_trained += batch_size
+
+                if until_validation <= 0:
+                    #print('Current performance after seeing', amount_trained, 'samples:')
+                    until_validation = validate_after # reset
+                    model.eval()
+                    train_acc = evaluate(model, train_set, batch_size, padding_token)
+                    dev_acc = evaluate(model, dev_set, batch_size, padding_token)
+
+                    all_acc_train.append(train_acc)
+                    all_acc_dev.append(dev_acc)
+                    all_amount_trained.append(amount_trained)
+                    print('after seeing', amount_trained, 'samples:')
+                    print('Accuracy on train data:', train_acc)
+                    print('Accuracy on dev data:', dev_acc)
+                    # mean loss per sample
+                    mean_loss = total_loss[0] / number_batches
+                    print('mean loss', mean_loss)
+                    sys.stdout.flush()
+                    all_err.append(mean_loss)
+
+
+                    model.train()
+
+                    # remember best dev model
+                    if dev_acc > best_dev_acc:
+                        best_model = copy.deepcopy(model.state_dict())
+                        best_dev_acc = dev_acc
+                        best_train_acc = train_acc
+                        best_data_amount = amount_trained
+                        #print('Stored these model settings as best in this configuration.')
+
+                        # Since training is long -> always store current best on file.
+                        if store_intermediate_name is not None:
+                            print('Saving best model so far into', store_intermediate_name + '.model')
+                            torch.save(best_model, 'models/' + store_intermediate_name + '.model')
+                
+        # apply half decay learn rate (copied from original paper)
+        decay = epoch // 2
+        lr = start_lr / (2 ** decay)  
+        for pg in optimizer.param_groups:
+            pg['lr'] = lr
+
+        #print('mean loss in epoch', epoch+1, ':', total_loss[0] / number_batches)
+        running_time = time.time() - start
+        print('Running time:', running_time, 'seconds.')
+
+    # Done training, return best settings
+    return (best_model, best_data_amount, best_dev_acc, best_train_acc, all_acc_train, all_acc_dev, all_err, all_amount_trained, running_time)
+
+
 def train_model(model, train_set, dev_set, padding_token, loss_fn, lr, epochs, batch_size, validate_after=50, store_intermediate_name=None):
     '''
     Train the given model.

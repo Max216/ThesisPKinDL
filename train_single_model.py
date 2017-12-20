@@ -1,7 +1,7 @@
 """
 Usage:
-    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
-    train_single_model.py continue <file>
+    train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3>  [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
+    train_single_model.py exp1 <dim_hidden> <dim_s1> <dim_s2> <dim_s3> <path_res> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
 
 Options:
     <dim_hidden>    Hidden dimension of MLP.
@@ -40,12 +40,28 @@ def main():
     DEFAULT_BATCH = 32
     DEFAULT_CHUNK = 32*400
     
-    if args['continue']:
-        print('continue learning a model')
-        name = args['<file>'].split('/')[-1]
-        print(name)
-        # Parse name
-        # Do when needed
+    if args['exp1']:
+        dim_hidden = int(args['<dim_hidden>'])
+        dim_s1 = int(args['<dim_s1>'])
+        dim_s2 = int(args['<dim_s2>'])
+        dim_s3 = int(args['<dim_s3>'])
+
+        iterations = int(args.get('--iterations') or DEFAULT_ITERATIONS)
+        validate_after = int(args.get('--validate_after') or DEFAULT_VAL_AFTER)
+        batch = int(args.get('--batch') or DEFAULT_BATCH)
+        chunk = int(args.get('--chunk') or DEFAULT_CHUNK)
+        lr = float(args.get('--lr') or DEFAULT_LR)
+        path_train = args.get('--path_train') or PATH_TRAIN_DATA
+        path_dev = args.get('--path_dev') or PATH_DEV_DATA
+        appendix = args.get('--appendix') or ''
+        directsave = args.get('--directsave') or False
+        relative = args.get('--relative')
+        embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
+
+        embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
+        snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
+        snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
+
 
     elif args['new']:
         print('new model')
@@ -75,7 +91,6 @@ def main():
 
         print('Start training a new model:')
         
-
         embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
         snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
         snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
