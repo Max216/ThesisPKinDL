@@ -1,31 +1,31 @@
 from bottle import request, route, run, template, static_file
 
 # stupid thing to import from parent directory
-import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir) 
+#import os,sys,inspect
+#currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#parentdir = os.path.dirname(currentdir)
+#sys.path.insert(0,parentdir) 
 
 import fixed_model_code as m
-import evaluate as evaluate_lib
 
+import os
 import nltk
 from nltk import word_tokenize
 
 import analyse_alignment as aa
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 model_options = [
 	(
 		'Model (small) with fine-tuned padding', 
-		'./../models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-11-26_22:13_glove.model',
+		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-11-26_22:13_glove.model',
 		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions: 256 + 512 + 1024. Padding however was fine tuned. All evaluation on the dimensions and representation I did so far use this model.',
 		87.42, 85.20, 84.78
 	),
 	(
 		'Model (small) without fine-tuned padding',
-		'./../models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-12-11_11:49_opts:all_zero_padding.tmpsave.model',
+		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-12-11_11:49_opts:all_zero_padding.tmpsave.model',
 		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions 256 + 512 + 1024. Fixed the bug with fine tuning padding.',
 		89.38, 86.01, 85.37
 	)
@@ -60,7 +60,7 @@ def evaluate():
 
 	model_path = model_options[model_idx][1]
 
-	lbl, activations, representations = evaluate_lib.test(model_path, premise, hypothesis)
+	lbl, activations, representations = aa.test(model_path, premise, hypothesis)
 
 	# plotting
 
@@ -102,7 +102,7 @@ def alignments():
 
 @route('/static/<path>')
 def server_static(path):
-	return static_file(path, root='./')
+	return static_file(path, root='./webcontent')
 
 @route('/images/<path>')
 def image_serve(path):

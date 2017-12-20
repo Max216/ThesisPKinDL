@@ -14,8 +14,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.cuda as cu
 
-import embeddingholder
-import config
+import fixed_embeddingholder_code as embeddingholder
+import fixed_config_code as config
 
 import re
 
