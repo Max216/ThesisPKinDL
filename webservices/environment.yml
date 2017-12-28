@@ -1,0 +1,67 @@
+name: webapp-env
+channels:
+- conda-forge
+- soumith
+- anaconda
+- defaults
+dependencies:
+- intel-openmp=2018.0.0=hc7b2577_8
+- mkl=2018.0.1=h19d6760_4
+- nltk=3.2.5=py35h09ad193_0
+- numpy=1.13.3=py35hd829ed6_0
+- six=1.11.0=py35h423b573_1
+- backports=1.0=py35_1
+- backports.functools_lru_cache=1.4=py35_1
+- bottle=0.12.9=py35_0
+- cycler=0.10.0=py35_0
+- dbus=1.10.22=0
+- expat=2.2.5=0
+- fontconfig=2.12.6=0
+- freetype=2.8.1=0
+- gettext=0.19.7=1
+- glib=2.55.0=0
+- gst-plugins-base=1.8.0=0
+- gstreamer=1.8.0=1
+- icu=58.2=0
+- jpeg=9b=2
+- libiconv=1.15=0
+- libpng=1.6.34=0
+- libxcb=1.12=1
+- libxml2=2.9.5=2
+- matplotlib=2.1.1=py35_2
+- pcre=8.39=0
+- pyparsing=2.2.0=py35_0
+- pyqt=5.6.0=py35_4
+- python-dateutil=2.6.1=py35_0
+- pytz=2017.3=py_2
+- qt=5.6.2=7
+- sip=4.18=py35_1
+- tornado=4.5.2=py35_0
+- xorg-libxau=1.0.8=3
+- xorg-libxdmcp=1.1.2=3
+- ca-certificates=2017.08.26=h1d4fec5_0
+- certifi=2017.11.5=py35h9749603_0
+- cffi=1.11.2=py35hc7b2db7_0
+- libedit=3.1=heed3624_0
+- libffi=3.2.1=hd88cf55_4
+- libgcc=7.2.0=h69d50b8_2
+- libgcc-ng=7.2.0=h7cc24e2_2
+- libstdcxx-ng=7.2.0=h7a57d05_2
+- ncurses=6.0=h9df7e31_2
+- openssl=1.0.2n=hb7f436b_0
+- pip=9.0.1=py35h7e7da9d_4
+- pycparser=2.18=py35h61b3040_1
+- python=3.5.4=h417fded_24
+- readline=7.0=ha6073c6_4
+- setuptools=36.5.0=py35ha8c1747_0
+- sqlite=3.20.1=hb898158_2
+- tk=8.6.7=hc745277_3
+- wheel=0.30.0=py35hd3883cf_1
+- xz=5.2.3=h55aa19d_2
+- zlib=1.2.11=ha838bed_2
+- pytorch=0.2.0=py35h01b9ba7_4cu75
+- pip:
+  - backports.functools-lru-cache==1.4
+  - torch==0.2.0.post4
+prefix: /home/max/anaconda3/envs/webapp-env
+

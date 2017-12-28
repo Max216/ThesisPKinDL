@@ -1,7 +1,7 @@
 """
 Usage:
     train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3>  [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
-    train_single_model.py exp1 <dim_hidden> <dim_s1> <dim_s2> <dim_s3> <path_res> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
+    train_single_model.py experiment <dim_hidden> <dim_s1> <dim_s2> <dim_s3> <path_res> <type>[--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
 
 Options:
     <dim_hidden>    Hidden dimension of MLP.
@@ -24,11 +24,17 @@ Options:
 """
 from docopt import docopt
 
+import torch.nn.functional as F
+
 import embeddingholder
 import mydataloader
 import config
 from config import *
+import time
 import train
+import pk_experiments
+import model
+from model import  *
 
 def main():
 
@@ -40,7 +46,7 @@ def main():
     DEFAULT_BATCH = 32
     DEFAULT_CHUNK = 32*400
     
-    if args['exp1']:
+    if args['experiment']:
         dim_hidden = int(args['<dim_hidden>'])
         dim_s1 = int(args['<dim_s1>'])
         dim_s2 = int(args['<dim_s2>'])
@@ -57,10 +63,24 @@ def main():
         directsave = args.get('--directsave') or False
         relative = args.get('--relative')
         embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
+        experiment_type = args.get('<type>')
 
         embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
-        snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
-        snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
+        train_set = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
+        dev_set = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
+        classifier = classifier = cuda_wrap(EntailmentClassifier(embedding_holder.embeddings, 
+                                            embedding_holder.padding(),
+                                            dimen_hidden=dim_hidden, 
+                                            dimen_out=3, 
+                                            dimen_sent_encoder=[dim_s1, dim_s2, dim_s3],
+                                            nonlinearity=F.relu, 
+                                            dropout=0.1))
+
+        experiment_name, pk_integrator = pk_experiments.experiments[experiment_type]
+        classifier_name = train.to_name(lr, dim_hidden, [dim_s2, dim_s2, dim_s3], 
+            batch, len(train_set), len(dev_set), str(time.time()), sent_repr='all', appendix=experiment_name)
+
+        train.train_model_with_res(classifier, train_set, dev_set, embedding_holder.padding(), pk_integrator, lr, iterations, batch, validate_after=validate_after, store_intermediate_name=experiment_name)
 
 
     elif args['new']:
