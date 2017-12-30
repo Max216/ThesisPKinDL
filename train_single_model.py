@@ -1,7 +1,8 @@
 """
 Usage:
+    train_single_model.py continue <path> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
     train_single_model.py new <dim_hidden> <dim_s1> <dim_s2> <dim_s3>  [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
-    train_single_model.py experiment <dim_hidden> <dim_s1> <dim_s2> <dim_s3> <path_res> <type>[--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
+    train_single_model.py experiment <dim_hidden> <dim_s1> <dim_s2> <dim_s3> <path_res> <type> [--iterations=<iterations>] [--embeddings=<embeddings>] [--validate_after=<validate_after>] [--batch=<batch>] [--chunk=<chunk>] [--lr=<lr>] [--path_train=<path_train>] [--path_dev=<path_dev>] [--appendix=<appendix>] [--relative] [--directsave]
 
 Options:
     <dim_hidden>    Hidden dimension of MLP.
@@ -45,6 +46,18 @@ def main():
     DEFAULT_VAL_AFTER = 2000
     DEFAULT_BATCH = 32
     DEFAULT_CHUNK = 32*400
+
+    iterations = int(args.get('--iterations') or DEFAULT_ITERATIONS)
+    validate_after = int(args.get('--validate_after') or DEFAULT_VAL_AFTER)
+    batch = int(args.get('--batch') or DEFAULT_BATCH)
+    chunk = int(args.get('--chunk') or DEFAULT_CHUNK)
+    lr = float(args.get('--lr') or DEFAULT_LR)
+    path_train = args.get('--path_train') or PATH_TRAIN_DATA
+    path_dev = args.get('--path_dev') or PATH_DEV_DATA
+    appendix = args.get('--appendix') or ''
+    directsave = args.get('--directsave') or False
+    relative = args.get('--relative')
+    embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
     
     if args['experiment']:
         dim_hidden = int(args['<dim_hidden>'])
@@ -52,17 +65,7 @@ def main():
         dim_s2 = int(args['<dim_s2>'])
         dim_s3 = int(args['<dim_s3>'])
 
-        iterations = int(args.get('--iterations') or DEFAULT_ITERATIONS)
-        validate_after = int(args.get('--validate_after') or DEFAULT_VAL_AFTER)
-        batch = int(args.get('--batch') or DEFAULT_BATCH)
-        chunk = int(args.get('--chunk') or DEFAULT_CHUNK)
-        lr = float(args.get('--lr') or DEFAULT_LR)
-        path_train = args.get('--path_train') or PATH_TRAIN_DATA
-        path_dev = args.get('--path_dev') or PATH_DEV_DATA
-        appendix = args.get('--appendix') or ''
-        directsave = args.get('--directsave') or False
-        relative = args.get('--relative')
-        embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
+        
         experiment_type = args.get('<type>')
 
         embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
@@ -82,6 +85,16 @@ def main():
 
         train.train_model_with_res(classifier, train_set, dev_set, embedding_holder.padding(), pk_integrator, lr, iterations, batch, validate_after=validate_after, store_intermediate_name=experiment_name)
 
+    elif args['continue']:
+        print('yay')
+        embedding_holder = embeddingholder.EmbeddingHolder(embedding_path)
+        classifier, loaded_name = model.load_model(args['<path>'])
+        snli_train = mydataloader.get_dataset_chunks(path_train, embedding_holder, chunk_size=chunk, mark_as='[train]')
+        snli_dev = mydataloader.get_dataset_chunks(path_dev, embedding_holder, chunk_size=chunk, mark_as='[dev]')
+
+
+        train.train_model(classifier, snli_train, snli_dev, embedding_holder.padding(), 
+            F.cross_entropy, lr, iterations, batch, validate_after, loaded_name + '.continued_best')
 
     elif args['new']:
         print('new model')
@@ -90,17 +103,6 @@ def main():
         dim_s2 = int(args['<dim_s2>'])
         dim_s3 = int(args['<dim_s3>'])
 
-        iterations = int(args.get('--iterations') or DEFAULT_ITERATIONS)
-        validate_after = int(args.get('--validate_after') or DEFAULT_VAL_AFTER)
-        batch = int(args.get('--batch') or DEFAULT_BATCH)
-        chunk = int(args.get('--chunk') or DEFAULT_CHUNK)
-        lr = float(args.get('--lr') or DEFAULT_LR)
-        path_train = args.get('--path_train') or PATH_TRAIN_DATA
-        path_dev = args.get('--path_dev') or PATH_DEV_DATA
-        appendix = args.get('--appendix') or ''
-        directsave = args.get('--directsave') or False
-        relative = args.get('--relative')
-        embedding_path = args.get('--embeddings') or PATH_WORD_EMBEDDINGS
         print(embedding_path)
 
         if relative:
