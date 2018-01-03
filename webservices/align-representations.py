@@ -31,6 +31,36 @@ model_options = [
 	)
 ]
 
+@route('/alignment_general_results', method='POST')
+def evaluate_general():
+	bin_size = float(request.forms.get('stepsize_grid'))
+	zero_threshold = None
+
+	if request.forms.get('cb_uncolor_center'):
+		zero_threshold = float(request.forms.get('zero-threshold'))
+	names = aa.plot_general_statistics(bin_size, zero_threshold)
+	return ';'.join(names)
+
+@route('/alignment_general_sample', method='GET')
+def evaluate_general_sample():
+	premise = request.query.get('premise')
+	hypothesis = request.query.get('hypothesis')
+	model_idx = int(request.query.get('model'))
+	bin_size = float(request.query.get('bin_size'))
+	zero_threshold = None
+	if request.query.get('cb_uncolor_center'):
+		zero_threshold = float(request.query.get('zero-threshold'))
+
+	model_path = model_options[model_idx][1]
+	lbl, activations, representations = aa.test(model_path, premise, hypothesis)
+
+	sample = aa.Sample(
+		word_tokenize(premise), activations[0].data[0], representations[0].data[0], 
+		word_tokenize(hypothesis), activations[1].data[0], representations[1].data[0], 
+		lbl, lbl)
+	return aa.create_json_matrix(sample, bin_size, zero_threshold, dict([('prediction', lbl)]))
+	#return '''{"props": {"adapted": [[6, 5, 35], [7, 5, 364], [6, 6, 52], [7, 6, 1375]]}, "plot": {"z": [[0, 1, 0, 0, 0, 2, 1, 1, 0, 0, 1, 0, 2], [0, 1, 0, 0, 0, 9, 1, 1, 1, 0, 1, 1, 0], [0, 0, 0, 0, 1, 1, 2, 2, 0, 1, 0, 2, 0], [1, 0, 0, 1, 0, 5, 0, 2, 1, 0, 0, 0, 0], [0, 0, 0, 2, 1, 6, 4, 3, 0, 1, 1, 0, 0], [0, 0, 1, 0, 2, 11, 5, 0, 1, 1, 1, 0, 1], [0, 0, 0, 0, 3, 30, 30, 9, 2, 0, 2, 0, 3], [0, 0, 1, 2, 9, 30, 30, 29, 10, 3, 3, 4, 1], [0, 0, 0, 0, 9, 30, 5, 1, 0, 0, 0, 0, 0], [0, 1, 0, 2, 3, 3, 0, 1, 0, 0, 0, 0, 0]], "x": ["v: -0.6083", "v: -0.5083", "v: -0.4083", "v: -0.3083", "v: -0.2083", "v: -0.1083", "v: -0.0083", "v: 0.0917", "v: 0.1917", "v: 0.2917", "v: 0.3917", "v: 0.4917", "v: 0.5917"], "y": ["v: 0.6508", "v: 0.5508", "v: 0.4508", "v: 0.3508", "v: 0.2508", "v: 0.1508", "v: 0.0508", "v: -0.0492", "v: -0.1492", "v: -0.2492"]}}'''
+
 @route('/alignment_results', method='POST')
 def evaluate():
 	model_idx = int(request.forms.get('selected_model_index'))
@@ -106,6 +136,6 @@ def server_static(path):
 
 @route('/images/<path>')
 def image_serve(path):
-	return static_file(path, root='./data/')
+	return static_file(path, root='./data/') 
 
-run(host='localhost', port=9876, debug=True)
+run(host='localhost', port=9876, debug=True, reloader=True)
