@@ -136,7 +136,7 @@ $( document ).ready(function() {
     		success: function(data) {
     			splitted = data.split(';')
     			$('#prediction_lbl').text(splitted[0])
-                $("#result_image").attr("src","/images/" + splitted[1]);
+                $("#result_image").attr("src","/~max/bla/images/" + splitted[1]);
                 $('#result').show()
     		},
     		error: function(){
@@ -458,9 +458,9 @@ $( document ).ready(function() {
                 var imgContradiction = splitted[1]
                 var imgNeutral = splitted[2]
 
-                $("#general_avg_result_entailment").attr("src","/images/" + imgEntailment);
-                $("#general_avg_result_contradiction").attr("src","/images/" + imgContradiction);
-                $("#general_avg_result_neutral").attr("src","/images/" + imgNeutral);
+                $("#general_avg_result_entailment").attr("src","/~max/bla/images/" + imgEntailment);
+                $("#general_avg_result_contradiction").attr("src","/~max/bla/images/" + imgContradiction);
+                $("#general_avg_result_neutral").attr("src","/~max/bla/images/" + imgNeutral);
                 $('#general_averaged_results').show()
             },
             error: function(){
