@@ -88,7 +88,7 @@ class SentenceEncoder(nn.Module):
         output2, (h_n2, c_n2) = self.lstm2(input_lstm2, (self.hidden_state2, self.cell_state2))
         input_lstm3 = torch.cat((input_lstm2, output2), dim=2)
         output3, (h_n3, c_n3) = self.lstm3(input_lstm3, (self.hidden_state3, self.cell_state3))
-        return output3
+        return F.relu(output3)
 
 class EntailmentClassifier(nn.Module):
     """

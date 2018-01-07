@@ -21,24 +21,66 @@ model_options = [
 		'Model (small) with fine-tuned padding', 
 		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-11-26_22:13_glove.model',
 		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions: 256 + 512 + 1024. Padding however was fine tuned. All evaluation on the dimensions and representation I did so far use this model.',
-		87.42, 85.20, 84.78
+		87.42, 85.20, 84.78,
+		'normal'
 	),
 	(
 		'Model (small) without fine-tuned padding',
 		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-12-11_11:49_opts:all_zero_padding.tmpsave.model',
 		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions 256 + 512 + 1024. Fixed the bug with fine tuning padding.',
-		89.38, 86.01, 85.37
+		89.38, 86.01, 85.37,
+		'normal'
+	),
+	(
+		'Model (big) without fine-tuned padding',
+		'./models/0_0002lr-1600hidden-512_1024_2048lstm-32batch-43_1-relu-0_1dropout_2018-01-01_01:08_opts:zero_padding_big_model_all.model',
+		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions 512 + 1024 + 2048. Needs still more training.',
+		89.70, 85.92, '-',
+		'normal'
+	),
+	(
+		'Model (small) with ReLu representations',
+		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-12-23_11:48_opts:relu_sent_zero_padding_all.model',
+		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions 256 + 512 + 1024. The resulting representation from max-pooling is sent through ReLu to avoid negative values. Needs still more training.',
+		89.44, 85.62, '-',
+		'relu'
+	),
+	(
+		'Model (small) with random embeddings',
+		'./models/0_0002lr-1600hidden-256_512_1024lstm-32batch-43_1-relu-0_1dropout_2017-12-26_19:54_opts:zero_padding_random_embeddings_all.model',
+		'This model is trained on SNLI with sentence encoding BiLSTMs with dimensions 256 + 512 + 1024. Instead of pretrained GloVe embeddings, random embeddings were used (Glorot initialized).',
+		85.53, 79.54, '-',
+		'rnd_embeddings'
 	)
 ]
+
+general_type_options = [
+	('150 samples per label', ['./stored_data/representation_samples_450_150_150_150.txt']),
+	('Swapped premise-hypothesis in label entailment', ['./stored_data/swapped_results_entailment_entailment.txt','./../analyses/swapped_results_entailment_contradiction.txt','./../analyses/swapped_results_entailment_neutral.txt']),
+	('Swapped premise-hypothesis in label neutral', ['./stored_data/swapped_results_neutral_entailment.txt','./../analyses/swapped_results_neutral_contradiction.txt','./../analyses/swapped_results_neutral_neutral.txt']),
+	('Swapped premise-hypothesis in label contradiction', ['./stored_data/swapped_results_contradiction_entailment.txt','./../analyses/swapped_results_contradiction_contradiction.txt','./../analyses/swapped_results_contradiction_neutral.txt'])
+]
+
+@route('/predict_representations', method='POST')
+def predict_representations():
+	model_idx = int(request.json['model'])
+	p_rep = request.json['repPremise']
+	h_rep = request.json['repHypothesis']
+	model_path = model_options[model_idx][1]
+	model_type = model_options[model_idx][-1]
+
+	result = aa.predict_rep(model_path, model_type, p_rep, h_rep)
+	return result
 
 @route('/alignment_general_results', method='POST')
 def evaluate_general():
 	bin_size = float(request.forms.get('stepsize_grid'))
+	plot_type = int(request.forms.get('general_sample_selection'))
 	zero_threshold = None
 
 	if request.forms.get('cb_uncolor_center'):
 		zero_threshold = float(request.forms.get('zero-threshold'))
-	names = aa.plot_general_statistics(bin_size, zero_threshold)
+	names = aa.plot_general_statistics(bin_size, zero_threshold, general_type_options[plot_type][1])
 	return ';'.join(names)
 
 @route('/alignment_general_sample', method='GET')
@@ -52,7 +94,8 @@ def evaluate_general_sample():
 		zero_threshold = float(request.query.get('zero-threshold'))
 
 	model_path = model_options[model_idx][1]
-	lbl, activations, representations = aa.test(model_path, premise, hypothesis)
+	model_type = model_options[model_idx][-1]
+	lbl, activations, representations = aa.test(model_path, model_type, premise, hypothesis)
 
 	sample = aa.Sample(
 		word_tokenize(premise), activations[0].data[0], representations[0].data[0], 
@@ -89,8 +132,9 @@ def evaluate():
 		unshared_min_val = float(request.forms.get('unshared_single_t'))
 
 	model_path = model_options[model_idx][1]
+	model_type = model_options[model_idx][-1]
 
-	lbl, activations, representations = aa.test(model_path, premise, hypothesis)
+	lbl, activations, representations = aa.test(model_path, model_type, premise, hypothesis)
 
 	# plotting
 
@@ -125,7 +169,8 @@ def alignments():
 	
 	params  = {
 	'model_options': model_options,
-	'selected_model_idx': 1
+	'selected_model_idx': 1,
+	'general_types': general_type_options
 	}
 
 	return template('align-representations', params)
