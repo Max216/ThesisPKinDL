@@ -183,4 +183,4 @@ def server_static(path):
 def image_serve(path):
 	return static_file(path, root='./data/') 
 
-run(host='localhost', port=9876, debug=True, reloader=True)
+run(host='', port=9876, debug=True, reloader=True)
