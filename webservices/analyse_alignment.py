@@ -30,15 +30,16 @@ import json
 #from docopt import docopt
 
 RND_EMBEDDING_PATH = './stored_data/random_glorot_300d'
+GLOVE_EMBEDDING_PATH = './stored_data/snli_glove.840B.300d'
 
 
-def get_model(path, model_type):
+def get_model(path, model_type, embedding_holder = None):
 	if model_type == 'normal':
-		classifier, _ = m.load_model(path)
+		classifier, _ = m.load_model(path, embedding_holder or embeddingholder.EmbeddingHolder(GLOVE_EMBEDDING_PATH))
 	elif model_type == 'relu':
-		classifier, _ = mr.load_model(path)
+		classifier, _ = mr.load_model(path, embedding_holder or embeddingholder.EmbeddingHolder(GLOVE_EMBEDDING_PATH))
 	elif model_type == 'rnd_embeddings':
-		classifier, _ = m.load_model(path, embeddingholder.EmbeddingHolder(RND_EMBEDDING_PATH))
+		classifier, _ = m.load_model(path, embedding_holder or embeddingholder.EmbeddingHolder(RND_EMBEDDING_PATH))
 
 	classifier.eval()
 	classifier = m.cuda_wrap(classifier)
@@ -55,9 +56,9 @@ def test(model_path, model_type, p, h, print_out=False):
 	if model_type == 'rnd_embeddings':
 		embedding_holder = embeddingholder.EmbeddingHolder(RND_EMBEDDING_PATH)
 	else:
-		embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+		embedding_holder = embeddingholder.EmbeddingHolder(GLOVE_EMBEDDING_PATH)
 	vec_p, vec_h, _ = mydataloader.load_test_pair(p, h, embedding_holder)
-	classifier = get_model(model_path, model_type)
+	classifier = get_model(model_path, model_type, embedding_holder=embedding_holder)
 	var_p = autograd.Variable(m.cuda_wrap(vec_p.view(-1, 1)))
 	var_h = autograd.Variable(m.cuda_wrap(vec_h).view(-1, 1))
 	out, activations, representations = classifier(var_p, var_h, output_sent_info=True)
