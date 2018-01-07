@@ -5,13 +5,13 @@
   <meta charset="utf-8">
   <title>Align representations</title>
 
-  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/bla/static/bootstrap.min.css">
 
-  <script src="/static/jquery-3.2.1.min.js"></script>
-  <script src="/static/popper.min.js"></script>
-  <script src="/static/bootstrap.min.js"></script>
-  <script src="/static/alignment.js"></script>
-  <script type="text/javascript" src="/static/plotly.1.31.2.min.js"></script>
+  <script src="/bla/static/jquery-3.2.1.min.js"></script>
+  <script src="/bla/static/popper.min.js"></script>
+  <script src="/bla/static/bootstrap.min.js"></script>
+  <script src="/bla/static/alignment.js"></script>
+  <script type="text/javascript" src="/bla/static/plotly.1.31.2.min.js"></script>
 </head>
 
 <body>
