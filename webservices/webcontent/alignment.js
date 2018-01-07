@@ -131,7 +131,7 @@ $( document ).ready(function() {
     $('#btn_run').click(function(){
     	$.ajax({
     		type: 'POST',
-    		url: '/alignment_results',
+    		url: '/~max/bla/alignment_results',
     		data: $('#form').serialize(),
     		success: function(data) {
     			splitted = data.split(';')
@@ -301,7 +301,7 @@ $( document ).ready(function() {
 
         $.ajax({
             type: 'GET',
-            url: '/alignment_general_sample',
+            url: '/~max/bla/alignment_general_sample',
             data: $('#form_general_sample').serialize(),
             success: function(data) {
                 data = $.parseJSON(data);
@@ -383,7 +383,7 @@ $( document ).ready(function() {
                         dataSend.model = $('#form_model_selection_general').val()
                         $.ajax({
                             type: 'POST',
-                            url: '/predict_representations',
+                            url: '/~max/bla/predict_representations',
                             data: JSON.stringify(dataSend),
                             contentType: "application/json; charset=utf-8",
                             success: function(result) {
@@ -450,7 +450,7 @@ $( document ).ready(function() {
     $('#btn_run_general').click(function(){
         $.ajax({
             type: 'POST',
-            url: '/alignment_general_results',
+            url: '/~max/bla/alignment_general_results',
             data: $('#form_general').serialize(),
             success: function(data) {
                 splitted = data.split(';')
