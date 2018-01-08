@@ -1,17 +1,21 @@
 import mydataloader
 
-def build_from_snli_format(path, relations):
+def build_from_snli_format(path, relations, max_words=1):
     '''
     Load the resource from json-SNLI format.
     '''
 
     resource_dict = dict()
 
+    cnt_relevant = 0
+    cnt_irrelevant = 0
+
     with open(path) as f_in:
         for line in f_in:
             line = line.strip()
             w1, w2, relation = mydataloader.extract_snli(line)
-            if len(w1) == 1 and len(w2) == 1:
+            if len(w1) == max_words and len(w2) == max_words:
+                cnt_relevant += 1
                 w1 = w1[0]
                 w2 = w2[0]
                 if relation in relations:
@@ -22,8 +26,10 @@ def build_from_snli_format(path, relations):
                         print('[Warning]', 'Overwriting', w1, '-', w2, '(' + resource_dict[w1][w2] + ') with', relation)
                     resource_dict[w1][w2] = relation
             else:
-                print('[Warning]', 'More than one word in resource:', w1, w2)
+                cnt_irrelevant +=1
+                #print('[Warning]', 'More than one word in resource:', w1, w2)
 
+    print('Dictionary:', 'use', cnt_relevant, '; don\'t use:', cnt_irrelevant, 'samples with label:', relations)
     return resource_dict
 
 class WordResource:
@@ -42,7 +48,7 @@ class WordResource:
         self.relations = interested_relations
 
         if build_fn == 'snli':
-            self.resource_dict = build_from_snli_format(res_path, interested_relations)
+            self.resource_dict = build_from_snli_format(res_path, interested_relations, max_words=1)
 
     def word_resource_overlap(self, sent1, sent2):
         '''
