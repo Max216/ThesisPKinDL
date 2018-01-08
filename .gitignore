@@ -12,4 +12,5 @@ __pycache__/**
 *.vocab
 *representation_samples_450_150_150_150.txt
 analyses
+*/stored_data/*
 !analyse_repr_data/*
