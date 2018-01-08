@@ -11,13 +11,18 @@ def build_from_snli_format(path, relations):
         for line in f_in:
             line = line.strip()
             w1, w2, relation = mydataloader.extract_snli(line)
-            if relation in relations:
-                if w1 not in resource_dict:
-                    resource_dict[w1] = dict()
+            if len(w1) == 1 and len(w2) == 1:
+                w1 = w1[0]
+                w2 = w2[0]
+                if relation in relations:
+                    if w1 not in resource_dict:
+                        resource_dict[w1] = dict()
 
-                if w2 in resource_dict[w1]:
-                    print('[Warning]', 'Overwriting', w1, '-', w2, '(' + resource_dict[w1][w2] + ') with', relation)
-                resource_dict[w1][w2] = relation
+                    if w2 in resource_dict[w1]:
+                        print('[Warning]', 'Overwriting', w1, '-', w2, '(' + resource_dict[w1][w2] + ') with', relation)
+                    resource_dict[w1][w2] = relation
+            else:
+                print('[Warning]', 'More than one word in resource:', w1, w2)
 
     return resource_dict
 
