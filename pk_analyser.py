@@ -207,7 +207,7 @@ def main():
 
     Usage:
         pk_analyser.py create <model> <data> <resource> <resource_label>
-        pk_analyser.py summary <summary_file> <sort_type> [direction]
+        pk_analyser.py summary <summary_file> <sort_type> <direction>
     """)
 
     if args['create']:
@@ -234,7 +234,7 @@ def main():
         else:
             reverse = True
         data = get_summary_items(summary_file, sort=sort_type, reverse=reverse)
-        
+
         for w1, w2, amount, amount2, acc, _ in data:
             print(w1 + '-' + w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
 
