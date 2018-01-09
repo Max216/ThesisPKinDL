@@ -69,7 +69,7 @@ class WordResource:
     def __len__(self):
         cnt = 0
         for w1 in self.resource_dict:
-            cnt += len(resource_dict[w1])
+            cnt += len(self.resource_dict[w1])
 
         return cnt
 
