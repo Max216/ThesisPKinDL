@@ -128,11 +128,21 @@ class PkWordPair:
                     f_out.write(stringify(dims2) + '\n') 
                     f_out.write(stringify(reps2) + '\n') 
 
-def get_summary_items(summary_file):
+def get_summary_items(summary_file, sort='amount', reverse=True):
+    sort_idx = dict([
+        ('w1', 0), ('w2', 1), ('size', 2), ('ind_size', 3), ('acc', 4)
+    ])
+
+    if sort not in sort_idx:
+        print('Specify one of the following for sorting:', sort_idx.keys())
+        return
+    else:
+        sidx = sort_idx[sort]
+
     with open(summary_file) as f_in:
         data = [line.strip().split(' ') for line in f_in]
 
-    data = sorted([(d[0], d[1], d[2], d[3], d[4], d[5]) for d in data], key=lambda x: x[4])
+    data = sorted([(d[0], d[1], d[2], d[3], d[4], d[5]) for d in data], key=lambda x: x[sidx], reverse=reverse)
     return data
 
 def create_pk_analyse_data(classifier_path, data, w_res):
@@ -197,7 +207,7 @@ def main():
 
     Usage:
         pk_analyser.py create <model> <data> <resource> <resource_label>
-        pk_analyser.py summary <summary_file>
+        pk_analyser.py summary <summary_file> <sort_type> [direction]
     """)
 
     if args['create']:
@@ -216,7 +226,15 @@ def main():
         create_pk_analyse_data(model_path, data, w_res)
     elif args['summary']:
         summary_file = args['<summary_file>']
-        data = get_summary_items(summary_file)
+        sort_type = args['<sort_type>']
+        direction = args['<direction>']
+
+        if direction == 'normal':
+            reverse = False
+        else:
+            reverse = True
+        data = get_summary_items(summary_file, sort=sort_type, reverse=reverse)
+        
         for w1, w2, amount, amount2, acc, _ in data:
             print(w1 + '-' + w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
 
