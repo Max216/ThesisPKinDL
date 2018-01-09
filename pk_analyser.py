@@ -218,7 +218,7 @@ def main():
         summary_file = args['<summary_file>']
         data = get_summary_items(summary_file)
         for w1, w2, amount, amount2, acc, _ in data:
-            print(w1 +'-' w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
+            print(w1 + '-' + w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
 
 
 
