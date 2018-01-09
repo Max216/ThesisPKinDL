@@ -142,7 +142,7 @@ def get_summary_items(summary_file, sort='amount', reverse=True):
     with open(summary_file) as f_in:
         data = [line.strip().split(' ') for line in f_in]
 
-    data = sorted([(d[0], d[1], d[2], d[3], d[4], d[5]) for d in data], key=lambda x: x[sidx], reverse=reverse)
+    data = sorted([(d[0], d[1], int(d[2]), int(d[3]), float(d[4]), d[5]) for d in data], key=lambda x: x[sidx], reverse=reverse)
     return data
 
 def create_pk_analyse_data(classifier_path, data, w_res):
@@ -236,7 +236,7 @@ def main():
         data = get_summary_items(summary_file, sort=sort_type, reverse=reverse)
 
         for w1, w2, amount, amount2, acc, _ in data:
-            print(w1 + '-' + w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
+            print(w1 + '-' + w2 + ': ' + str(amount) + ', ' + str(amount2) + '; Acc: ' + str(acc))
 
 
 
