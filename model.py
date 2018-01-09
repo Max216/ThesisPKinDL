@@ -218,6 +218,18 @@ def lbl_to_float(val):
     '''
     return float(val.replace('_', '.'))
 
+def predict(classifier, embedding_holder, p, h):
+    p_batch = torch.LongTensor(len(p), 1)
+    h_batch = torch.LongTensor(len(h), 1)
+
+    p_batch[:,0] = torch.LongTensor([embedding_holder.word_index(w) for w in p])
+    h_batch[:,0] = torch.LongTensor([embedding_holder.word_index(w) for w in h])
+    
+    return classifier(
+        cuda_wrap(autograd.Variable(p_batch)), 
+        cuda_wrap(autograd.Variable(h_batch)), 
+        output_sent_info=True)
+
 def load_model(model_path, embedding_holder = None):
     '''
     Load a model. Parameters are retrieved from the given model name.

@@ -73,5 +73,22 @@ class WordResource:
 
         return cnt
 
+    def get_word_pairs(self, sent1, sent2):
+        '''
+        Get all pairs of (w1 w2) where w1 is in sent1 and w2 is in sent2 and both of them are in this resource.
+        Instead of the words, indizes are returned.
+        '''
+
+        results = []
+        for idx1, w1 in enumerate(sent1):
+            if w1 in self.resource_dict:
+                current = self.resource_dict[w1]
+                for idx2, w2 in enumerate(sent2):
+                    if w2 in current:
+                        results.append((idx1, idx2))
+
+        return results
+
+
 
 

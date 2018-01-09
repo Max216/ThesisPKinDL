@@ -32,7 +32,7 @@ def main():
     cnt_relevant = 0
     cnt_irrelevant = 0
     with open(data_path) as f_in:
-        with open(name_out) as f_out:
+        with open(name_out, 'w') as f_out:
             for line in f_in:
                 p, h, lbl = mydataloader.extract_snli(line)
                 if lbl in mydataloader.index_to_tag and filter_fn(w_res, p, h):
