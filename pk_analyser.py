@@ -16,6 +16,9 @@ import os
 def to_classifier_folder(model_name):
     return './analyses/for_model/' + model_name + '_folder/' 
 
+def stringify(arr):
+    return ' '.join(str(v) for v in arr)
+
 class PkWordPair:
     '''
     Holding all information of a word pair of an external resource and train data and a model
@@ -41,18 +44,89 @@ class PkWordPair:
 
     def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2):
         
-        self.samples.append(sample_idx)
         if sample_idx not in self.pairs:
             self.pairs[sample_idx] = []
 
-        self.pairs[sample_idx].append((dims1, reps1, dims2, reps2))
+            # Only count prediction once.
+            if gold not in self.predictions:
+                self.predictions[gold] = dict()
+            if predicted not in self.predictions[gold]:
+                self.predictions[gold][predicted] = 1
+            else:
+                self.predictions[gold][predicted] += 1
 
-        if gold not in self.predictions:
-            self.predictions[gold] = dict()
-        if predicted not in self.predictions[gold]:
-            self.predictions[gold][predicted] = 1
-        else:
-            self.predictions[gold][predicted] += 1
+        self.samples.append(sample_idx)
+        
+        self.pairs[sample_idx].append((dims1, reps1, dims2, reps2, gold, predicted))
+
+        
+
+    def accuracy(self):
+        cnt_correct = 0
+        cnt_incorrct = 0
+
+        for lbl_gold in self.predictions:
+            for lbl_predicted in self.predictions[lbl_gold]:
+                if lbl_gold == lbl_predicted:
+                    cnt_correct += self.predictions[lbl_gold][lbl_predicted]
+                else:
+                    cnt_incorrct += self.predictions[lbl_gold][lbl_predicted]
+
+        return cnt_correct / (cnt_correct + cnt_incorrct)
+
+    def precision_recall(self, label):
+        tp = 0.00000000001
+        tn = 0.00000000001
+        fp = 0.00000000001
+        fn = 0.00000000001
+
+        for lbl_gold in self.predictions:
+            for lbl_predicted in self.predictions[lbl_gold]:
+
+                if label == lbl_gold:
+                    if lbl_gold == lbl_predicted:
+                        tp += self.predictions[lbl_gold][lbl_predicted]
+                    else:
+                        fn += self.predictions[lbl_gold][lbl_predicted]
+                elif label == lbl_predicted and label != lbl_gold:
+                    fp += self.predictions[lbl_gold][lbl_predicted] 
+                else:
+                    tn += self.predictions[lbl_gold][lbl_predicted] 
+
+        precision =  tp / (tp + fp)
+        recall = tp / (tp + fn)
+
+        return precision, recall
+
+
+
+    def sample_len(self, count_doubles=True):
+        cnt_items = self.samples
+        if count_doubles == False:
+            cnt_items = list(set(cnt_items))
+        return len(cnt_items)
+
+
+    def store(self):
+        lines_general = [
+            self.w1, self.w2,
+            str(self.accuracy()),
+            stringify(self.precision_recall('entailment')),
+            stringify(self.precision_recall('contradiction')),
+            stringify(self.precision_recall('neutral')),
+            stringify(self.samples)
+        ]
+
+        with open(self.path, 'w') as f_out:
+            f_out.write('\n'.join(lines_general))
+
+            for key in self.pairs:
+                for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
+                    f_out.write(' '.join([str(key), gold, predicted]) + '\n')
+                    f_out.write(stringify(dims1) + '\n')
+                    f_out.write(stringify(reps1) + '\n') 
+                    f_out.write(stringify(dims2) + '\n') 
+                    f_out.write(stringify(reps2) + '\n') 
 
 def create_pk_analyse_data(classifier_path, data, w_res):
     '''
@@ -70,7 +144,7 @@ def create_pk_analyse_data(classifier_path, data, w_res):
         os.makedirs(dest_folder)
 
     all_pairs = dict()
-
+    print('Start going through data ...')
     for index, (premise, hypothesis, gold_label) in enumerate(data):
         word_indizes = w_res.get_word_pairs(premise, hypothesis)
         scores, activations, representations = m.predict(classifier, embedding_holder, premise, hypothesis)
@@ -97,6 +171,19 @@ def create_pk_analyse_data(classifier_path, data, w_res):
             pkpair = all_pairs[key]
             pkpair.add_sample(index, gold_label, predicted_label, selected_dims_p, selected_reps_p, selected_dims_h, selected_reps_h)
 
+    print('Done.')
+    print('Write out files ...')
+    summary_data = []
+    for key in all_pairs:
+        pkpair = all_pairs[key]
+        pkpair.store()
+
+        summary_data.append((pkpair.w1, pkpair.w2, pkpair.sample_len(), pkpair.sample_len(count_doubles=True), pkpair.accuracy(), pkpair.path))
+    print('Done.')
+    print('Write summary ... ')
+    with open(dest_folder + 'summary.txt', 'w') as f_out:
+        f_out.write('\n'.join([stringify(data) for data in summary_data]))
+    print('Done.')
 
 def main():
     args = docopt("""Analyse.
@@ -111,8 +198,12 @@ def main():
         res_path = args['<resource>']
         res_label = args['<resource_label>']
 
+        print('Load data ...')
         data = mydataloader.load_snli(data_path)
+        print('Done.')
+        print('Load ressource ...')
         w_res = word_resource.WordResource(res_path, build_fn='snli', interested_relations=[res_label])
+        print('Done.')
 
         create_pk_analyse_data(model_path, data, w_res)
 
