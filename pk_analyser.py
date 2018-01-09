@@ -128,6 +128,13 @@ class PkWordPair:
                     f_out.write(stringify(dims2) + '\n') 
                     f_out.write(stringify(reps2) + '\n') 
 
+def get_summary_items(summary_file):
+    with open(summary_file) as f_in:
+        data = [line.strip().split(' ') for line in f_in]
+
+    data = sorted([(d[0], d[1], d[2], d[3], d[4], d[5]) for d in data], key=lambda x: x[4])
+    return data
+
 def create_pk_analyse_data(classifier_path, data, w_res):
     '''
     Create data files to analyse samples containing word pairs for known relations.
@@ -190,6 +197,7 @@ def main():
 
     Usage:
         pk_analyser.py create <model> <data> <resource> <resource_label>
+        pk_analyser.py summary <summary_file>
     """)
 
     if args['create']:
@@ -206,6 +214,12 @@ def main():
         print('Done.')
 
         create_pk_analyse_data(model_path, data, w_res)
+    elif args['summary']:
+        summary_file = args['<summary_file>']
+        data = get_summary_items(summary_file)
+        for w1, w2, amount, amount2, acc, _ in data:
+            print(w1 +'-' w2 + ': ' + amount + ', ' + amount2 + '; Acc: ' + acc)
+
 
 
 if __name__ == '__main__':
