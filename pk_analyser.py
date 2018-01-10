@@ -24,7 +24,7 @@ class PkWordPair:
     Holding all information of a word pair of an external resource and train data and a model
     '''
 
-    def __init__(self, w1, w2, path, load=False):
+    def __init__(self, path, w1=None, w2=None, load=False):
         '''
         Create a new instance.
 
@@ -39,7 +39,7 @@ class PkWordPair:
         self.pairs = dict()
 
         if load:
-            print('TODO load')
+            self.load()
     
 
     def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2):
@@ -106,6 +106,17 @@ class PkWordPair:
             cnt_items = list(set(cnt_items))
         return len(cnt_items)
 
+    def load(self):
+        with open(self.path) as f_in:
+            lines = [line.strip() for line in f_in.readlines()]
+
+        self.w1 = lines[0]
+        self.w2 = lines[1]
+        self.samples = [int(v) for v in lines[6].split(' ')]
+
+        print('w1', self.w1)
+        print('w2', self.w2)
+        print('samples', self.samples)
 
     def store(self):
         lines_general = [
@@ -119,6 +130,7 @@ class PkWordPair:
 
         with open(self.path, 'w') as f_out:
             f_out.write('\n'.join(lines_general))
+            f_out.write('\n')
 
             for key in self.pairs:
                 for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
@@ -177,7 +189,7 @@ def create_pk_analyse_data(classifier_path, data, w_res):
         for ip, ih in word_indizes:
             key = premise[ip] + '_' + hypothesis[ih]
             if key not in all_pairs:
-                all_pairs[key] = PkWordPair(premise[ip], hypothesis[ih], dest_folder + key + '.pkpair')
+                all_pairs[key] = PkWordPair(dest_folder + key + '.pkpair', premise[ip], hypothesis[ih])
 
             selected_dims_p = np.where(p_act == ip)[0]
             selected_dims_h = np.where(h_act == ih)[0]
@@ -208,6 +220,7 @@ def main():
     Usage:
         pk_analyser.py create <model> <data> <resource> <resource_label>
         pk_analyser.py summary <summary_file> <sort_type> <direction>
+        pk_analyser.py show <file>
     """)
 
     if args['create']:
@@ -237,6 +250,11 @@ def main():
 
         for w1, w2, amount, amount2, acc, _ in data:
             print(w1 + '-' + w2 + ': ' + str(amount) + ', ' + str(amount2) + '; Acc: ' + str(acc))
+
+    elif args['show']:
+        file = args['<file>']
+        pkpair = PkWordPair(file, load=True)
+
 
 
 
