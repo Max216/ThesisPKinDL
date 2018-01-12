@@ -32,6 +32,13 @@ def build_from_snli_format(path, relations, max_words=1):
     print('Dictionary:', 'use', cnt_relevant, '; don\'t use:', cnt_irrelevant, 'samples with label:', relations)
     return resource_dict
 
+def build_single_pair(data):
+    w1 = data[0]
+    w2 = data[1]
+    relation = data[2]
+
+    return dict([(w1, dict([(w2, relation)]))])
+
 class WordResource:
     '''
     Store information about pairwise words from a resouce
@@ -49,6 +56,8 @@ class WordResource:
 
         if build_fn == 'snli':
             self.resource_dict = build_from_snli_format(res_path, interested_relations, max_words=1)
+        elif build_fn == 'single_pair':
+            self.resource_dict = build_single_pair(res_path)
 
     def word_resource_overlap(self, sent1, sent2):
         '''

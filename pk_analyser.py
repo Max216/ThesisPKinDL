@@ -5,6 +5,7 @@ import embeddingholder
 import mydataloader
 import model as m
 import config
+import plotting as pt
 
 from docopt import docopt
 
@@ -12,6 +13,7 @@ import torch
 import numpy as np
 
 import os
+from collections import defaultdict
 
 def to_classifier_folder(model_name):
     return './analyses/for_model/' + model_name + '_folder/' 
@@ -20,6 +22,9 @@ def stringify(arr):
     return ' '.join(str(v) for v in arr)
 
 class PkWordPair:
+
+    FILE_DATA = config.PATH_TRAIN_DATA_CLEAN
+
     '''
     Holding all information of a word pair of an external resource and train data and a model
     '''
@@ -41,6 +46,28 @@ class PkWordPair:
         if load:
             self.load()
     
+    def get_sents(self, gold_label, predicted_label, max_len):
+        ids = []
+        for id in self.samples:
+            for pair in self.pairs[id]:
+                if pair[4] == gold_label and pair[5] == predicted_label:
+                    ids.append(id)
+        ids = ids[:max_len]
+
+        if len(ids) == 0:
+            return []
+
+        samples = []
+        with open(self.FILE_DATA) as f_in:
+            cnt = 0
+            for line in f_in:
+                if cnt in ids:
+                    p, h, lbl = mydataloader.extract_snli(line.strip())
+                    samples.append((p, h))
+                elif cnt > ids[-1]:
+                    break
+                cnt += 1
+        return samples
 
     def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2):
         
@@ -49,7 +76,7 @@ class PkWordPair:
 
             # Only count prediction once.
             if gold not in self.predictions:
-                self.predictions[gold] = dict()
+                self.predictions[gold] = defaultdict(int)
             if predicted not in self.predictions[gold]:
                 self.predictions[gold][predicted] = 1
             else:
@@ -59,7 +86,22 @@ class PkWordPair:
         
         self.pairs[sample_idx].append((dims1, reps1, dims2, reps2, gold, predicted))
 
-        
+    def get_class_counts(self, labels=['entailment', 'neutral', 'contradiction']):
+        '''
+        Get the amount of samples per gold label together with the assoziated amount of classifications
+        '''
+
+        counts = []
+        for lbl_gold in labels:
+            if lbl_gold not in self.predictions:
+                self.predictions[lbl_gold] = defaultdict(int)
+            predictions = [self.predictions[lbl_gold][lbl_predicted] for lbl_predicted in labels]
+
+            counts.append((lbl_gold, [sum(predictions)] + predictions))
+
+        print(counts)
+        return counts
+
 
     def accuracy(self):
         cnt_correct = 0
@@ -98,6 +140,10 @@ class PkWordPair:
 
         return precision, recall
 
+    def str_precision_recall(self, label,round_to=2, separator='\n'):
+        prec, recall = self.precision_recall(label)
+        return separator.join(['Precision: ' + str(round(prec, round_to)), 'Recall: ' + str(round(recall, round_to))])
+
 
 
     def sample_len(self, count_doubles=True):
@@ -114,9 +160,25 @@ class PkWordPair:
         self.w2 = lines[1]
         self.samples = [int(v) for v in lines[6].split(' ')]
 
-        print('w1', self.w1)
-        print('w2', self.w2)
-        print('samples', self.samples)
+        lines_labels = lines[7::5]
+        lines_dims1 = lines[8::5]
+        lines_reps1 = lines[9::5]
+        lines_dims2 = lines[10::5]
+        lines_reps2 = lines[11::5]
+
+        for i in range(len(lines_labels)):
+            splitted_labels = lines_labels[i].split(' ')
+            sample_idx = int(splitted_labels[0])
+            lbl_gold = splitted_labels[1]
+            lbl_predicted = splitted_labels[2]
+
+            dims1 = [int(v) for v in lines_dims1[i].split(' ')]
+            dims2 = [int(v) for v in lines_dims2[i].split(' ')]
+            reps1 = [float(v) for v in lines_reps1[i].split(' ')]
+            reps2 = [float(v) for v in lines_reps2[i].split(' ')]
+
+            self.add_sample(sample_idx, lbl_gold, lbl_predicted, dims1, reps1, dims2, reps2)
+
 
     def store(self):
         lines_general = [
@@ -140,7 +202,7 @@ class PkWordPair:
                     f_out.write(stringify(dims2) + '\n') 
                     f_out.write(stringify(reps2) + '\n') 
 
-def get_summary_items(summary_file, sort='amount', reverse=True):
+def get_summary_items(summary_file, sort='size', reverse=True, min_amount=-1):
     sort_idx = dict([
         ('w1', 0), ('w2', 1), ('size', 2), ('ind_size', 3), ('acc', 4)
     ])
@@ -155,7 +217,13 @@ def get_summary_items(summary_file, sort='amount', reverse=True):
         data = [line.strip().split(' ') for line in f_in]
 
     data = sorted([(d[0], d[1], int(d[2]), int(d[3]), float(d[4]), d[5]) for d in data], key=lambda x: x[sidx], reverse=reverse)
+    
+    if min_amount > -1:
+        data = [d for d in data if d[2] >= min_amount]
+
     return data
+
+
 
 def create_pk_analyse_data(classifier_path, data, w_res):
     '''
@@ -214,16 +282,29 @@ def create_pk_analyse_data(classifier_path, data, w_res):
         f_out.write('\n'.join([stringify(data) for data in summary_data]))
     print('Done.')
 
+def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
+    w_res = word_resource.WordResource((w1, w2, ''), build_fn='single_pair')
+    create_pk_analyse_data(classifier_path, data, w_res)
+
 def main():
     args = docopt("""Analyse.
 
     Usage:
+        pk_analyser.py create_single <model> <data> <w1> <w2>
         pk_analyser.py create <model> <data> <resource> <resource_label>
-        pk_analyser.py summary <summary_file> <sort_type> <direction>
-        pk_analyser.py show <file>
+        pk_analyser.py summary <summary_file> <sort_type> <direction> [--ma=<min_amount>]
+        pk_analyser.py show <file> <amount>
     """)
 
-    if args['create']:
+
+    if args['create_single']:
+        model_path = args['<model>']
+        data_path = args['<data>']
+        w1 = args['<w1>']
+        w2 = args['<w2>']
+        data = mydataloader.load_snli(data_path)
+        create_pk_analyse_data_for_pair(model_path, data, w1, w2)
+    elif args['create']:
         model_path = args['<model>']
         data_path = args['<data>']
         res_path = args['<resource>']
@@ -241,19 +322,41 @@ def main():
         summary_file = args['<summary_file>']
         sort_type = args['<sort_type>']
         direction = args['<direction>']
+        min_amount = int(args['--ma'] or -1)
+        print(min_amount)
 
         if direction == 'normal':
             reverse = False
         else:
             reverse = True
-        data = get_summary_items(summary_file, sort=sort_type, reverse=reverse)
+        data = get_summary_items(summary_file, sort=sort_type, reverse=reverse, min_amount=min_amount)
 
         for w1, w2, amount, amount2, acc, _ in data:
             print(w1 + '-' + w2 + ': ' + str(amount) + ', ' + str(amount2) + '; Acc: ' + str(acc))
 
     elif args['show']:
+        labels = ['entailment', 'neutral', 'contradiction']
         file = args['<file>']
+        amount = int(args['<amount>'])
+
+
         pkpair = PkWordPair(file, load=True)
+        general_data = pkpair.get_class_counts(labels=labels)
+
+        general_data = [(lbl + '\n' + pkpair.str_precision_recall(lbl) ,  data) for lbl, data in general_data]
+
+        legend_labels = ['gold'] + ['predicted '+lbl for lbl in labels]
+        title = file.split('/')[-1].split('.')[0] +' (' + str(pkpair.accuracy()) + ')'
+
+        for lg in labels:
+            for lp in labels:
+                print('#', lg, lp)
+                for p, h in pkpair.get_sents(lg, lp, amount):
+                    print('[p]', ' '.join(p))
+                    print('[h]', ' '.join(h))
+                    print()
+
+        pt.plot_multi_bar_chart(general_data, title, legend_labels=legend_labels)
 
 
 

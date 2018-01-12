@@ -7,12 +7,16 @@ from docopt import docopt
 
 def in_resource(res, p, h):
     return res.word_resource_overlap(p, h)
+def no_filter(res, p, h):
+    return True
 
 def main():
     args = docopt("""Find data based on some criterion.
 
     Usage:
         find_data.py inres <data_path> <resource_path> <resource_label> <name_out>
+        find_data.py valid <data_path> <name_out>
+
     """)
 
     data_path = args['<data_path>']
@@ -21,14 +25,16 @@ def main():
     name_out = args['<name_out>']
 
     filter_fn = None
+    w_res = None
     if args['inres']:
-    	filter_fn = in_resource
+        filter_fn = in_resource
+        print('Create resource for:', resource_label, '...')
+        w_res = word_resource.WordResource(resource_path, interested_relations=[resource_label])
+        print('Loaded', len(w_res), 'word information.')
+    elif args['valid']:
+        filter_fn = no_filter
 
-    print('Create resource for:', resource_label, '...')
-    w_res = word_resource.WordResource(resource_path, interested_relations=[resource_label])
-    print('Loaded', len(w_res), 'word information.')
-
-    print('Load relevant data for resource ...')
+    print('Load relevant data ...')
     cnt_relevant = 0
     cnt_irrelevant = 0
     with open(data_path) as f_in:
