@@ -237,6 +237,7 @@ class PkWordPair:
         self.samples = []
 
         start = 7
+        _sample_types = None
         if self.type == 'spkpair':
             _sample_types = lines[7].split(' ')
             start = 8
@@ -430,8 +431,9 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
     create_pk_analyse_data(classifier_path, data, w_res)
 
 def experiment2(model_path, data_path):
-    zero_dims = [402, 837, 1221, 1301, 1826]
-    name = 'zero_' + ' '.join([str(d) for d in zero_dims])
+    #zero_dims = [402, 837, 1221, 1301, 1826]
+    zero_dims = [50, 72, 246, 341, 402, 731, 837, 1221, 1301, 1763, 1826]
+    name = 'zero_' + '_'.join([str(d) for d in zero_dims])
     data = mydataloader.load_snli(data_path)
 
     def twist_fn(representation, sent_type, _):
