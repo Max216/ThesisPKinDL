@@ -499,8 +499,8 @@ def experiment1(model_path, data_path):
     swap_hyp = swap_premise
 
     def run (swaps_p, swaps_h, lbl):
-        for sp in swap_premise:
-            for sh in swap_hyp:
+        for sp in swaps_p:
+            for sh in swaps_h:
                 if sp != sh:
                     create_pk_analyse_data_for_swapped(model_path, data, sp, sh, lbl)
 
