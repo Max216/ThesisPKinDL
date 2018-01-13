@@ -173,7 +173,9 @@ class PkWordPair:
                 sd = np.std(vals)
 
             return (dim, mean, sd, current_cnt)
-
+        print(relevant_dims2)
+        print(relevant_dims1)
+        print([d for d in relevant_dims2 if d not in relevant_dims1])
         relevant_dims1 = [dimify(d, dim_cnt_1, rep_sum_1) for d in relevant_dims1]
         relevant_dims2 = [dimify(d, dim_cnt_2, rep_sum_2) for d in relevant_dims2]
 
@@ -478,7 +480,9 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
 
 def experiment2(model_path, data_path):
     #zero_dims = [402, 837, 1221, 1301, 1826]
-    zero_dims = [50, 72, 246, 341, 402, 731, 837, 1221, 1301, 1763, 1826]
+    #zero_dims = [50, 72, 246, 341, 402, 731, 837, 1221, 1301, 1763, 1826]
+    zero_dims = [50, 72, 90, 246, 247, 266, 318, 341, 344, 402, 731, 979, 1062, 1221, 1227, 1310, 1667, 1713, 1751, 1763, 1826, 1934, 1990]
+
     name = 'zero_' + '_'.join([str(d) for d in zero_dims])
     data = mydataloader.load_snli(data_path)
 
