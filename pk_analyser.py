@@ -52,6 +52,7 @@ class PkWordPair:
         self.pairs = dict()
         self.type = path.split('.')[-1]
         self.sample_types = []
+        self.dim = 2048
 
         if load:
             self.load()
@@ -98,6 +99,39 @@ class PkWordPair:
                     break
                 cnt += 1
         return samples
+
+    def get_common_dims(self, t_percent, t_min):
+        '''
+        First filters all dimensions s.t. only those remain with a value higher thn t_min. Then check if 
+        t_percent of all samples have this.
+        '''
+
+        dim_cnt_1 = np.zeros(self.dim, dtype=int)
+        dim_cnt_2 = np.zeros(self.dim, dtype=int)
+        
+        total_len = 0
+        for key in self.pairs:
+            for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
+
+                filtered_dims1 = [dim for i, dim in enumerate(dims1) if reps1[i] >= t_min]
+                filtered_dims2 = [dim for i, dim in enumerate(dims2) if reps2[i] >= t_min]
+
+                add_dims_1 = np.zeros(self.dim, dtype=int)
+                np.put(add_dims_1, filtered_dims1, np.ones(len(dims1)))
+                
+                add_dims_2 = np.zeros(self.dim, dtype=int)
+                np.put(add_dims_2, filtered_dims2, np.ones(len(dims2)))
+
+                dim_cnt_1 += add_dims_1
+                dim_cnt_2 += add_dims_2
+                total_len += 1
+        
+        min_len = total_len * t_percent
+        
+        relevant_dims1 = [i for i in range(self.dim) if dim_cnt_1[i] >= min_len]
+        relevant_dims2 = [i for i in range(self.dim) if dim_cnt_2[i] >= min_len]
+
+        return (relevant_dims1, relevant_dims2, [d for d in relevant_dims1 if d in relevant_dims2])
 
 
     def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2, find_at=None):
@@ -281,7 +315,7 @@ def get_summary_items(summary_file, sort='size', reverse=True, min_amount=-1):
 
     return data
 
-def create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label):
+def create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label, twister=None):
     '''
     Create data files to analyse samples by using sentenves with <w1> as premise and the same sentence with 
     <w1> replaced by <w2> as hypthesis
@@ -303,7 +337,10 @@ def create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label):
         os.makedirs(dest_folder)
 
     print('Go through data ... ')
-    spkpair = PkWordPair(dest_folder + w1 + '_' + w2 + '.spkpair', w1, w2)
+    if twister == None:
+        spkpair = PkWordPair(dest_folder + w1 + '_' + w2 + '.spkpair', w1, w2)
+    else:
+        spkpair = PkWordPair(dest_folder + w1 + '_' + w2 + '_' + twister.name + '.spkpair', w1, w2)
     for idx, (premise, hypothesis, _ ) in enumerate(data):
         for key, sentence in [('premise', premise), ('hypothesis', hypothesis)]:
             if w1 in sentence:
@@ -311,7 +348,7 @@ def create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label):
                 copy = [replace_word(w, w1, w2) for w in sentence]
 
                 # Predict stuff
-                scores, activations, representations = m.predict(classifier, embedding_holder, sentence, copy)
+                scores, activations, representations = m.predict(classifier, embedding_holder, sentence, copy, twister=twister)
                 _, predicted_idx = torch.max(scores, dim=1)
                 predicted_label = mydataloader.index_to_tag[predicted_idx.data[0]]
                 w1_act = activations[0].data.cpu().numpy()[0]
@@ -392,6 +429,20 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
     w_res = word_resource.WordResource((w1, w2, ''), build_fn='single_pair')
     create_pk_analyse_data(classifier_path, data, w_res)
 
+def experiment2(model_path, data_path):
+    dim = 837
+    name = 'zero_837'
+    data = mydataloader.load_snli(data_path)
+
+    def twist_fn(representation, sent_type, _):
+        if sent_type == 'hypothesis':
+            representation[0,837] = float(0.0)
+
+        return representation
+
+    twister = m.ModelTwister(twist_fn, name=name)
+    create_pk_analyse_data_for_swapped(model_path, data, 'A', 'b', 'entailment', twister=twister)
+
 def experiment1(model_path, data_path):
     data = mydataloader.load_snli(data_path)
 
@@ -431,7 +482,9 @@ def main():
         pk_analyser.py create <model> <data> <resource> <resource_label>
         pk_analyser.py summary <summary_file> <sort_type> <direction> [--ma=<min_amount>]
         pk_analyser.py show <file> <amount>
+        pk_analyser.py comp <file> <t_percent> <t_min>
         pk_analyser.py experiment1 <model> <data>
+        pk_analyser.py experiment2 <model> <data>
     """)
 
     if args['replace']:
@@ -444,6 +497,16 @@ def main():
         create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label)
     elif args['experiment1']:
         experiment1(model_path = args['<model>'],data_path = args['<data>'])
+    elif args['experiment2']:
+        experiment2(model_path = args['<model>'],data_path = args['<data>'])
+    elif args['comp']:
+        labels = ['entailment', 'neutral', 'contradiction']
+        file = args['<file>']
+        t_percent = float(args['<t_percent>'])
+        t_min = float(args['<t_min>'])
+        pkpair = PkWordPair(file, load=True)
+        common_dims = pkpair.get_common_dims(t_percent, t_min)
+        print(common_dims)
 
     elif args['create_single']:
         model_path = args['<model>']

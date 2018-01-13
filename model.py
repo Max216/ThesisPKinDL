@@ -218,7 +218,7 @@ def lbl_to_float(val):
     '''
     return float(val.replace('_', '.'))
 
-def predict(classifier, embedding_holder, p, h):
+def predict(classifier, embedding_holder, p, h, twister=None):
     p_batch = torch.LongTensor(len(p), 1)
     h_batch = torch.LongTensor(len(h), 1)
 
@@ -228,7 +228,8 @@ def predict(classifier, embedding_holder, p, h):
     return classifier(
         cuda_wrap(autograd.Variable(p_batch)), 
         cuda_wrap(autograd.Variable(h_batch)), 
-        output_sent_info=True)
+        output_sent_info=True,
+        twister=twister)
 
 def load_model(model_path, embedding_holder = None):
     '''
@@ -282,13 +283,14 @@ class ModelTwister:
     Manipulate dimensions of the sentence representation using this class.
     '''
 
-    def __init__(self, twist, tools = None):
+    def __init__(self, twist, tools = None, name = None):
         '''
         :param twist - function(representation, ['premise'|'hypothesis'], tools) to twist the representation
         :param tools - additional information to use in the twist function
         '''
         self.twist = twist
         self.tools = tools
+        self.name = name
 
     def twist_representation(self, representation, sent_type):
         return self.twist(representation, sent_type, self.tools)
