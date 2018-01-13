@@ -249,13 +249,16 @@ class PkWordPair:
                 f_out.write(' '.join(self.sample_types))
                 f_out.write('\n')
 
-            for key in self.pairs:
-                for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
-                    f_out.write(' '.join([str(key), gold, predicted]) + '\n')
-                    f_out.write(stringify(dims1) + '\n')
-                    f_out.write(stringify(reps1) + '\n') 
-                    f_out.write(stringify(dims2) + '\n') 
-                    f_out.write(stringify(reps2) + '\n') 
+            indexer = defaultdict(int)
+            for key in self.samples:
+                (dims1, reps1, dims2, reps2, gold, predicted) = self.pairs[key][indexer[key]]
+                indexer[key] += 1
+                f_out.write(' '.join([str(key), gold, predicted]) + '\n')
+                f_out.write(stringify(dims1) + '\n')
+                f_out.write(stringify(reps1) + '\n') 
+                f_out.write(stringify(dims2) + '\n') 
+                f_out.write(stringify(reps2) + '\n') 
+                    
 
 def get_summary_items(summary_file, sort='size', reverse=True, min_amount=-1):
     sort_idx = dict([
