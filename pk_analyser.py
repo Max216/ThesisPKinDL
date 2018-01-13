@@ -408,8 +408,14 @@ def experiment1(model_path, data_path):
 
     swap_premise = ['inside', 'outside']
     swap_hyp = swap_premise
-
     run(swap_premise, swap_hyp, 'contradiction')
+
+    swap_premise = ['river', 'lake', 'sea']
+    swap_hyp = swap_premise
+    run(swap_premise, swap_hyp, 'contradiction')
+
+    swap_hyp = ['water']
+    run(swap_premise, swap_hyp, 'entailment')
 
     
 
