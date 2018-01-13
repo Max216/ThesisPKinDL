@@ -430,18 +430,19 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
     create_pk_analyse_data(classifier_path, data, w_res)
 
 def experiment2(model_path, data_path):
-    dim = 837
-    name = 'zero_837'
+    zero_dims = [402, 837, 1221, 1301, 1826]
+    name = 'zero_' + ' '.join([str(d) for d in zero_dims])
     data = mydataloader.load_snli(data_path)
 
     def twist_fn(representation, sent_type, _):
         if sent_type == 'hypothesis':
-            representation[0,837] = float(0.0)
+            for d in zero_dims:
+                representation[0,d] = float(0.0)
 
         return representation
 
     twister = m.ModelTwister(twist_fn, name=name)
-    create_pk_analyse_data_for_swapped(model_path, data, 'A', 'b', 'entailment', twister=twister)
+    create_pk_analyse_data_for_swapped(model_path, data, 'basketball', 'sport', 'entailment', twister=twister)
 
 def experiment1(model_path, data_path):
     data = mydataloader.load_snli(data_path)
