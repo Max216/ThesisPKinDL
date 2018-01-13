@@ -15,6 +15,11 @@ import numpy as np
 import os
 from collections import defaultdict
 
+def f7(seq):
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
+
 def replace_word(w_test, w_replace, w_target):
     '''
     :param w_test gets replaced by :param w_target if w_test == w_replace
@@ -108,22 +113,38 @@ class PkWordPair:
 
         dim_cnt_1 = np.zeros(self.dim, dtype=int)
         dim_cnt_2 = np.zeros(self.dim, dtype=int)
+
+        rep_sum_1 = []
+        rep_sum_2 = []
         
         total_len = 0
         for key in self.pairs:
             for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
 
-                filtered_dims1 = [dim for i, dim in enumerate(dims1) if reps1[i] >= t_min]
-                filtered_dims2 = [dim for i, dim in enumerate(dims2) if reps2[i] >= t_min]
+                filtered_idx1 = [(i,dim) for i, dim in enumerate(dims1) if reps1[i] >= t_min]
+                filtered_idx2 = [(i,dim) for i, dim in enumerate(dims2) if reps2[i] >= t_min]
+                filtered_dims1 = [dim for i, dim in filtered_idx1]
+                filtered_dims2 = [dim for i, dim in filtered_idx2]
 
+                # Add dimension indizes
                 add_dims_1 = np.zeros(self.dim, dtype=int)
                 np.put(add_dims_1, filtered_dims1, np.ones(len(dims1)))
                 
                 add_dims_2 = np.zeros(self.dim, dtype=int)
                 np.put(add_dims_2, filtered_dims2, np.ones(len(dims2)))
 
+                # Add values
+                add_vals_1 = np.zeros(self.dim, dtype=float)
+                add_vals_2 = np.zeros(self.dim, dtype=float)
+                for i, dim in filtered_idx1:
+                    add_vals_1[dim] = reps1[i]
+                for i, dim in filtered_idx2:
+                    add_vals_2[dim] = reps2[i]
+
                 dim_cnt_1 += add_dims_1
                 dim_cnt_2 += add_dims_2
+                rep_sum_1.append(add_vals_1)
+                rep_sum_2.append(add_vals_2)
                 total_len += 1
         
         min_len = total_len * t_percent
@@ -131,7 +152,32 @@ class PkWordPair:
         relevant_dims1 = [i for i in range(self.dim) if dim_cnt_1[i] >= min_len]
         relevant_dims2 = [i for i in range(self.dim) if dim_cnt_2[i] >= min_len]
 
-        return (relevant_dims1, relevant_dims2, [d for d in relevant_dims1 if d in relevant_dims2])
+        rep_sum_1 = np.asmatrix(rep_sum_1)
+        rep_sum_2 = np.asmatrix(rep_sum_2)
+
+        coverage = []
+        for dimension in f7(relevant_dims1 + relevant_dims2):
+            cov1 = dim_cnt_1[dimension] / total_len
+            cov2 = dim_cnt_2[dimension] / total_len
+            coverage.append((dimension, [cov1, cov2]))
+
+        def dimify(dim, dim_cnt, rep_sum):
+            current_cnt = dim_cnt[dim]
+            vals = np.asarray([v for v in np.asarray(rep_sum[:,dim]).flatten() if v > 0.0])
+            
+            if len(vals) == 0:
+                mean = 0
+                sd = 0
+            else:
+                mean = np.mean(vals)
+                sd = np.std(vals)
+
+            return (dim, mean, sd, current_cnt)
+
+        relevant_dims1 = [dimify(d, dim_cnt_1, rep_sum_1) for d in relevant_dims1]
+        relevant_dims2 = [dimify(d, dim_cnt_2, rep_sum_2) for d in relevant_dims2]
+
+        return (relevant_dims1, relevant_dims2, coverage)
 
 
     def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2, find_at=None):
@@ -516,8 +562,16 @@ def main():
         t_percent = float(args['<t_percent>'])
         t_min = float(args['<t_min>'])
         pkpair = PkWordPair(file, load=True)
-        common_dims = pkpair.get_common_dims(t_percent, t_min)
-        print(common_dims)
+        common_dims1, common_dims2, coverage = pkpair.get_common_dims(t_percent, t_min)
+        data1 = [(str(dim), mean, std) for dim, mean, std, cnt in common_dims1]
+        data2 = [(str(dim), mean, std) for dim, mean, std, cnt in common_dims2]
+        
+        title = pkpair.w1 + '_' + pkpair.w2 + ' (coverage:' + str(t_percent) + ', min val:' + str(t_min) + ')'
+        pt.plot_double_chart_w_std(data1, data2, title, 'dimension', 'mean value', [pkpair.w1, pkpair.w2], block=False)
+
+        coverage = [(str(dim), vals) for dim, vals in coverage]
+        title_cov = title + '; coverage'
+        pt.plot_multi_bar_chart(coverage, title_cov, [pkpair.w1, pkpair.w2], width=.35, rotate=90)
 
     elif args['create_single']:
         model_path = args['<model>']

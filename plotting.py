@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np 
+from collections import defaultdict
 
 color_palette = [
 '#e6194b', 
@@ -30,7 +31,12 @@ color_palette = [
 '#00ffff'
 ]
 
-def plot_multi_bar_chart(data, title, legend_labels, save=None):
+def f7(seq):
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
+
+def plot_multi_bar_chart(data, title, legend_labels, save=None, rotate=0, width=0.1):
     '''
     Plot a bar chart with several bars per x value
 
@@ -51,7 +57,7 @@ def plot_multi_bar_chart(data, title, legend_labels, save=None):
 
     fig, ax = plt.subplots()
     index = np.arange(num_groups)
-    bar_width = 0.1
+    bar_width = width
 
     for i, lbl in enumerate(legend_labels):
         plt.bar(index + i * bar_width, plot_data[i], bar_width, color=color_palette[i], label=lbl)
@@ -59,7 +65,7 @@ def plot_multi_bar_chart(data, title, legend_labels, save=None):
     plt.xlabel('Gold label')
     plt.ylabel('# samples')
     plt.title(title)
-    plt.xticks(index +  bar_width, x_labels)
+    plt.xticks(index +  bar_width, x_labels, rotation=rotate)
     plt.legend(bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
                 mode="expand", borderaxespad=0, ncol=2)
     plt.subplots_adjust(top=0.8)
@@ -87,3 +93,35 @@ def plot_single_bar_chart(data, title, x_axis_name, y_axis_name, save=None):
     plt.title(title)
 
     plt.show()
+
+def plot_double_chart_w_std(data1, data2, title, x_axis_name, y_axis_name, legend, block=True):
+    lbls1 = [lbl for lbl, mean, std in data1]
+    lbls2 = [lbl for lbl, mean, std in data2]
+    x_labels = f7(list(lbls1 + lbls2))
+    ind = np.arange(len(x_labels))
+    width = 0.35
+
+    fig, ax = plt.subplots()
+    for i, data in enumerate([data1, data2]):
+        mean_dict = defaultdict(int)
+        sd_dict = defaultdict(int)
+        for lbl, mean, sd in data:
+            mean_dict[lbl] = mean
+            sd_dict[lbl] = sd
+
+        plot_means = [mean_dict[lbl] for lbl in x_labels]
+        plot_stds = [sd_dict[lbl] for lbl in x_labels]
+
+        chart = ax.bar(ind + i * width, plot_means, width, color=color_palette[i], yerr=plot_stds, label=legend[i])
+
+    ax.set_ylabel(y_axis_name)
+    ax.set_xlabel(x_axis_name)
+    ax.set_title(title)
+    ax.set_xticks(ind + width / 2)
+    ax.set_xticklabels(x_labels, rotation=90)
+    plt.subplots_adjust(bottom=0.3)
+    ax.legend(bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
+                mode="expand", borderaxespad=0, ncol=2)
+    plt.show(block=block)
+    
+
