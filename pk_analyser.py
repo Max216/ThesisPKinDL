@@ -15,6 +15,14 @@ import numpy as np
 import os
 from collections import defaultdict
 
+def replace_word(w_test, w_replace, w_target):
+    '''
+    :param w_test gets replaced by :param w_target if w_test == w_replace
+    '''
+    if w_test == w_replace:
+        return w_target
+    return w_test
+
 def to_classifier_folder(model_name):
     return './analyses/for_model/' + model_name + '_folder/' 
 
@@ -42,35 +50,64 @@ class PkWordPair:
         self.predictions = dict()
         self.samples = []
         self.pairs = dict()
+        self.type = path.split('.')[-1]
+        self.sample_types = []
 
         if load:
             self.load()
     
     def get_sents(self, gold_label, predicted_label, max_len):
         ids = []
-        for id in self.samples:
+        stypes = []
+        swapped_type = self.type == 'spkpair'
+
+        for i, id in enumerate(self.samples):
             for pair in self.pairs[id]:
                 if pair[4] == gold_label and pair[5] == predicted_label:
                     ids.append(id)
+                    if swapped_type:
+                        stypes.append(self.sample_types[i])
         ids = ids[:max_len]
 
         if len(ids) == 0:
             return []
 
         samples = []
+        cnt_found = 0
         with open(self.FILE_DATA) as f_in:
             cnt = 0
             for line in f_in:
                 if cnt in ids:
                     p, h, lbl = mydataloader.extract_snli(line.strip())
-                    samples.append((p, h))
+
+                    if swapped_type:
+                        current_type = stypes[cnt_found]
+                        if current_type == 'premise':
+                            sent = p    
+                        elif current_type == 'hypothesis':
+                            sent = h
+                        else:
+                            print('Invalid type:', current_type)
+                            return 1/0
+                        samples.append((sent, [replace_word(w, self.w1, self.w2) for w in sent]))
+                    else:
+                        samples.append((p, h))
+
+                    cnt_found += 1
                 elif cnt > ids[-1]:
                     break
                 cnt += 1
         return samples
 
-    def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2):
-        
+
+    def add_sample(self, sample_idx, gold, predicted, dims1, reps1, dims2, reps2, find_at=None):
+        if self.type == 'spkpair':
+            if find_at == None:
+                print('Must specify "premise" or "hypothesis" when adding a sample to ".spkpair".')
+                return
+            else:
+                self.sample_types.append(find_at)
+
         if sample_idx not in self.pairs:
             self.pairs[sample_idx] = []
 
@@ -83,8 +120,8 @@ class PkWordPair:
                 self.predictions[gold][predicted] += 1
 
         self.samples.append(sample_idx)
-        
         self.pairs[sample_idx].append((dims1, reps1, dims2, reps2, gold, predicted))
+
 
     def get_class_counts(self, labels=['entailment', 'neutral', 'contradiction']):
         '''
@@ -99,9 +136,14 @@ class PkWordPair:
 
             counts.append((lbl_gold, [sum(predictions)] + predictions))
 
-        print(counts)
         return counts
 
+    def get_prediction_counts(self, labels=['entailment', 'neutral', 'contradiction']):
+        counts = defaultdict(int)
+        for key in self.predictions:
+            for predicted in self.predictions[key]:
+                counts[predicted] += self.predictions[key][predicted]
+        return [(lbl, counts[lbl]) for lbl in labels]
 
     def accuracy(self):
         cnt_correct = 0
@@ -114,7 +156,7 @@ class PkWordPair:
                 else:
                     cnt_incorrct += self.predictions[lbl_gold][lbl_predicted]
 
-        return cnt_correct / (cnt_correct + cnt_incorrct)
+        return cnt_correct / (cnt_correct + cnt_incorrct + 0.00000000000001)
 
     def precision_recall(self, label):
         tp = 0.00000000001
@@ -158,13 +200,18 @@ class PkWordPair:
 
         self.w1 = lines[0]
         self.w2 = lines[1]
-        self.samples = [int(v) for v in lines[6].split(' ')]
+        self.samples = []
 
-        lines_labels = lines[7::5]
-        lines_dims1 = lines[8::5]
-        lines_reps1 = lines[9::5]
-        lines_dims2 = lines[10::5]
-        lines_reps2 = lines[11::5]
+        start = 7
+        if self.type == 'spkpair':
+            _sample_types = lines[7].split(' ')
+            start = 8
+
+        lines_labels = lines[start::5]
+        lines_dims1 = lines[start+1::5]
+        lines_reps1 = lines[start+2::5]
+        lines_dims2 = lines[start+3::5]
+        lines_reps2 = lines[start+4::5]
 
         for i in range(len(lines_labels)):
             splitted_labels = lines_labels[i].split(' ')
@@ -177,7 +224,10 @@ class PkWordPair:
             reps1 = [float(v) for v in lines_reps1[i].split(' ')]
             reps2 = [float(v) for v in lines_reps2[i].split(' ')]
 
-            self.add_sample(sample_idx, lbl_gold, lbl_predicted, dims1, reps1, dims2, reps2)
+            if _sample_types != None:
+                self.add_sample(sample_idx, lbl_gold, lbl_predicted, dims1, reps1, dims2, reps2, _sample_types[i])
+            else:
+                self.add_sample(sample_idx, lbl_gold, lbl_predicted, dims1, reps1, dims2, reps2)
 
 
     def store(self):
@@ -190,9 +240,14 @@ class PkWordPair:
             stringify(self.samples)
         ]
 
+
         with open(self.path, 'w') as f_out:
             f_out.write('\n'.join(lines_general))
             f_out.write('\n')
+
+            if self.type == 'spkpair':
+                f_out.write(' '.join(self.sample_types))
+                f_out.write('\n')
 
             for key in self.pairs:
                 for (dims1, reps1, dims2, reps2, gold, predicted) in self.pairs[key]:
@@ -222,6 +277,54 @@ def get_summary_items(summary_file, sort='size', reverse=True, min_amount=-1):
         data = [d for d in data if d[2] >= min_amount]
 
     return data
+
+def create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label):
+    '''
+    Create data files to analyse samples by using sentenves with <w1> as premise and the same sentence with 
+    <w1> replaced by <w2> as hypthesis
+
+    :param model_path   path to classifier
+    :param data         all data
+    :param w1           look for sentenceas containing w1
+    :param w2           replace w1 with w2
+    :param assumed_label    assumed label after replacing those two
+    '''
+    embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+
+    classifier, classifier_name = m.load_model(model_path, embedding_holder)
+    classifier = m.cuda_wrap(classifier)
+    classifier.eval()
+
+    dest_folder = to_classifier_folder(classifier_name)
+    if not os.path.exists(dest_folder):
+        os.makedirs(dest_folder)
+
+    print('Go through data ... ')
+    spkpair = PkWordPair(dest_folder + w1 + '_' + w2 + '.spkpair', w1, w2)
+    for idx, (premise, hypothesis, _ ) in enumerate(data):
+        for key, sentence in [('premise', premise), ('hypothesis', hypothesis)]:
+            if w1 in sentence:
+                w_idx = sentence.index(w1)
+                copy = [replace_word(w, w1, w2) for w in sentence]
+
+                # Predict stuff
+                scores, activations, representations = m.predict(classifier, embedding_holder, sentence, copy)
+                _, predicted_idx = torch.max(scores, dim=1)
+                predicted_label = mydataloader.index_to_tag[predicted_idx.data[0]]
+                w1_act = activations[0].data.cpu().numpy()[0]
+                w2_act = activations[1].data.cpu().numpy()[0]
+                w1_rep = representations[0].data.cpu().numpy()[0]
+                w2_rep = representations[1].data.cpu().numpy()[0]
+
+                selected_dims_w1 = np.where(w1_act == w_idx)[0]
+                selected_dims_w2 = np.where(w2_act == w_idx)[0]
+
+                selected_reps_w1 = np.take(w1_rep, selected_dims_w1)
+                selected_reps_w2 = np.take(w2_rep, selected_dims_w2)
+
+                spkpair.add_sample(idx, assumed_label, predicted_label, selected_dims_w1, selected_reps_w1, selected_dims_w2, selected_reps_w2, key)
+    print('Store', spkpair.path)
+    spkpair.store()
 
 
 
@@ -286,18 +389,54 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
     w_res = word_resource.WordResource((w1, w2, ''), build_fn='single_pair')
     create_pk_analyse_data(classifier_path, data, w_res)
 
+def experiment1(model_path, data_path):
+    data = mydataloader.load_snli(data_path)
+
+    swap_premise = ['football', 'basketball', 'hockey']
+    swap_hyp = swap_premise
+
+    def run (swaps_p, swaps_h, lbl):
+        for sp in swap_premise:
+            for sh in swap_hyp:
+                if sp != sh:
+                    create_pk_analyse_data_for_swapped(model_path, data, sp, sh, lbl)
+
+    run(swap_premise, swap_hyp, 'contradiction')
+
+    swap_hyp = ['sport']
+    run(swap_premise, swap_hyp, 'entailment')
+
+    swap_premise = ['inside', 'outside']
+    swap_hyp = swap_premise
+
+    run(swap_premise, swap_hyp, 'contradiction')
+
+    
+
 def main():
     args = docopt("""Analyse.
 
     Usage:
-        pk_analyser.py create_single <model> <data> <w1> <w2>
+        pk_analyser.py create_single <model> <data> <w1> <w2> 
+        pk_analyser.py replace <model> <data> <w1> <w2> <lbl>
         pk_analyser.py create <model> <data> <resource> <resource_label>
         pk_analyser.py summary <summary_file> <sort_type> <direction> [--ma=<min_amount>]
         pk_analyser.py show <file> <amount>
+        pk_analyser.py experiment1 <model> <data>
     """)
 
+    if args['replace']:
+        model_path = args['<model>']
+        data_path = args['<data>']
+        w1 = args['<w1>']
+        w2 = args['<w2>']
+        assumed_label = args['<lbl>']
+        data = mydataloader.load_snli(data_path)
+        create_pk_analyse_data_for_swapped(model_path, data, w1, w2, assumed_label)
+    elif args['experiment1']:
+        experiment1(model_path = args['<model>'],data_path = args['<data>'])
 
-    if args['create_single']:
+    elif args['create_single']:
         model_path = args['<model>']
         data_path = args['<data>']
         w1 = args['<w1>']
@@ -323,7 +462,6 @@ def main():
         sort_type = args['<sort_type>']
         direction = args['<direction>']
         min_amount = int(args['--ma'] or -1)
-        print(min_amount)
 
         if direction == 'normal':
             reverse = False
@@ -341,22 +479,37 @@ def main():
 
 
         pkpair = PkWordPair(file, load=True)
-        general_data = pkpair.get_class_counts(labels=labels)
+        legend_labels = ['predicted '+lbl for lbl in labels]
 
-        general_data = [(lbl + '\n' + pkpair.str_precision_recall(lbl) ,  data) for lbl, data in general_data]
 
-        legend_labels = ['gold'] + ['predicted '+lbl for lbl in labels]
-        title = file.split('/')[-1].split('.')[0] +' (' + str(pkpair.accuracy()) + ')'
+        if pkpair.type == 'pkpair':
+            general_data = pkpair.get_class_counts(labels=labels)
+            general_data = [(lbl + '\n' + pkpair.str_precision_recall(lbl) ,  data) for lbl, data in general_data]
+            legend_labels = ['gold'] + legend_labels
+            title = file.split('/')[-1].split('.')[0] +' (' + str(pkpair.accuracy()) + ')'
 
-        for lg in labels:
-            for lp in labels:
-                print('#', lg, lp)
-                for p, h in pkpair.get_sents(lg, lp, amount):
-                    print('[p]', ' '.join(p))
-                    print('[h]', ' '.join(h))
-                    print()
+            for lg in labels:
+                for lp in labels:
+                    print('#', lg, lp)
+                    for p, h in pkpair.get_sents(lg, lp, amount):
+                        print('[p]', ' '.join(p))
+                        print('[h]', ' '.join(h))
+                        print()
 
-        pt.plot_multi_bar_chart(general_data, title, legend_labels=legend_labels)
+            pt.plot_multi_bar_chart(general_data, title, legend_labels=legend_labels)
+        else:
+            title = pkpair.w1 + '_' + pkpair.w2
+            data = pkpair.get_prediction_counts()
+
+            for lg in labels:
+                for lp in labels:
+                    print('#', lg, lp)
+                    for p, h in pkpair.get_sents(lg, lp, amount):
+                        print('[p]', ' '.join(p))
+                        print('[h]', ' '.join(h))
+                        print()
+
+            pt.plot_single_bar_chart(data, title, 'predicted label', '# samples')
 
 
 

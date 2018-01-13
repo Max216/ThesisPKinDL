@@ -63,44 +63,27 @@ def plot_multi_bar_chart(data, title, legend_labels, save=None):
     plt.legend(bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
                 mode="expand", borderaxespad=0, ncol=2)
     plt.subplots_adjust(top=0.8)
+
+    if save != None:
+        print('TODO')
+        1/0
+    else:
+        plt.show()
+
+
+
+def plot_single_bar_chart(data, title, x_axis_name, y_axis_name, save=None):
+    print(data)
+    x_labels = [x for x,y in data]
+    y_vals = [y for x,y in data]
+    x_indizes = np.arange(len(data))
+    width = 0.35
+    color = [color_palette[i] for i in range(len(data))]
+
+    plt.bar(x_indizes, y_vals, width, color=color)
+    plt.ylabel(y_axis_name)
+    plt.xlabel(x_axis_name)
+    plt.xticks(x_indizes, x_labels)
+    plt.title(title)
+
     plt.show()
-
-def plot_correct_incorrect_bar(x_labels, misclassification_dict, title, block=True):
-    num_groups = len(x_labels)
-    
-    # how many classified as label as array for plotting
-    amounts = dict()
-    for lbl in x_labels:
-        amounts[lbl] = [misclassification_dict[l][lbl] for l in x_labels]
-    
-    # how many of gold label for acc
-    amounts_gold = dict()
-    for lbl in x_labels:
-        amounts_gold[lbl] = sum([misclassification_dict[lbl][l] for l in x_labels])
-
-    # calculate accuracy
-    amount_data = [amounts_gold[lbl] for lbl in x_labels]
-    correct = [amounts[lbl][i] for i, lbl in enumerate(x_labels)]
-    print(title)
-    print(amount_data)
-    print(correct)
-    accuracy = round(sum(correct) / sum(amount_data) * 100, 2)
-    lbl_accuracies = [round(correct[i] / amount_data[i] * 100, 2) for i in range(len(x_labels))]
-
-    fig, ax = plt.subplots()
-    index = np.arange(num_groups)
-    colors = [color_palette[i] for i in index]
-    bar_width = .1
-
-    for i, lbl in enumerate(x_labels):
-        plt.bar(index + i * bar_width, amounts[lbl], bar_width, color=color_palette[i], label=lbl)
-
-    plt.xlabel('Gold label')
-    plt.ylabel('# samples')
-    x_labels = [lbl + ' (' + str(lbl_accuracies[i]) + ')' for i, lbl in enumerate(x_labels)]
-    plt.xticks(index +  bar_width, x_labels)
-    plt.title(title + ' (' + str(accuracy) + ')')
-    plt.legend(title='Classified as:', bbox_to_anchor=(0,1.12,1,0.2), loc="lower left",
-                mode="expand", borderaxespad=0, ncol=3)
-    plt.subplots_adjust(top=0.8)
-    plt.show(block=block)
