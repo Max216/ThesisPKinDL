@@ -458,22 +458,30 @@ def experiment1(model_path, data_path):
                 if sp != sh:
                     create_pk_analyse_data_for_swapped(model_path, data, sp, sh, lbl)
 
-    run(swap_premise, swap_hyp, 'contradiction')
+    #run(swap_premise, swap_hyp, 'contradiction')
 
     swap_hyp = ['sport']
-    run(swap_premise, swap_hyp, 'entailment')
+    #run(swap_premise, swap_hyp, 'entailment')
 
     swap_premise = ['inside', 'outside']
     swap_hyp = swap_premise
-    run(swap_premise, swap_hyp, 'contradiction')
+    #run(swap_premise, swap_hyp, 'contradiction')
 
     swap_premise = ['river', 'lake', 'sea']
     swap_hyp = swap_premise
-    run(swap_premise, swap_hyp, 'contradiction')
+    #run(swap_premise, swap_hyp, 'contradiction')
 
     swap_hyp = ['water']
-    run(swap_premise, swap_hyp, 'entailment')
+    #run(swap_premise, swap_hyp, 'entailment')
 
+    swap_premise = ['different', 'same']
+    run(swap_premise, swap_premise, 'contradiction')
+
+    swap_premise = ['closed', 'open']
+    run(swap_premise, swap_premise, 'contradiction')
+
+    swap_premise = ['short', 'long']
+    run(swap_premise, swap_premise, 'contradiction')
     
 
 def main():
