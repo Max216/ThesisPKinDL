@@ -481,15 +481,15 @@ def create_pk_analyse_data_for_pair(classifier_path, data, w1, w2):
 def experiment2(model_path, data_path):
     #zero_dims = [402, 837, 1221, 1301, 1826]
     #zero_dims = [50, 72, 246, 341, 402, 731, 837, 1221, 1301, 1763, 1826]
-    zero_dims = [50, 72, 90, 246, 247, 266, 318, 341, 344, 402, 731, 979, 1062, 1221, 1227, 1310, 1667, 1713, 1751, 1763, 1826, 1934, 1990]
-
+    #zero_dims = [50, 72, 90, 246, 247, 266, 318, 341, 344, 402, 731, 979, 1062, 1221, 1227, 1310, 1667, 1713, 1751, 1763, 1826, 1934, 1990]
+    zero_dims = [1713]
     name = 'zero_' + '_'.join([str(d) for d in zero_dims])
     data = mydataloader.load_snli(data_path)
 
     def twist_fn(representation, sent_type, _):
         if sent_type == 'hypothesis':
             for d in zero_dims:
-                representation[0,d] = float(0.0)
+                representation[0,d] = float(0.7)
 
         return representation
 
