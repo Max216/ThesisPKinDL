@@ -69,11 +69,13 @@ def evaluate(model_path, data_path, new_embeddings=None, twister=None):
         classifier.inc_embedding_layer(embeddings_diff)
 
     print('Load data ...')
-    data = mydataloader.simple_load(data_path)
+    #data = [mydataloader.simple_load(data_path)]
+    data = mydataloader.get_dataset_chunks(data_path, embedding_holder, chunk_size=640, mark_as='[test]')
     print(len(data), 'samples loaded.')
     print('Evaluate ...')
     classifier.eval()
     classifier = m.cuda_wrap(classifier)
+
     print('Accuracy:', train.evaluate(classifier, [data], size=32, padding_token=embedding_holder.padding(), twister=twister))
 
 if __name__ == '__main__':
