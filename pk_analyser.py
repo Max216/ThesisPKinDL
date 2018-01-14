@@ -483,20 +483,36 @@ def experiment2(model_path, data_path):
     #zero_dims = [50, 72, 246, 341, 402, 731, 837, 1221, 1301, 1763, 1826]
     #zero_dims = [50, 72, 90, 246, 247, 266, 318, 341, 344, 402, 731, 979, 1062, 1221, 1227, 1310, 1667, 1713, 1751, 1763, 1826, 1934, 1990]
     #zero_dims = [95, 114, 266, 777, 877, 1352, 1388, 1505, 1606, 1657, 1665, 1667, 1731]
-    zero_dims = [80, 95, 114, 266, 295, 372, 547, 754, 777, 877, 1069, 1301, 1352, 1388, 1565, 1606, 1657, 1665, 1667, 1705, 1713, 1998]
-
+    #zero_dims = [80, 95, 114, 266, 295, 372, 547, 754, 777, 877, 1069, 1301, 1352, 1388, 1565, 1606, 1657, 1665, 1667, 1705, 1713, 1998]
+    zero_dims = [23]
     name = 'zero_' + '_'.join([str(d) for d in zero_dims])
     data = mydataloader.load_snli(data_path)
 
-    def twist_fn(representation, sent_type, _):
+    def twist_fn(representation, sent_type, _, activations, sent):
         if sent_type == 'hypothesis':
             for d in zero_dims:
+                print('activations', activations)
+                print('sent', sent)
                 representation[0,d] = float(0.7)
 
         return representation
+    embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+    idx_interested_word = embedding_holder.word_index('sport')
+    
+    def twist_all_acts_from_w_to_zero(representation, sent_type, w_idx, activations, sent):
+        if sent_type == 'hypothesis':
+            word_index_of_interest = (sent.data.view(-1) == w_idx).nonzero()
+            for w_idx in word_index_of_interest.view(-1):
+                dims_to_zero = (activations.data.view(-1) == w_idx).nonzero()
+                for d in dims_to_zero.view(-1):
+                    representation[0,d] = float(0.0)
+        return representation
+
 
     twister = m.ModelTwister(twist_fn, name=name)
-    create_pk_analyse_data_for_swapped(model_path, data, 'basketball', 'sport', 'entailment', twister=twister)
+    twister2 = m.ModelTwister(twist_all_acts_from_w_to_zero, name='zero_all', tools=idx_interested_word)
+    #create_pk_analyse_data_for_swapped(model_path, data, 'A', 'The', 'entailment', twister=twister)
+    create_pk_analyse_data_for_swapped(model_path, data, 'basketball', 'sport', 'entailment', twister=twister2)
 
 def experiment1(model_path, data_path):
     data = mydataloader.load_snli(data_path)

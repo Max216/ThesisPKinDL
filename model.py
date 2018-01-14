@@ -164,8 +164,8 @@ class EntailmentClassifier(nn.Module):
 
 
         if twister != None:
-            sent1_representation = twister.twist_representation(sent1_representation, 'premise')
-            sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis')
+            sent1_representation = twister.twist_representation(sent1_representation, 'premise', activations=idxs1, sent=sent1)
+            sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis', activations=idxs2, sent=sent1)
         # Create feature tensor
         if self.sent_repr == "all":
             feedforward_input = torch.cat((
@@ -292,5 +292,5 @@ class ModelTwister:
         self.tools = tools
         self.name = name
 
-    def twist_representation(self, representation, sent_type):
-        return self.twist(representation, sent_type, self.tools)
+    def twist_representation(self, representation, sent_type, activations, sent):
+        return self.twist(representation, sent_type, self.tools, activations=activations, sent=sent)
