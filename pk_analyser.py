@@ -505,7 +505,9 @@ def experiment2(model_path, data_path):
             for w_idx in word_index_of_interest.view(-1):
                 dims_to_zero = (activations.data.view(-1) == w_idx).nonzero()
                 for d in dims_to_zero.view(-1):
+                    print('zero:', d, representation[0,d], 'to:')
                     representation[0,d] = float(0.0)
+                    print('>', representation[0,d])
         return representation
 
 
