@@ -3,6 +3,7 @@ trained_model.py
 __pycache__/**
 *.png
 *.model
+*.model1
 *.simplemodel
 *.traininfo
 *.log
