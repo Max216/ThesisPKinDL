@@ -53,6 +53,7 @@ def train_model(name, classifier, padding_token, train_set, dev_set, iterations=
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(padding_token))
 
     start_time = time.time()
+    start_lr = lr
     for epoch in range(iterations):
         print('Train epoch', epoch + 1)
 
@@ -108,4 +109,13 @@ def train_model(name, classifier, padding_token, train_set, dev_set, iterations=
                     print('Saving current best model!')
                     sys.stdout.flush()
                     model_tools.store(name, best_model, 'temp')
+
+        # Half decay lr
+        decay = epoch // 2
+        lr = start_lr / (2 ** decay)  
+        for pg in optimizer.param_groups:
+            pg['lr'] = lr
+            
+        running_time = time.time() - start_time
+        print('Running time:', running_time, 'seconds.')
 
