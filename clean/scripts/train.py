@@ -34,7 +34,7 @@ def main():
         print('Create model ... ')
         model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings)
         train_set = datahandler_train.get_dataset(embedding_holder)
-        dev_set = datahandler_train.get_dataset(embedding_holder)
+        dev_set = datahandler_dev.get_dataset(embedding_holder)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
 
 if __name__ == '__main__':
