@@ -17,44 +17,6 @@ DEFAULT_DATA_FORMAT = 'snli'
 DEFAULT_VALID_LABELS = ['neutral', 'contradiction', 'entailment']
 
 # Internal Helper functions
-def _is_sublist(list1, list2):
-    '''
-    Check if list1 is a sublist (with keeping order) of list2
-    :return True/False
-    '''
-
-    if len(list1) == 0:
-        return True
-
-    first_elm = list1[0]
-    indizes_first = [i for i, item in enumerate(list2) if first_elm == item]
-
-    if len(indizes_first) == 0:
-        return False
-
-    # Check for remaining words
-    # single word is easy
-    if len(list1) == 1:
-        return True
-
-    # multi word
-    remaining1 = list1[1:]
-    for idx in indizes_first:
-        if idx + len(remaining1) >= len(list2):
-            continue
-
-        assume_result = True
-        for item_to_check in remaining1:
-            idx += 1
-            if item_to_check != list2[idx]:
-                assume_result = False
-                break
-
-        if assume_result == True:
-            return True
-
-    return False
-
 def _convert_snli_out(samples, out_name):
     if out_name.split('.')[-1] != 'jsonl':
         out_name += '.jsonl'
@@ -64,6 +26,16 @@ def _convert_snli_out(samples, out_name):
         [json.dumps({ 'sentence1' : ' '.join(p), 'sentence2' : ' '.join(h), 'gold_label' : lbl }) for p, h, lbl in samples]
     )
 
+def _load_txt_01_nc(lines):
+    def extract_line(line):
+        splitted = line.split()
+        if splitted[-1] == "0":
+            lbl = 'neutral'
+        else:
+            lbl = 'contradiction'
+        return (splitted[0], splitted[1], lbl)
+
+    return [extract_line(line.strip()) for line in lines]
 
 def _load_snli(lines, valid_labels=DEFAULT_VALID_LABELS):
     '''
@@ -114,7 +86,7 @@ class SentEncoderDataset(Dataset):
 
 class ExtResPairhandler:
     '''
-    Manages pairs of words coming from an external resource
+    Manages pairs of words coming from an external resource, Can only deal with single words.
     '''
 
     def __init__(self, path, data_format=DEFAULT_DATA_FORMAT):
@@ -122,45 +94,65 @@ class ExtResPairhandler:
 
         with open(path) as f_in:
             if data_format == 'snli':
-                self.knowledge = _load_snli(f_in.readlines())
+                data = _load_snli(f_in.readlines())
+                data = [(p[0], h[0], lbl) for p, h, lbl in data]
+            elif data_format == 'txt_01_nc':
+                data = _load_txt_01_nc(f_in.readlines())
             else:
                 print('Unknown data format:', data_format)
                 1/0
 
-    def filter(self, data_handler, min_count=5, same_label=True):
+        self.knowledge = self.create_knowledge_dict(data)
+        
+
+    def create_knowledge_dict(self, data):
+        knowledge = dict()
+        for wp, wh, lbl in data:
+            if lbl not in knowledge:
+                knowledge[lbl] = dict()
+            if wp not in knowledge[lbl]:
+                knowledge[lbl][wp] = set([wh])
+            else:
+                knowledge[lbl][wp].add(wh)
+        return knowledge
+
+
+    def filter_vocab(self, vocab):
         '''
-        Filters the pairs s.t. only those remain if at least <min_count> samples contain
-        the first word within the premise and the 2nd word within the hypothesis.
-
-        :param data_handler         Datahandler with the data to check
-        :param min_count            At least this many sample are reuired containing the words
-        :param same_label           Only count samples that are labeld as the resource pair.
+        Only keeps samples if both words are contained in the given vocab
+        :param vocab    list of vocabulary
         '''
+        print('Filter by vocab using', len(vocab), 'vocabularies.')
+        data = []
+        for label in self.knowledge:
+            all_w_p = self.knowledge[label]
+            for wp in all_w_p:
+                if wp in vocab:
+                    all_w_h = all_w_p[wp]
+                    data.extend([(wp, wh, label) for wh in all_w_h if wh in vocab])
 
-        def count_in_data(p, h, lbl):
-            count = 0
-            for p_data, h_data, lbl_data in data_handler.samples:
-                if same_label and lbl_data != lbl:
-                    continue
-                p_in_data = _is_sublist(p, p_data)
-                
-                if not p_in_data:
-                    continue
+        print('Previously:', self.__len__(), 'samples.')
+        self.knowledge = self.create_knowledge_dict(data)
+        print('Now:', self.__len__(), 'samples.')
 
-                if _is_sublist(h, h_data):
-                    count += 1
+    def save(self, out_name, data_format=None):
+        if data_format == None:
+            data_format = self.data_format
 
-            return count
-
-
-        self.knowledge = [(p, h, lbl) for (p, h, lbl) in self.knowledge if count_in_data(p, h, lbl) >= min_count]
-
-    def save(self, out_name):
-        if self.data_format == 'snli':
-            name, lines = _convert_snli_out(self.knowledge, out_name)
+        if data_format == 'snli':
+            data = [([p], [h], lbl) for lbl in self.knowledge for p in self.knowledge[lbl] for h in self.knowledge[lbl][p]]
+            name, lines = _convert_snli_out(data, out_name)
 
         with open(name, 'w') as f_out:
             f_out.write('\n'.join(lines))
+
+
+    def __len__(self):
+        count = 0
+        for label in self.knowledge:
+            for wp in self.knowledge[label]:
+                count += len(self.knowledge[label][wp])
+        return count
 
 
 
