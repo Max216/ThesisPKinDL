@@ -15,6 +15,7 @@ def main():
 
     Usage:
         ext_res_tools.py filter <data> <ext_res> <out_name>
+        ext_res_tools.py merge <data> <ext_res> <out_name>
 
     """)
 

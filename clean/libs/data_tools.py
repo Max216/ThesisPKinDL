@@ -3,6 +3,7 @@ Methods to deal with the data
 '''
 
 import json
+import collections
 
 import torch
 from torch.utils.data import Dataset
@@ -198,6 +199,30 @@ class Datahandler:
 
         for dh in data_handlers:
             self.samples.extend(dh.samples)
+
+    def create_word_cnt(self, file_out):
+        counter = collections.defaultdict(int)
+        for p, h, _ in self.samples:
+            for w in p:
+                counter[w] += 1
+            for w in h:
+                counter[w] += 1
+
+        with open(file_out, 'w') as f_out:
+            lines = [w + ' ' + str(counter[w]) for w in counter]
+            f_out.write('\n'.join(lines))
+
+    def get_word_counter(self, file_in):
+        with open(file_in) as f_in:
+            lines = [line.strip() for line in f_in.readlines()]
+
+        counter = collections.defaultdict(int)
+        for line in lines:
+            splitted = line.split(' ')
+            counter[splitted[0]] = int(splitted[1])
+
+        return counter
+
 
 
 # External Helper functions
