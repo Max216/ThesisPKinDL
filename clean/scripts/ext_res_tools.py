@@ -4,7 +4,6 @@ sys.path.append('./../')
 from docopt import docopt
  
 from libs import data_tools
-from libs import model as m
 
 def filter(data_handler, res_handler, out_name):
     res_handler.filter(data_handler, min_count=5)
