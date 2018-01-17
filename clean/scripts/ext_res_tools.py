@@ -22,17 +22,17 @@ def clean(res_to_clean):
                 all_knowledge[p] = dict()
             c_knowledge = all_knowledge[p]
             if h not in c_knowledge:
-                c_knowledge[h] = lbl
-            elif c_knowledge[h] != lbl:
-                c_knowledge[h] = '__conflict__'
+                c_knowledge[h] = [lbl]
+            else:
+                c_knowledge[h].append(lbl)
 
     # now get conflicts
     conflicts = []
     for p in all_knowledge:
         c_knowledge = all_knowledge[p]
         for h in c_knowledge:
-            if c_knowledge[h] == '__conflict__':
-                conflicts.append((p, h))
+            if len(c_knowledge[h]) != 1:
+                conflicts.append((p, h, c_knowledge[h]))
 
     print('Found the following conflicts:')
     print(conflicts)
