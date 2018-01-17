@@ -9,6 +9,26 @@ from docopt import docopt
  
 from libs import data_tools
 
+def test():
+    p1 = '~/data/snli_glove.840B.300d.txt'
+    p2 = '~/data/snli_spacy_glove_840B.300d.txt'
+
+    with open(p1) as f1:
+        vocab1 = set([line.split(' ')[0] for line in f1.readlines()])
+
+    with open(p2) as f2:
+        vocab2 = set([line.split(' ')[0] for line in f2.readlines()])
+
+    only1 = vocab1 - vocab2
+    print('In first:', len(only1), 'distinct')
+    print(only1)
+
+    only2 = vocab2 - vocab1
+    print('In 2nd:', len(only2), 'distinct')
+    print(only2)
+
+
+
 def cfd(embedding_path, data1_path, data2_path, name_out):
     datahandler1 = data_tools.Datahandler(data1_path)
     datahandler2 = data_tools.Datahandler(data2_path)
@@ -30,6 +50,7 @@ def main():
 
     Usage:
         embedding_tools.py cfd <embeddings> <data_train> <data_dev> <name_out>
+        embedding_tools.py test
 
     """)
 
@@ -40,6 +61,8 @@ def main():
 
     if args['cfd']:
         cfd(embeddings, data_train, data_dev, name_out)
+    elif args['test']:
+        test()
 
 
 if __name__ == '__main__':
