@@ -50,7 +50,9 @@ def clean(res_to_clean, types):
     def deal_with_cohyp(p, h, conflicts):
         lbl = [lbl for lbl, typ in conflicts if typ == 'cohyp'][0]
         if lbl == 'contradiction':
-            print('Remove from all others')
+            for lbl, typ in conflicts:
+                if typ != 'cohyp':
+                    print('del from', typ)
             return True
         else:
             print('Figure out later')
