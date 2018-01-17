@@ -122,6 +122,14 @@ class ExtResPairhandler:
             self.add_to_knowledge_dict(knowledge, (wp, wh, lbl))
         return knowledge
 
+    def add(self, samples):
+        '''
+        Adds samples to the dictionary.
+        :param samples          list of samples to add [(w1, w2, lbl) ...]
+        '''
+        for sample in samples:
+            self.add_to_knowledge_dict(self.knowledge, sample)
+
     def remove(self, p, h, lbl):
         '''
         Remove this sample from the knowledge.
@@ -207,6 +215,24 @@ class ExtResPairhandler:
             for wp in self.knowledge[label]:
                 count += len(self.knowledge[label][wp])
         return count
+
+    def count(self, label):
+        '''Count the amount of samples for the givn label.'''
+        if label not in self.knowledge:
+            return 0
+        count = 0
+
+        for wp in self.knowledge[label]:
+            count += len(self.knowledge[label][wp])
+        return count
+
+    def get_label_counts(self):
+        '''
+        Return an array of all counts per label.
+        :return     [(label-name, count), ...]
+        '''
+
+        return [(label, self.count(label)) for label in self.knowledge]
 
 
 

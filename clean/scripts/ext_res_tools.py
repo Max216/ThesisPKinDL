@@ -13,7 +13,7 @@ def read_strp_lines(file):
     with open (file) as f_in:
         return [line.strip() for line in f_in]
 
-def clean(res_to_clean, types):
+def clean(res_to_clean, types, merged_name):
     resources = [data_tools.ExtResPairhandler(path) for path in res_to_clean]
     known_types = ['syn', 'anto', 'hyp', 'cohyp']
     for t in types:
@@ -122,11 +122,17 @@ def clean(res_to_clean, types):
 
 
 
-    print('Conflictss remaining', len(conflicts))
     print('Save updated resources')
     for i in range(len(resources)):
         resources[i].save(res_to_clean[i])
+        print(types[i] +':', resources[i].get_label_counts())
 
+    # merge all
+    merged_res = resources[0]
+    for res in resources[1:]:
+        merged_res.add(res.items())
+    print('Merged all:', merged_res.get_label_counts())
+    merged_res.save(merged_name)
         
 
 
@@ -150,7 +156,7 @@ def main():
         ext_res_tools.py filter <vocab> <ext_res> <out_name>
         ext_res_tools.py convert <ext_res> <type_from> <type_to> <out_name>
         ext_res_tools.py symmetric <ext_res> <symmetry_fn> <out_name>
-        ext_res_tools.py clean (-r <res_path>)...  (-t <res_types>)...
+        ext_res_tools.py clean (-r <res_path>)...  (-t <res_types>)... <out_name>
 
     """)
 
@@ -179,7 +185,7 @@ def main():
         if len(res_paths) != len(res_types):
             print('Must specify -t for each -r')
             return
-        clean(res_paths, res_types)
+        clean(res_paths, res_types, out_name)
 
 if __name__ == '__main__':
     main()
