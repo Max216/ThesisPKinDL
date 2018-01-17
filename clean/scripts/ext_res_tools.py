@@ -54,6 +54,15 @@ def clean(res_to_clean, types):
                 if typ != 'cohyp' and lbl != 'contradiction':
                     type_to_res[typ].remove(p, h, lbl)
             return True
+
+        # if entailment in hypernyms and neutral in cohyponyms, take entailment
+        if 'hyp' len([(lbl, typ) for lbl, typ in conflicts if lbl == 'entailment' and typ == 'hyp']) >= 1:
+            print('use as entailment')
+            for lbl, typ in conflicts:
+                if lbl != 'entailment':
+                    print('rm', typ)
+                    type_to_res[typ].remove(p, h, lbl)
+            return True
         else:
             print('Figure out later')
             return False
@@ -68,6 +77,7 @@ def clean(res_to_clean, types):
 
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
+            if not dealt_with
 
     print('Save updated resources')
     for i in range(len(resources)):
