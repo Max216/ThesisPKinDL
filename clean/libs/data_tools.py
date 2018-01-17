@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 import spacy
-nlp = spacy.load('en')
+#nlp = spacy.load('en')
 
 from libs import config
 
@@ -26,13 +26,16 @@ def _convert_snli_out(samples, out_name):
         [json.dumps({ 'sentence1' : ' '.join(p), 'sentence2' : ' '.join(h), 'gold_label' : lbl }) for p, h, lbl in samples]
     )
 
-def _load_txt_01_nc(lines):
+def _load_txt_01_cn(lines):
     def extract_line(line):
         splitted = line.split()
-        if splitted[-1] == "0":
+        if splitted[-1] == "1":
             lbl = 'neutral'
-        else:
+        elif splitted[-1] == "0":
             lbl = 'contradiction'
+        else:
+            print('unknown label', splitted[-1])
+            1/0
         return (splitted[0], splitted[1], lbl)
 
     return [extract_line(line.strip()) for line in lines]
@@ -96,8 +99,8 @@ class ExtResPairhandler:
             if data_format == 'snli':
                 data = _load_snli(f_in.readlines())
                 data = [(p[0], h[0], lbl) for p, h, lbl in data]
-            elif data_format == 'txt_01_nc':
-                data = _load_txt_01_nc(f_in.readlines())
+            elif data_format == 'txt_01_cn':
+                data = _load_txt_01_cn(f_in.readlines())
             else:
                 print('Unknown data format:', data_format)
                 1/0

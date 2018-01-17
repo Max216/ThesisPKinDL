@@ -13,9 +13,14 @@ def read_strp_lines(file):
     with open (file) as f_in:
         return [line.strip() for line in f_in]
 
-def clean(res_to_clean):
+def clean(res_to_clean, types):
     resources = [data_tools.ExtResPairhandler(path) for path in res_to_clean]
-    tmp_lbls = ['synonyms', 'antonyms', 'hypernyms', 'cohyponyms']
+    known_types = ['syn', 'anto', 'hyp', 'cohyp']
+    for t in types:
+        if t not in known_types:
+            print('Types must be one of the following:', ', '.join(known_types))
+            return
+
     all_knowledge = dict()
     for i,res in enumerate(resources):
         for p, h, lbl in res.items():
@@ -23,21 +28,22 @@ def clean(res_to_clean):
                 all_knowledge[p] = dict()
             c_knowledge = all_knowledge[p]
             if h not in c_knowledge:
-                c_knowledge[h] = [(lbl, tmp_lbls[i])]
+                c_knowledge[h] = [(lbl, types[i])]
             else:
-                c_knowledge[h].append(lbl, tmp_lbls[i])
+                c_knowledge[h].append((lbl, types[i]))
 
     # now get conflicts
-    conflicts = []
-    for p in all_knowledge:
-        c_knowledge = all_knowledge[p]
-        for h in c_knowledge:
-            h_set = set([w for w, _ in c_knowledge[h]])
-            if len(h_set) != 1 and 'contradiction' in h_set:
-                conflicts.append((p, h, str(c_knowledge[h])))
+    for ct in types:
+        conflicts = []
+        for p in all_knowledge:
+            c_knowledge = all_knowledge[p]
+            for h in c_knowledge:
+                h_set = set([origin for w, origin in c_knowledge[h]])
+                if len(h_set) != 1 and ct in h_set:
+                    conflicts.append((p, h, str(c_knowledge[h])))
 
-    print('Found the following conflicts:')
-    print('\n'.join(conflicts))
+        print('Found the following conflicts:')
+        print('\n'.join([str(c) for c in conflicts]))
 
 
 
@@ -60,7 +66,7 @@ def main():
         ext_res_tools.py filter <vocab> <ext_res> <out_name>
         ext_res_tools.py convert <ext_res> <type_from> <type_to> <out_name>
         ext_res_tools.py symmetric <ext_res> <symmetry_fn> <out_name>
-        ext_res_tools.py clean (-r <res_path>)...
+        ext_res_tools.py clean (-r <res_path>)...  (-t <res_types>)...
 
     """)
 
@@ -77,14 +83,19 @@ def main():
     elif args['convert']:
         type_from = args['<type_from>']
         type_to = args['<type_to>']
-        data_tools.ExtResPairhandler(path_res, data_format='txt_01_nc').save(out_name, data_format='snli')
+        data_tools.ExtResPairhandler(path_res, data_format=type_from).save(out_name, data_format=type_to)
     elif args['symmetric']:
         fn = symmetry_functions[symmetry_fn]
         ext_handler = data_tools.ExtResPairhandler(path_res)
         ext_handler.extend_from_own(extend_fn=fn)
         ext_handler.save(out_name)
     elif args['clean']:
-        clean(args['<res_path>'])
+        res_paths = args['<res_path>']
+        res_types = args['<res_types>']
+        if len(res_paths) != len(res_types):
+            print('Must specify -t for each -r')
+            return
+        clean(res_paths, res_types)
 
 if __name__ == '__main__':
     main()
