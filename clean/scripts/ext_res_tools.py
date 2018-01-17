@@ -63,8 +63,9 @@ def clean(res_to_clean, types):
 
         if print_out in ctypes:
             print(p, h, results)
-            
-        dealt_with = deal_with_cohyp(p, h, results)
+
+        if 'cohyp' in ctypes:    
+            dealt_with = deal_with_cohyp(p, h, results)
 
         
 
