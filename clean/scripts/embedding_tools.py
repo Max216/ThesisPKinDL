@@ -60,8 +60,8 @@ def main():
 
     if args['cfd']:
         cfd(embeddings, data_train, data_dev, name_out)
-    elif args['test']:
-        test(args['<embeddings1>'], args['<embeddings2>'])
+    elif args['diff']:
+        diff(args['<embeddings1>'], args['<embeddings2>'])
 
 
 if __name__ == '__main__':
