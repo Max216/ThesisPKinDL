@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 import spacy
-#nlp = spacy.load('en')
+nlp = spacy.load('en')
 
 from libs import config
 
@@ -164,9 +164,8 @@ class ExtResPairhandler:
         for label in self.knowledge:
             all_w_p = self.knowledge[label]
             for wp in all_w_p:
-                if wp in vocab:
-                    all_w_h = all_w_p[wp]
-                    samples.extend([(wp, wh, label) for wh in all_w_h])
+                all_w_h = all_w_p[wp]
+                samples.extend([(wp, wh, label) for wh in all_w_h])
 
         return samples
 
