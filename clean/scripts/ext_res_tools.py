@@ -93,6 +93,11 @@ def clean(res_to_clean, types):
                     type_to_res[typ].remove(p, h, lbl)
             return True
         return False
+
+    def deal_with_remaining(p, h, conflicts):
+        for lbl, typ in conflicts:
+            type_to_res[typ].remove(p, h, lbl)
+        return True
         
 
 
@@ -112,6 +117,9 @@ def clean(res_to_clean, types):
             dealt_with = deal_with_antonym(p, h, results)
         if not dealt_with and 'syn' in ctypes:
             dealt_with = deal_with_synonym(p, h, results)
+        if not dealt_with:
+            deal_with_remaining(p, h, results)
+
 
 
     print('Conflictss remaining', len(conflicts))
