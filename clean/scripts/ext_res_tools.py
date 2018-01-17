@@ -70,6 +70,18 @@ def clean(res_to_clean, types):
                     type_to_res[typ].remove(p, h, lbl)
             return True
 
+    def deal_with_antonym(p, h, conflicts):
+        # just remove if also syn
+        ctypes = [t for lbl, t in conflicts]
+        if 'syn' in ctypes:
+            for lbl, typ in ctypes:
+                type_to_res[typ].remove(p, h, lbl)
+
+            return True
+
+        return False
+
+
     print_out = 'anto'
     for p, h, results in conflicts:
         labels = [l for l, t in results]
@@ -82,6 +94,7 @@ def clean(res_to_clean, types):
         dealt_with = False
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
+
 
     print('Conflictss remaining', len(conflicts))
     print('Save updated resources')
