@@ -15,28 +15,29 @@ def read_strp_lines(file):
 
 def clean(res_to_clean):
     resources = [data_tools.ExtResPairhandler(path) for path in res_to_clean]
+    tmp_lbls = ['synonyms', 'antonyms', 'hypernyms', 'cohyponyms']
     all_knowledge = dict()
-    for res in resources:
+    for i,res in enumerate(resources):
         for p, h, lbl in res.items():
             if p not in all_knowledge:
                 all_knowledge[p] = dict()
             c_knowledge = all_knowledge[p]
             if h not in c_knowledge:
-                c_knowledge[h] = [lbl]
+                c_knowledge[h] = [(lbl, tmp_lbls[i])]
             else:
-                c_knowledge[h].append(lbl)
+                c_knowledge[h].append(lbl, tmp_lbls[i])
 
     # now get conflicts
     conflicts = []
     for p in all_knowledge:
         c_knowledge = all_knowledge[p]
         for h in c_knowledge:
-            h_set = set(c_knowledge[h])
+            h_set = set([w for w, _ in c_knowledge[h]])
             if len(h_set) != 1 and 'contradiction' in h_set:
-                conflicts.append((p, h, c_knowledge[h]))
+                conflicts.append((p, h, str(c_knowledge[h])))
 
     print('Found the following conflicts:')
-    print(conflicts)
+    print('\n'.join(conflicts))
 
 
 
