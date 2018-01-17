@@ -31,7 +31,8 @@ def clean(res_to_clean):
     for p in all_knowledge:
         c_knowledge = all_knowledge[p]
         for h in c_knowledge:
-            if len(set(c_knowledge[h])) != 1:
+            h_set = set(c_knowledge[h])
+            if len(h_set) != 1 and 'contradiction' in h_set:
                 conflicts.append((p, h, c_knowledge[h]))
 
     print('Found the following conflicts:')
