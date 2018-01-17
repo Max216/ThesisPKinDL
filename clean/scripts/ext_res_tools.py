@@ -46,8 +46,15 @@ def clean(res_to_clean, types):
     #print('\n'.join([str(c) for c in conflicts]))
 
     # deal with conflicts
+    type_to_res = dict([(types[i], resources[i]) for i in range(len(resources))])
     def deal_with_cohyp(p, h, conflicts):
-        pass
+        lbl = [lbl for lbl, typ in conflicts if typ == 'cohyp'][0]
+        if lbl == 'contradiction':
+            print('Remove from all others')
+            return True
+        else:
+            print('Figure out later')
+            return False
 
     print_out = 'cohyp'
     for p, h, results in conflicts:
@@ -55,7 +62,9 @@ def clean(res_to_clean, types):
         ctypes = [t for l, t in results]
 
         if print_out in ctypes:
-            print(p, h, results, '\n')
+            print(p, h, results)
+            
+        dealt_with = deal_with_cohyp(p, h, results)
 
         
 
