@@ -104,8 +104,8 @@ class ExtResPairhandler:
 
         self.knowledge = self.create_knowledge_dict(data)
         
-    def add_to_knowledge_dict(knowledge_dict, sample):
-        p, h, lbl = sample
+    def add_to_knowledge_dict(self, knowledge_dict, sample):
+        wp, wh, lbl = sample
         if lbl not in knowledge_dict:
             knowledge_dict[lbl] = dict()
         if wp not in knowledge_dict[lbl]:
