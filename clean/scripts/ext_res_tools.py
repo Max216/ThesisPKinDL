@@ -33,19 +33,31 @@ def clean(res_to_clean, types):
                 c_knowledge[h].append((lbl, types[i]))
 
     # now get conflicts
-    for ct in ['cohyp']:
-        print(ct)
-        conflicts = []
-        for p in all_knowledge:
-            c_knowledge = all_knowledge[p]
-            for h in c_knowledge:
-                c_set = set([origin for w, origin in c_knowledge[h]])
-                h_set = set([w for w, origin in c_knowledge[h]])
-                if len(h_set) != 1 and ct in c_set:
-                    conflicts.append((p, h, str(c_knowledge[h])))
+    conflicts = []
+    for p in all_knowledge:
+        c_knowledge = all_knowledge[p]
+        for h in c_knowledge:
+            c_set = set([origin for w, origin in c_knowledge[h]])
+            h_set = set([w for w, origin in c_knowledge[h]])
+            if len(h_set) != 1:
+                conflicts.append((p, h, c_knowledge[h]))
 
-        print('Found the following conflicts:')
-        print('\n'.join([str(c) for c in conflicts]))
+    #print('Found the following conflicts:')
+    #print('\n'.join([str(c) for c in conflicts]))
+
+    # deal with conflicts
+    def deal_with_cohyp(p, h, conflicts):
+        pass
+
+    print_out = 'cohyp'
+    for p, h, results in conflicts:
+        labels = [l for l, t in results]
+        types = [t, for l, t in results]
+
+        if print_out in types:
+            print(p, h, conflicts, '\n')
+
+        
 
 
 
