@@ -74,7 +74,7 @@ def clean(res_to_clean, types):
         # just remove if also syn
         ctypes = [t for lbl, t in conflicts]
         if 'syn' in ctypes:
-            for lbl, typ in ctypes:
+            for lbl, typ in conflicts:
                 type_to_res[typ].remove(p, h, lbl)
 
             return True
