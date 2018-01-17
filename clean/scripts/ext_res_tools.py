@@ -70,18 +70,20 @@ def clean(res_to_clean, types):
                     type_to_res[typ].remove(p, h, lbl)
             return True
 
-    print_out = 'cohyp'
+    print_out = 'anto'
     for p, h, results in conflicts:
         labels = [l for l, t in results]
         ctypes = [t for l, t in results]
 
-        #if print_out in ctypes:
-        #    print(p, h, results)
-        print(p, h, results)
+        if print_out in ctypes:
+            print(p, h, results)
+        #print(p, h, results)
 
+        dealt_with = False
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
 
+    print('Conflictss remaining', len(conflicts))
     print('Save updated resources')
     for i in range(len(resources)):
         resources[i].save(res_to_clean[i])
