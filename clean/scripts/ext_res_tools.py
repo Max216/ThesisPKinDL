@@ -94,6 +94,8 @@ def clean(res_to_clean, types):
         dealt_with = False
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
+        if not dealt_with and 'anto' in ctypes:
+            dealt_with = deal_with_antonym(p, h, results)
 
 
     print('Conflictss remaining', len(conflicts))
