@@ -85,8 +85,13 @@ def clean(res_to_clean, types):
                     type_to_res[typ].remove(p, h, lbl)
             return True
 
+    def deal_with_synonym(p, h, conflicts):
+        # just remove if also syn
+        pass
+        
 
-    print_out = 'syn'
+
+    print_out = 'hyp'
     for p, h, results in conflicts:
         labels = [l for l, t in results]
         ctypes = [t for l, t in results]
