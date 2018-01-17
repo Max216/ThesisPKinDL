@@ -60,20 +60,24 @@ def clean(res_to_clean, types):
             print('use as entailment')
             for lbl, typ in conflicts:
                 if lbl != 'entailment':
-                    print('rm', typ)
                     type_to_res[typ].remove(p, h, lbl)
             return True
+
+        # force remaining to neutral
         else:
-            print('Figure out later')
-            return False
+            for lbl, typ in conflicts:
+                if lbl != 'neutral':
+                    type_to_res[typ].remove(p, h, lbl)
+            return True
 
     print_out = 'cohyp'
     for p, h, results in conflicts:
         labels = [l for l, t in results]
         ctypes = [t for l, t in results]
 
-        if print_out in ctypes:
-            print(p, h, results)
+        #if print_out in ctypes:
+        #    print(p, h, results)
+        print(p, h, results)
 
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
