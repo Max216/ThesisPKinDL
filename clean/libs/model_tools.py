@@ -55,6 +55,7 @@ def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, n
     embedding_dim = embedding_holder.dim()
 
     if sent_encoding_dims != None and len(sent_encoding_dims == 3):
+        print('ayya')
         sent_lstm_dim_1 = sent_encoding_dims[0]
         sent_lstm_dim_2 = sent_encoding_dims[1]
         sent_lstm_dim_3 = sent_encoding_dims[2]
