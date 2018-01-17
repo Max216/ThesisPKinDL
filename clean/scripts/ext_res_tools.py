@@ -13,9 +13,35 @@ def read_strp_lines(file):
     with open (file) as f_in:
         return [line.strip() for line in f_in]
 
+def clean(res_to_clean):
+    resources = [data_tools.ExtResPairhandler(path) for path in res_to_clean]
+    all_knowledge = dict()
+    for res in resources:
+        for p, h, lbl in res.items():
+            if p not in all_knowledge:
+                all_knowledge[p] = dict()
+            c_knowledge = all_knowledge[p]
+            if h not in c_knowledge:
+                c_knowledge[h] = lbl
+            elif c_knowledge[h] != lbl:
+                c_knowledge[h] = '__conflict__'
+
+    # now get conflicts
+    conflicts = []
+    for p in all_knowledge:
+        c_knowledge = all_knowledge[p]
+        for h in c_knowledge:
+            if c_knowledge[h] == '__conflict__':
+                conflicts.append((p, h))
+
+    print('Found the following conflicts:')
+    print(conflicts)
+
+
+
 
 def symmetry_fn_keep_label(p, h, label):
-    return (h, p, lbl)
+    return (h, p, label)
 
 def symmetry_fn_entailment_to_neutral(p, h, label):
     if label == 'entailment':
@@ -32,6 +58,7 @@ def main():
         ext_res_tools.py filter <vocab> <ext_res> <out_name>
         ext_res_tools.py convert <ext_res> <type_from> <type_to> <out_name>
         ext_res_tools.py symmetric <ext_res> <symmetry_fn> <out_name>
+        ext_res_tools.py clean (-r <res_path>)...
 
     """)
 
@@ -54,6 +81,8 @@ def main():
         ext_handler = data_tools.ExtResPairhandler(path_res)
         ext_handler.extend_from_own(extend_fn=fn)
         ext_handler.save(out_name)
+    elif args['clean']:
+        clean(args['<res_path>'])
 
 if __name__ == '__main__':
     main()

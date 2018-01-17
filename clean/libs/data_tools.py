@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 import spacy
-nlp = spacy.load('en')
+#nlp = spacy.load('en')
 
 from libs import config
 
@@ -131,7 +131,7 @@ class ExtResPairhandler:
             c_knowledge = self.knowledge[label]
             for p in c_knowledge:
                 c_p_knowledge = c_knowledge[p]
-                new_samples.extend([extend_fn(p, h, label)] for h in c_p_knowledge)
+                new_samples.extend([extend_fn(p, h, label) for h in c_p_knowledge])
 
         print('Adding', len(new_samples), 'new samples')
         for sample in new_samples:
@@ -155,6 +155,20 @@ class ExtResPairhandler:
         print('Previously:', self.__len__(), 'samples.')
         self.knowledge = self.create_knowledge_dict(data)
         print('Now:', self.__len__(), 'samples.')
+
+    def items(self):
+        '''
+        :return [(premise, hypothesis, label), ...] for all samples stored.
+        '''
+        samples = []
+        for label in self.knowledge:
+            all_w_p = self.knowledge[label]
+            for wp in all_w_p:
+                if wp in vocab:
+                    all_w_h = all_w_p[wp]
+                    samples.extend([(wp, wh, label) for wh in all_w_h])
+
+        return samples
 
     def save(self, out_name, data_format=None):
         if data_format == None:
