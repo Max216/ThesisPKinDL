@@ -56,7 +56,7 @@ def clean(res_to_clean, types):
             return True
 
         # if entailment in hypernyms and neutral in cohyponyms, take entailment
-        if 'hyp' len([(lbl, typ) for lbl, typ in conflicts if lbl == 'entailment' and typ == 'hyp']) >= 1:
+        if len([(lbl, typ) for lbl, typ in conflicts if lbl == 'entailment' and typ == 'hyp']) >= 1:
             print('use as entailment')
             for lbl, typ in conflicts:
                 if lbl != 'entailment':
