@@ -86,8 +86,13 @@ def clean(res_to_clean, types):
             return True
 
     def deal_with_synonym(p, h, conflicts):
-        # just remove if also syn
-        pass
+        # only keep if synonym and entailment from hypernym
+        if len([(lbl, typ) for lbl, typ in conflicts if lbl == 'entailment' and typ == 'hyp']) >= 1:
+            for lbl, typ in conflicts:
+                if lbl != 'entailment':
+                    type_to_res[typ].remove(p, h, lbl)
+            return True
+        return False
         
 
 
@@ -105,6 +110,8 @@ def clean(res_to_clean, types):
             dealt_with = deal_with_cohyp(p, h, results)
         if not dealt_with and 'anto' in ctypes:
             dealt_with = deal_with_antonym(p, h, results)
+        if not dealt_with and 'syn' in ctypes:
+            dealt_with = deal_with_synonym(p, h, results)
 
 
     print('Conflictss remaining', len(conflicts))
