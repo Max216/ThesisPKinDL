@@ -77,7 +77,6 @@ def clean(res_to_clean, types):
 
         if 'cohyp' in ctypes:    
             dealt_with = deal_with_cohyp(p, h, results)
-            if not dealt_with
 
     print('Save updated resources')
     for i in range(len(resources)):
