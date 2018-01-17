@@ -192,6 +192,16 @@ class Datahandler:
         for dh in data_handlers:
             self.samples.extend(dh.samples)
 
+    def vocab(self):
+        '''
+        Get a list of all vocabularies usied in the dataset.
+        :return [word1, ...]
+        '''
+
+        combined_premise_hyp = [premise + hyp for premise, hyp, _ in self.samples]
+        return set([w for p_h in combined_premise_hyp for w in p_h])
+
+
     def create_word_cnt(self, file_out):
         counter = collections.defaultdict(int)
         for p, h, _ in self.samples:
