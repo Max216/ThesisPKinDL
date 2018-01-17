@@ -52,9 +52,9 @@ def clean(res_to_clean, types):
     print_out = 'cohyp'
     for p, h, results in conflicts:
         labels = [l for l, t in results]
-        types = [t, for l, t in results]
+        ctypes = [t for l, t in results]
 
-        if print_out in types:
+        if print_out in ctypes:
             print(p, h, conflicts, '\n')
 
         
