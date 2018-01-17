@@ -312,6 +312,7 @@ class Datahandler:
 def get_datahandler_train(path=None):
     if path == None:
         path = config.PATH_TRAIN_DATA
+    print('use the following training data:', path)
     return Datahandler(path)
 
 def get_datahandler_dev(path=None):
