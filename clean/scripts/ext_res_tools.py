@@ -79,6 +79,11 @@ def clean(res_to_clean, types):
 
             return True
 
+        else: 
+            for lbl, typ in conflicts:
+                if lbl != 'contradiction':
+                    type_to_res[typ].remove(p, h, lbl)
+
         return False
 
 
@@ -87,9 +92,9 @@ def clean(res_to_clean, types):
         labels = [l for l, t in results]
         ctypes = [t for l, t in results]
 
-        if print_out in ctypes:
-            print(p, h, results)
-        #print(p, h, results)
+        #if print_out in ctypes:
+        #    print(p, h, results)
+        print(p, h, results)
 
         dealt_with = False
         if 'cohyp' in ctypes:    
