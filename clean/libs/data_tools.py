@@ -128,7 +128,7 @@ class ExtResPairhandler:
         '''
 
         # delete pair
-        del self.knowledge[lbl][p][h]
+        self.knowledge[lbl][p].remove(h)
 
         # check if premise still has hypothesis
         if len(self.knowledge[lbl][p]) == 0:
