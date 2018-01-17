@@ -55,7 +55,7 @@ def clean(res_to_clean, types):
         ctypes = [t for l, t in results]
 
         if print_out in ctypes:
-            print(p, h, conflicts, '\n')
+            print(p, h, results, '\n')
 
         
 
