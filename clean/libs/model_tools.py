@@ -63,6 +63,8 @@ def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, n
         sent_lstm_dim_2 = DEFAULT_SENT_ENCODING_DIMS[1]
         sent_lstm_dim_3 = DEFAULT_SENT_ENCODING_DIMS[2]
 
+    print('Create model:')
+    print('sent encoder:', sent_lstm_dim_1, sent_lstm_dim_2, sent_lstm_dim_3)
     sent_encoder = m.SentenceEncoder(
         embedding_dim=embedding_dim, 
         dimen1=sent_lstm_dim_1,
@@ -73,6 +75,7 @@ def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, n
 
     # Create model
     hidden_dim = mlp_dim or DEFAULT_HIDDEN_DIM
+    print('MLP:', hidden_dim)
     mlp_out_dim = num_classes or DEFAULT_NUM_CLASSES
 
     classifier = m.EntailmentClassifier(

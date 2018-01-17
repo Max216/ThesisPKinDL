@@ -10,7 +10,7 @@ def main():
     args = docopt("""Train a neural network.
 
     Usage:
-        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>]
+        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>]
 
     """)
 
@@ -20,6 +20,7 @@ def main():
     hidden_dim = args['--hidden']
     embedding_path = args['--embeddings']
     sent_fn = args['--sentfn'] or 'normal'
+    appendix = args['--appendix'] or ''
     m_settings = m.ModelSettings([('sent-rep', sent_fn)])
 
     datahandler_train = data_tools.get_datahandler_train(path_train)
@@ -34,7 +35,8 @@ def main():
         print('Create model ... ')
         if encoding_dim != None:
             encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
-        model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings)
+        model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
+        print('Store result as', model_namel)
         train_set = datahandler_train.get_dataset(embedding_holder)
         dev_set = datahandler_dev.get_dataset(embedding_holder)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
