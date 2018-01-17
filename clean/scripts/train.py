@@ -36,7 +36,7 @@ def main():
         if encoding_dim != None:
             encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
         model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
-        print('Store result as', model_namel)
+        print('Store result as', model_name)
         train_set = datahandler_train.get_dataset(embedding_holder)
         dev_set = datahandler_dev.get_dataset(embedding_holder)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
