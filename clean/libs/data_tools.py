@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 import spacy
-#nlp = spacy.load('en')
+nlp = spacy.load('en')
 
 from libs import config
 
