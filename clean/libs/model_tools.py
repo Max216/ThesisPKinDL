@@ -36,7 +36,7 @@ def create_model_name(classifier, version=1, hint='', opts=m.ModelSettings()):
 
     return '.'.join([dim_details, opts_details, time, model_version])
 
-def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings()):
+def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings(), hint=None):
     '''
     Create a model from parameters
 
@@ -86,7 +86,8 @@ def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, n
         sent_encoder=sent_encoder
     )
 
-    name = create_model_name(classifier, opts=opts)
+    hint = hint or ''
+    name = create_model_name(classifier, opts=opts, hint=hint)
 
     return (name, m.cuda_wrap(classifier), embedding_holder)
 
