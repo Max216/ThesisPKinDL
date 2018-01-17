@@ -9,14 +9,13 @@ from docopt import docopt
  
 from libs import data_tools
 
-def test():
-    p1 = '~/data/snli_glove.840B.300d.txt'
-    p2 = '~/data/snli_spacy_glove_840B.300d.txt'
+def diff(embeddings1, embeddings2):
 
-    with open(p1) as f1:
+
+    with open(embeddings1) as f1:
         vocab1 = set([line.split(' ')[0] for line in f1.readlines()])
 
-    with open(p2) as f2:
+    with open(embeddings1) as f2:
         vocab2 = set([line.split(' ')[0] for line in f2.readlines()])
 
     only1 = vocab1 - vocab2
@@ -50,7 +49,7 @@ def main():
 
     Usage:
         embedding_tools.py cfd <embeddings> <data_train> <data_dev> <name_out>
-        embedding_tools.py test
+        embedding_tools.py diff <embeddings1> <embeddings2>
 
     """)
 
@@ -62,7 +61,7 @@ def main():
     if args['cfd']:
         cfd(embeddings, data_train, data_dev, name_out)
     elif args['test']:
-        test()
+        test(args['<embeddings1>'], args['<embeddings2>'])
 
 
 if __name__ == '__main__':
