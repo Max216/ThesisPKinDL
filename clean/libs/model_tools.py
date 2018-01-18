@@ -5,6 +5,7 @@ from time import gmtime, strftime
 import os
 
 import torch
+import torch.cuda as cu
 
 from libs import config
 from libs import embeddingholder as eh
@@ -35,6 +36,28 @@ def create_model_name(classifier, version=1, hint='', opts=m.ModelSettings()):
     model_version = 'model' + str(version)
 
     return '.'.join([dim_details, opts_details, time, model_version])
+
+def params_from_model_name(name):
+    categories = name.split('.')
+
+    result = dict()
+
+    # parse category1
+    cat1 = categories[0].split('_')
+    result['dim_hidden'] = int(cat1[0])
+    result['dim_encoder_1'] = int(cat1[1])
+    result['dim_encoder_2'] = int(cat1[2])
+    result['dim_encoder_3'] = int(cat1[3])
+
+    # parse category2
+    cat2 = categories[1].split('_')
+    print(cat2)
+    opts = [(splitted[0], splitted[1]) for splitted in [s.split('=') for s in cat2]]
+    print('settings:', opts)
+    result['opts'] = m.ModelSettings(opts)
+
+    print(result)
+    return result
 
 def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings(), hint=None):
     '''
@@ -102,4 +125,35 @@ def store(name, classifier_state, result_type):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     path = current_dir + '/../results/models/' + result_type + '/'
     torch.save(classifier_state, path + name)
+
+def load(path, embedding_holder=None):
+    model_name = path.split('/')[-1]
+    params = params_from_model_name(model_name)
+    if embedding_holder == None:
+        embedding_holder = eh.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+
+    sent_encoder = m.SentenceEncoder(
+        embedding_dim=embedding_holder.dim(), 
+        dimen1=params['dim_encoder_1'],
+        dimen2=params['dim_encoder_2'],
+        dimen_out=params['dim_encoder_3'],
+        options=params['opts']
+    )
+
+    classifier = m.cuda_wrap(m.EntailmentClassifier(
+        pretrained_embeddings=embedding_holder.embedding_matrix(),
+        padding_idx=embedding_holder.padding(),
+        dimen_hidden=params['dim_hidden'],
+        dimen_out=DEFAULT_NUM_CLASSES,
+        sent_encoder=sent_encoder
+    ))
+
+    if cu.is_available():
+        classifier.load_state_dict(torch.load(path))
+    else:
+        classifier.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
+
+    model.eval()
+
+    return (model_name, classifier, embedding_holder)
 
