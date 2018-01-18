@@ -10,6 +10,7 @@ import torch.autograd as autograd
 from libs import collatebatch
 from libs import model as m
 
+ZERO = 0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
 
 def eval(classifier, data, batch_size, padding_token, twister=None):
     '''
@@ -39,3 +40,81 @@ def eval(classifier, data, batch_size, padding_token, twister=None):
         correct += torch.sum(torch.eq(m.cuda_wrap(lbl_batch), predicted_idx))
 
     return correct / total
+
+def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
+    '''
+    Create a dictionary with the prediction like dict[gold][predicted] = #amount. Batch size is one.
+    :param classifier       classifier to be evaluated
+    :param data             dataset for evaluation
+    :param padding_token    to pad input
+    :param identifiers      if set, an additional dictionary is returned with the identifiers per label
+    :param twister          if apply sentence representation twists
+    '''
+
+    classifier.eval()
+    data_loader = DataLoader(data, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
+
+    prediction_dict = dict([(lbl, dict([(lbl2, 0) for lbl2 in idx_to_lbl])) for lbl in idx_to_lbl])
+    identifier_dict = dict([(lbl, dict([(lbl2, []) for lbl2 in idx_to_lbl])) for lbl in idx_to_lbl])
+
+    index = 0
+    for premise_batch, hyp_batch, lbl_batch in data_loader:
+        prediction = classifier(
+            autograd.Variable(m.cuda_wrap(premise_batch)),
+            autograd.Variable(m.cuda_wrap(hyp_batch)),
+            twister=twister
+        ).data
+
+        # count corrects
+        _, predicted_idx = torch.max(prediction, dim=1)
+
+        gold_lbl = idx_to_lbl[lbl_batch.cpu()[0]]
+        predicted_lbl = idx_to_lbl[predicted_idx.cpu()[0]]
+        
+        prediction_dict[gold_lbl][predicted_lbl] += 1
+        if identifiers != None:
+            identifier_dict[gold_lbl][predicted_lbl].append(identifiers[index])
+
+        index += 1
+
+
+    if identifiers == None:
+        return prediction_dict
+    else:
+        return (prediction_dict, identifier_dict) 
+
+def accuracy_prediction_dict(prediction_dict):
+    correct = 0
+    total = 0
+    for gold_label in prediction_dict:
+        for predicted_label in prediction_dict[gold_label]:
+            if gold_label == predicted_label:
+                correct += prediction_dict[gold_label][predicted_label]
+            total += prediction_dict[gold_label][predicted_label]
+
+    return correct / (total + ZERO)
+
+def recall_precision_prediction_dict(prediction_dict, label):
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
+
+    for gold_label in prediction_dict:
+        for predicted_label in prediction_dict[gold_label]:
+            if predicted_label == label:
+                if gold_label == predicted_label:
+                    tp += prediction_dict[gold_label][predicted_label]
+                else:
+                    fp += prediction_dict[gold_label][predicted_label]
+            else:
+                if gold_label == predicted_label:
+                    fn += prediction_dict[gold_label][predicted_label]
+                else:
+                    tn += prediction_dict[gold_label][predicted_label]
+
+    recall = tp / (tp + fn + ZERO)
+    precision = tp / (tp + fp+ ZERO)
+    return (recall, precision)
+
+

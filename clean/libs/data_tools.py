@@ -2,6 +2,7 @@
 Methods to deal with the data
 '''
 
+import random
 import json
 import collections
 
@@ -9,7 +10,8 @@ import torch
 from torch.utils.data import Dataset
 
 import spacy
-nlp = spacy.load('en')
+import nltk
+#nlp = spacy.load('en')
 
 from libs import config
 
@@ -56,10 +58,23 @@ def _load_snli(lines, valid_labels=DEFAULT_VALID_LABELS):
     else:
         return [(p, h, lbl) for (p, h, lbl) in samples if lbl in valid_labels]
 
+def _load_snli_nltk(lines, valid_labels=DEFAULT_VALID_LABELS):
+    def extract_snli_line(line):
+        parsed_data = json.loads(line)
+        return (nltk.word_tokenize(parsed_data['sentence1']), nltk.word_tokenize(parsed_data['sentence2']), parsed_data['gold_label'])
+         
+    samples = [extract_snli_line(line) for line in lines]
+    if valid_labels == None:
+        return samples
+    else:
+        return [(p, h, lbl) for (p, h, lbl) in samples if lbl in valid_labels]
 
+
+#def _tokenize(sent):
+#    doc = nlp(sent,  parse=False, tag=False, entity=False)
+#    return [token.text for token in doc]
 def _tokenize(sent):
-    doc = nlp(sent,  parse=False, tag=False, entity=False)
-    return [token.text for token in doc]
+    return nltk.word_tokenize(sent)
 
 # Classes
 class SentEncoderDataset(Dataset):
@@ -86,6 +101,147 @@ class SentEncoderDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.converted_samples[idx]
+
+class ExtResPairData:
+    '''Contains information to all samples of a train set. Original samples as well as adversarial samples'''
+
+    def __init__(self, w1, w2, label, valid_labels):
+        self.w1 = w1
+        self.w2 = w2
+        self.label = label
+        self.valid_labels = valid_labels
+        self.samples = dict([(l, []) for l in valid_labels])
+        self.adversarial_samples_w1_premise = []
+        self.adversarial_samples_w1_hyp = []
+        self.adversarial_samples_w2_premise = []
+        self.adversarial_samples_w2_hyp = []
+        self.adversarial_hashes = set()
+        self.cnt_w1 = 0
+        self.cnt_w2 = 0
+
+    def _replace_word(self, sent, word_to_replace, replacing_word):
+        return [w if w != word_to_replace else replacing_word for w in sent]
+
+    def absorb_if_matches(self, index, sample):
+        '''
+        Adds this sample and/or creates adversarial samples, if it matches the criteria for this pair. 
+        '''
+        p, h, slbl = sample
+
+        # make sure to only add once
+        added_adversarials = set()
+
+        if self.w1 in p:
+            self.cnt_w1 += 1
+            # is "natural" sample
+            if self.w2 in h:
+                self.samples[slbl].append(index)
+
+            # add adversarial samples
+            sample_hash = hash('_'.join(p) + '#' + '_'.join(self._replace_word(p, self.w1, self.w2)))
+            if sample_hash not in self.adversarial_hashes:
+                self.adversarial_samples_w1_premise.append(index)
+                self.adversarial_hashes.add(sample_hash)
+
+        if self.w2 in p:
+            self.cnt_w2 += 1
+            sample_hash = hash('_'.join(self._replace_word(p, self.w2, self.w1)) + '#' + '_'.join(p))
+            if sample_hash not in self.adversarial_hashes:
+                self.adversarial_samples_w2_premise.append(index)
+                self.adversarial_hashes.add(sample_hash)
+
+        if self.w1 in h:
+            self.cnt_w1 += 1
+            sample_hash = hash('_'.join(h) + '#' + '_'.join(self._replace_word(h, self.w1, self.w2)))
+            if sample_hash not in self.adversarial_hashes:
+                self.adversarial_samples_w1_hyp.append(index)
+                self.adversarial_hashes.add(sample_hash)
+
+        if self.w2 in h:
+            self.cnt_w2 += 1
+            sample_hash = hash('_'.join(self._replace_word(h, self.w2, self.w1)) + '#' + '_'.join(h))
+            if sample_hash not in self.adversarial_hashes:
+                self.adversarial_samples_w2_hyp.append(index)
+                self.adversarial_hashes.add(sample_hash)
+
+    def get_natural_dataset(self, datahandler, embedding_holder, gold_label):
+        '''
+        Get the dataset containing all natural samples for the given label
+        '''
+        sample_set = self.get_natural_samples(datahandler, gold_label, amount=-1)
+        return SentEncoderDataset(sample_set, embedding_holder, datahandler.tag_to_idx)
+
+    def get_adversarial_dataset(self, datahandler, embedding_holder):
+        '''
+        Get the dataset containing all adversarial samples
+        '''
+        sample_set = self.get_adversarial_samples(datahandler, amount=-1)
+        return SentEncoderDataset(sample_set, embedding_holder, datahandler.tag_to_idx)
+
+    def get_natural_samples(self, datahandler, gold_label, amount=-1):
+        '''
+        return readable samples as they occur in the data
+        :param amount       max amount to return
+        :param gold_label   only look for samples having this label
+        :param datahandler  must be the same data as on generation!
+        '''
+        if gold_label not in self.samples:
+            return []
+
+        if amount == -1:
+            return datahandler.get_samples(self.samples[gold_label])
+        return datahandler.get_samples(self.samples[gold_label])[:10]
+
+    def get_adversarial_samples(self, datahandler, amount=-1):
+        '''
+        return readable adversarial samples from data.
+        :param amount       max amount to return
+        :param datahandler  must be the same data as on generation!
+        '''
+        W2_HYP = 0
+        W1_HYP = 1
+        W2_PREM = 2
+        W1_PREM = 3
+
+        adv_w2_p = [(W2_PREM, idx) for idx in self.adversarial_samples_w2_premise]
+        adv_w2_h = [(W2_HYP, idx) for idx in self.adversarial_samples_w2_hyp]
+        adv_w1_p = [(W1_PREM, idx) for idx in self.adversarial_samples_w1_premise]
+        adv_w1_h = [(W1_HYP, idx) for idx in self.adversarial_samples_w1_hyp]
+
+        all_adv = adv_w2_h + adv_w2_p + adv_w1_h + adv_w1_p
+        if len(all_adv) <= amount or amount == -1:
+            request_samples = all_adv
+        else:
+            print('using random sample!')
+            random.seed(1)
+            request_samples = random.sample(all_adv, amount)
+
+        # now create samples
+        indizes = [idx for _, idx in request_samples]
+        samples = datahandler.get_samples(indizes)
+
+        results = []
+        for i, (p, h, _) in enumerate(samples):
+            typ = request_samples[i][0]
+            if typ == W2_HYP:
+                results.append((self._replace_word(h, self.w2, self.w1), h, self.label))
+            elif typ == W1_HYP:
+                results.append((h, self._replace_word(h, self.w1, self.w2), self.label))
+            elif typ == W1_PREM:
+                results.append((p, self._replace_word(p, self.w1, self.w2), self.label))
+            elif typ == W2_PREM:
+                results.append((self._replace_word(p, self.w2, self.w1), p, self.label))
+            else:
+                print('Should not happen')
+                1/0
+
+        return results
+
+
+
+
+
+
 
 class ExtResPairhandler:
     '''
@@ -281,6 +437,20 @@ class ExtResPairhandler:
 
         return [(label, self.count(label)) for label in self.knowledge]
 
+    def find_samples(self, datahandler):
+        '''
+        Return a list of each knowledge sample with data indizes for all samples
+        '''
+
+        all_knowledge_items = [ExtResPairData(w1, w2, label, valid_labels=datahandler.valid_labels) for w1, w2, label in self.items()]
+
+        for i, sample in enumerate(datahandler.samples):
+            for knowledge_item in all_knowledge_items:
+                knowledge_item.absorb_if_matches(i, sample)
+
+        return all_knowledge_items
+
+
 
 
 class Datahandler:
@@ -303,12 +473,20 @@ class Datahandler:
         with open(path) as f_in:
             if data_format == 'snli':
                 self.samples = _load_snli(f_in.readlines())
+            elif data_format == 'snli_nltk':
+                self.samples = _load_snli_nltk(f_in.readlines())
             else:
                 print('Unknown data format:', data_format)
                 1/0
 
     def get_dataset(self, embedding_holder):
         return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx)
+
+    def get_samples(self, indizes):
+        '''
+        get the samples having these indizes
+        '''
+        return [self.samples[i] for i in indizes]
 
     def merge(self, data_handlers):
         '''

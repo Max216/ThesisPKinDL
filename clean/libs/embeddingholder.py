@@ -3,6 +3,7 @@ Store and manage word embeddings
 '''
 
 import numpy as np
+from libs import config
 
 class EmbeddingHolder:
     
@@ -101,3 +102,9 @@ class EmbeddingHolder:
 
 
         return wv
+
+def create_embeddingholder(path=None):
+    if path == None:
+        path = config.PATH_WORD_EMBEDDINGS
+
+    return EmbeddingHolder(path)
