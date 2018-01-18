@@ -153,7 +153,7 @@ def load(path, embedding_holder=None):
     else:
         classifier.load_state_dict(torch.load(path, map_location=lambda storage, loc: storage))
 
-    model.eval()
+    classifier.eval()
 
     return (model_name, classifier, embedding_holder)
 
