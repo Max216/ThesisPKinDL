@@ -11,7 +11,7 @@ from torch.utils.data import Dataset
 
 import spacy
 import nltk
-#nlp = spacy.load('en')
+nlp = spacy.load('en')
 
 from libs import config
 
@@ -70,11 +70,11 @@ def _load_snli_nltk(lines, valid_labels=DEFAULT_VALID_LABELS):
         return [(p, h, lbl) for (p, h, lbl) in samples if lbl in valid_labels]
 
 
-#def _tokenize(sent):
-#    doc = nlp(sent,  parse=False, tag=False, entity=False)
-#    return [token.text for token in doc]
 def _tokenize(sent):
-    return nltk.word_tokenize(sent)
+    doc = nlp(sent,  parse=False, tag=False, entity=False)
+    return [token.text for token in doc]
+#def _tokenize(sent):
+#    return nltk.word_tokenize(sent)
 
 # Classes
 class SentEncoderDataset(Dataset):
