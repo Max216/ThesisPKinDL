@@ -223,7 +223,7 @@ class ExtResPairhandler:
                     checked.append(i)
 
             if len(checked) > 0:
-                knowledge_samples_to_check = [s for i, s in knowledge_samples_to_check if i not in checked]
+                knowledge_samples_to_check = [s for i, s in enumerate(knowledge_samples_to_check) if i not in checked]
 
         self.knowledge = self.create_knowledge_dict(valid_samples)
 
