@@ -12,7 +12,7 @@ def main():
     args = docopt("""Preprocess data.
 
     Usage:
-        data_tools.py create_word_count <data> <out_name>
+        counter.py create_word_count <data> <out_name>
     """)
 
     path_data  = args['<data>']
