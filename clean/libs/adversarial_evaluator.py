@@ -103,7 +103,7 @@ class AdvEvaluator:
             return return_dict
 
     def get_sample_sents(self, typ, predicted, amount, datahandler):
-        indizes = self._get_data_ids_for_predicted(generation_type)
+        indizes = self._get_data_ids_for_predicted(typ)
 
         interested_samples = []
         predicted_set = set(self.adversarial_samples[predicted])
