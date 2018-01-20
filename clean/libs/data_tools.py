@@ -253,7 +253,7 @@ class ExtResPairData:
                 w_replaced = self.w2
                 w_replacer = self.w1
 
-            generated_sentence = sent_to_use[:].replace(w_replaced, w_replacer)
+            generated_sentence = _replace_word(sent_to_use, w_replaced, w_replacer)
 
             if replace_w1:
                 results.append((sent_to_use, generated_sentence))
