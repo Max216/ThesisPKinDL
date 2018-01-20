@@ -102,17 +102,28 @@ def recall_precision_prediction_dict(prediction_dict, label):
 
     for gold_label in prediction_dict:
         for predicted_label in prediction_dict[gold_label]:
-            if predicted_label == label:
-                if gold_label == predicted_label:
+            if gold_label == predicted_label:
+                if gold_label == label:
                     tp += prediction_dict[gold_label][predicted_label]
                 else:
-                    fp += prediction_dict[gold_label][predicted_label]
-            else:
-                if gold_label == predicted_label:
-                    fn += prediction_dict[gold_label][predicted_label]
-                else:
                     tn += prediction_dict[gold_label][predicted_label]
+            else:
+                if predicted_label == label:
+                    fp += prediction_dict[gold_label][predicted_label]
+                elif gold_label == label:
+                    fn += prediction_dict[gold_label][predicted_label]
+            #if predicted_label == label:
+            #    if gold_label == predicted_label:
+            #        tp += prediction_dict[gold_label][predicted_label]
+            #    else:
+            #        fp += prediction_dict[gold_label][predicted_label]
+            #else:
+            #    if gold_label == predicted_label:
+            #        fn += prediction_dict[gold_label][predicted_label]
+            #    else:
+            #        tn += prediction_dict[gold_label][predicted_label]
 
+    #print('tp', tp, 'fp', fp, 'tn', tn, 'fn', fn)
     recall = tp / (tp + fn + ZERO)
     precision = tp / (tp + fp+ ZERO)
     return (recall, precision)

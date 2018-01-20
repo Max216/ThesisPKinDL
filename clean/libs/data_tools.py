@@ -171,6 +171,30 @@ class ExtResPairData:
         sample_set = self.get_natural_samples(datahandler, gold_label, amount=-1)
         return SentEncoderDataset(sample_set, embedding_holder, datahandler.tag_to_idx)
 
+    def get_dataset_sample_idx_w1_replaced(self):
+        '''
+        return all samples in a dataset that have been created by replacing w1
+        :return [(idx_in_dataset, sample_idx)]
+        '''
+        len_w1_replaced = len(self.adversarial_samples_w1_premise) + len(self.adversarial_samples_w1_hyp)
+        len_w2_replaced = len(self.adversarial_samples_w2_premise) + len(self.adversarial_samples_w2_hyp)
+
+        db_indizes = [len_w2_replaced + i for i in range(len_w1_replaced)]
+        sample_indizes = self.adversarial_samples_w1_premise + self.adversarial_samples_w1_hyp
+        return [(db_indizes[i], sample_indizes[i]) for i in range(len(db_indizes))]
+
+    def get_dataset_sample_idx_w2_replaced(self):
+        '''
+        return all samples in a dataset that have been created by replacing w2
+        :return [(idx_in_dataset, sample_idx)]
+        '''
+        sample_indizes = self.adversarial_samples_w2_hyp + self.adversarial_samples_w2_premise
+        return [(i, sample_indizes[i]) for i in range(len(sample_indizes))]
+
+    def get_dataset_sample_idx_any_replaced(self):
+        sample_indizes = self.adversarial_samples_w2_hyp + self.adversarial_samples_w2_premise + self.adversarial_samples_w1_hyp + adversarial_samples_w1_premise
+        return [(i, sample_indizes[i]) for i in range(len(sample_indizes))]
+
     def get_adversarial_dataset(self, datahandler, embedding_holder):
         '''
         Get the dataset containing all adversarial samples
@@ -192,6 +216,52 @@ class ExtResPairData:
             return datahandler.get_samples(self.samples[gold_label])
         return datahandler.get_samples(self.samples[gold_label])[:10]
 
+    def get_adversarial_samples_for(self, sample_indizes, datahandler):
+        results = []
+        for index in sample_indizes:
+
+            sent_to_use = None
+            replace_w1 = None
+            p, h, lbl = datahandler.samples[index]
+
+            if index in self.adversarial_samples_w2_hyp:
+                replace_w1 = False
+                sent_to_use = h
+
+            elif index in self.adversarial_samples_w2_premise:
+                replace_w1 = False
+                sent_to_use = p
+
+            elif index in self.adversarial_samples_w1_hyp:
+                replace_w1 = True
+                sent_to_use = h
+
+            elif index in self.adversarial_samples_w1_premise:
+                replace_w1 = True
+                sent_to_use = p
+
+            else:
+                print('Should not happen:', index)
+                1/0
+
+            
+            if replace_w1:
+                w_replaced = self.w1
+                w_replacer = self.w2
+
+            else:
+                w_replaced = self.w2
+                w_replacer = self.w1
+
+            generated_sentence = sent_to_use[:].replace(w_replaced, w_replacer)
+
+            if replace_w1:
+                results.append((sent_to_use, generated_sentence))
+            else:
+                results.append((generated_sentence, sent_to_use))
+
+        return results
+
     def get_adversarial_samples(self, datahandler, amount=-1):
         '''
         return readable adversarial samples from data.
@@ -203,10 +273,11 @@ class ExtResPairData:
         W2_PREM = 2
         W1_PREM = 3
 
-        adv_w2_p = [(W2_PREM, idx) for idx in self.adversarial_samples_w2_premise]
         adv_w2_h = [(W2_HYP, idx) for idx in self.adversarial_samples_w2_hyp]
-        adv_w1_p = [(W1_PREM, idx) for idx in self.adversarial_samples_w1_premise]
+        adv_w2_p = [(W2_PREM, idx) for idx in self.adversarial_samples_w2_premise]
         adv_w1_h = [(W1_HYP, idx) for idx in self.adversarial_samples_w1_hyp]
+        adv_w1_p = [(W1_PREM, idx) for idx in self.adversarial_samples_w1_premise]
+
 
         all_adv = adv_w2_h + adv_w2_p + adv_w1_h + adv_w1_p
         if len(all_adv) <= amount or amount == -1:
