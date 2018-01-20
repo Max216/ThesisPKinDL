@@ -192,7 +192,7 @@ class ExtResPairData:
         return [(i, sample_indizes[i]) for i in range(len(sample_indizes))]
 
     def get_dataset_sample_idx_any_replaced(self):
-        sample_indizes = self.adversarial_samples_w2_hyp + self.adversarial_samples_w2_premise + self.adversarial_samples_w1_hyp + adversarial_samples_w1_premise
+        sample_indizes = self.adversarial_samples_w2_hyp + self.adversarial_samples_w2_premise + self.adversarial_samples_w1_hyp + self.adversarial_samples_w1_premise
         return [(i, sample_indizes[i]) for i in range(len(sample_indizes))]
 
     def get_adversarial_dataset(self, datahandler, embedding_holder):
