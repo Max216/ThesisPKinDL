@@ -30,24 +30,25 @@ class ReplacedDataHolder:
                 self.counter[w] = counter[w]
 
 
-    def add_samples(self, w1, w2, label, amount_real_samples, samples):
+    def add_samples(self, w1, w2, label, generation_type, amount_real_samples, samples):
         '''
         Adds generted samples to this instance
         :param w1                   relevant word in premise
         :param w2                   relevant word in hypothesis
         :param label                assumed label
+        :param generation_type      type of generation
         :param amount_real_samples  amount of real samples contining these word in this order
         :param samples              generated samples: [(premise, hypothesis, label, generation_replacement), ...]
         '''
 
         self._add_real_sample_count(w1, w2, amount_real_samples)
-        self.pairs.append((w1, w2, label, samples))
+        self.pairs.append((w1, w2, label, generation_type, samples))
 
     def get_internal_stats(self):
         '''
         Get info about the amount of samples generated per example
         '''
-        return [(w1, w2, label, self._to_data_name(w1, w2), len(samples)) for w1, w2, label, samples in self.pairs]
+        return [(w1, w2, label, generation_type, self._to_data_name(w1, w2), len(samples)) for w1, w2, label,generation_type, samples in self.pairs]
 
     def write_summary(self, directory):
         self._ensure_directory(directory)
@@ -55,7 +56,7 @@ class ReplacedDataHolder:
         # write out summary of data
         out_path = os.path.join(directory, self.SUMMARY_NAME)
         with open(out_path, 'w') as f_out:
-            for w1, w2, label, filepath, amount in self.get_internal_stats():
+            for w1, w2, label, generation_type, filepath, amount in self.get_internal_stats():
                 sample_json = {
                     'word_p': w1,
                     'word_h': w2,
@@ -64,13 +65,14 @@ class ReplacedDataHolder:
                     'amount': amount,
                     'sents_with_word_p': self.counter[w1],
                     'sents_with_word_h': self.counter[w2],
-                    'real_sample_count': self.real_sample_counter[w1][w2]
+                    'real_sample_count': self.real_sample_counter[w1][w2],
+                    'generate_replace': generation_type
                 }
                 f_out.write(json.dumps(sample_json) + '\n')
 
     def write_dataset(self, directory):
         self._ensure_directory(directory)
-        for w1, w2, _, samples in self.pairs:
+        for w1, w2, _, _2, samples in self.pairs:
             out_path = os.path.join(directory, self._to_data_name(w1, w2))
             with open(out_path, 'w') as f_out:
                 for premise, hypothesis, assumed_label, generation_type in samples:
@@ -309,7 +311,7 @@ class DataManipulator:
 
             # add data to container
             if len(new_samples) > 0:
-                replacement_holder.add_samples(w1, w2, label, real_sample_count, new_samples)
+                replacement_holder.add_samples(w1, w2, label,replace, real_sample_count, new_samples)
                 print('Added', len(new_samples), 'samples for replacing:', w1, direction_output[replace], w2)
             else:
                 print('No samples found for:', w1, direction_output[replace], w2)

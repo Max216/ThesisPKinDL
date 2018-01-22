@@ -52,8 +52,8 @@ def nationalities():
     return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
 
 
-#def test():
-#    return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
+def test():
+    return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
