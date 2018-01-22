@@ -115,6 +115,8 @@ class AdvEvaluator:
 
         return self.adv_sample_handler.get_adversarial_samples_for(interested_samples, datahandler)
 
+    def get_natural_samples(self, gold, predicted_label, amount, datahandler):
+
 
     def natural_prediction_dict(self):
         return self.natural_sample_count

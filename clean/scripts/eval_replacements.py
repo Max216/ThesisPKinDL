@@ -84,6 +84,11 @@ def summary(file_path, out_path):
                 generation_types = c_evaluator.generation_types
 
                 samples_out.write('# ' + w1 + ' - ' + w2 + '\n')
+                samples_out.write('## Natural samples\n')
+                for gold in valid_labels:
+                    for predicted_label in valid_labels:
+                        samples_out.write('### gold:' + gold + ', predicted:' + predicted_label + '\n')
+                        c_evaluator.get_natural_samples(gold, predicted_label, 5, datahandler)
 
                 for typ in generation_types:
 
