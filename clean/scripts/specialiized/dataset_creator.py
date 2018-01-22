@@ -46,6 +46,14 @@ def countries():
 
     return ('countries', [], [], all_incompatible(countries, exclude_words=exclude_words))
 
+def nationalities():
+    nationalities = 'American,Chinese,English,Japanese,Russian,Canadian,Australian,Dutch,French,Israeli,Spanish,Brazilian,Jordanian,Swedish,Greek,Italian,Irish,Mexican,Swiss,Singaporean,Turkish,Ukrainian,Egyptian,Norwegian,Indonesian,Vietnamese'.split(',')
+    exclude_words = [set(['American', 'Canadian'])]
+    return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
+
+
+#def test():
+#    return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
@@ -56,7 +64,9 @@ def main():
 
     out_name = args['<out_name>']
     all_fn = [
-        countries
+        countries,
+        nationalities
+        #test
     ]
 
     datahandler = data_manipulator.DataManipulator().load()
@@ -74,7 +84,7 @@ def main():
         generated_sample_holder.write_summary(directory)
         generated_sample_holder.write_dataset(directory)
 
-    with open(os.path.join(directory, 'data.txt'), 'w') as f_out:
+    with open(os.path.join(out_name, 'data.txt'), 'w') as f_out:
         for g in groups:
             f_out.write(g + '\n')
 

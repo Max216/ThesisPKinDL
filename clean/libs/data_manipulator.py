@@ -11,20 +11,36 @@ class ReplacedDataHolder:
     Maintains replaced data
     '''
 
-    SUMMARY_NAME = 'summary.sjson'
+    SUMMARY_NAME = 'SUMMARY.sjson'
 
     def __init__(self):
         self.pairs = []
+        self.counter = dict()
+        self.real_sample_counter = dict()
 
-    def add_samples(self, w1, w2, label, samples):
+    def update_counts(self, counter, min_val=1):
+        '''
+        remember the counts per word within the data
+        :param counter      dictionary(word, counts)
+        :param min_val      onyl remember values >= this value
+        '''
+
+        for w in counter:
+            if counter[w] >= min_val:
+                self.counter[w] = counter[w]
+
+
+    def add_samples(self, w1, w2, label, amount_real_samples, samples):
         '''
         Adds generted samples to this instance
-        :param w1       relevant word in premise
-        :param w2       relevant word in hypothesis
-        :param label    assumed label
-        :param samples  generated samples: [(premise, hypothesis, label, generation_replacement), ...]
+        :param w1                   relevant word in premise
+        :param w2                   relevant word in hypothesis
+        :param label                assumed label
+        :param amount_real_samples  amount of real samples contining these word in this order
+        :param samples              generated samples: [(premise, hypothesis, label, generation_replacement), ...]
         '''
 
+        self._add_real_sample_count(w1, w2, amount_real_samples)
         self.pairs.append((w1, w2, label, samples))
 
     def get_internal_stats(self):
@@ -35,6 +51,8 @@ class ReplacedDataHolder:
 
     def write_summary(self, directory):
         self._ensure_directory(directory)
+
+        # write out summary of data
         out_path = os.path.join(directory, self.SUMMARY_NAME)
         with open(out_path, 'w') as f_out:
             for w1, w2, label, filepath, amount in self.get_internal_stats():
@@ -43,12 +61,12 @@ class ReplacedDataHolder:
                     'word_h': w2,
                     'assumed_label': label,
                     'rel_path': filepath,
-                    'amount': amount
+                    'amount': amount,
+                    'sents_with_word_p': self.counter[w1],
+                    'sents_with_word_h': self.counter[w2],
+                    'real_sample_count': self.real_sample_counter[w1][w2]
                 }
                 f_out.write(json.dumps(sample_json) + '\n')
-
-
-
 
     def write_dataset(self, directory):
         self._ensure_directory(directory)
@@ -71,6 +89,11 @@ class ReplacedDataHolder:
         '''
 
         self.pairs.extend(other.pairs)
+        self.update_counts(other.counter)
+
+        for key_p in other.real_sample_counter:
+            for key_h in other.real_sample_counter[key_p]:
+                self._add_real_sample_count(key_p, key_h, other.real_sample_counter[key_p][key_h])
 
     def _to_data_name(self, w1, w2):
         '''
@@ -81,6 +104,15 @@ class ReplacedDataHolder:
     def _ensure_directory(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    def _add_real_sample_count(self, w1, w2, amount):
+        if w1 not in self.real_sample_counter:
+            self.real_sample_counter[w1] = dict()
+        if w2 not in self.real_sample_counter[w1]:
+            self.real_sample_counter[w1][w2] = amount
+        else:
+            print('Should not happen. Alread have real sample info:', self.real_sample_counter[w1][w2],'. Want to override with', amount)
+            1/0
 
 
 class DataManipulator:
@@ -127,60 +159,164 @@ class DataManipulator:
         
         # Iterate over all replacement samples
         replacement_holder = ReplacedDataHolder()
+
+        counter = dict()
+
         for w1, w2, label in replacements:
+
+            counted_w1 = False
+            counted_w2 = False
+            # skip if not both words in dataset
+            if w1 in counter:
+                counted_w1 = True
+                if counter[w1] == 0:
+                    continue
+            if w2 in counter:
+                counted_w2  = True
+                if counter[w2] == 0:
+                    continue
 
             regexp1 = re.compile('\\b' + w1 + '\\b')
             regexp2 = re.compile('\\b' + w2 + '\\b')
-
-            # remember seen sentences in order to avoid unnecessary searches
-            seen_sentences = set()
 
             # remember generated samples to avoid duplicates
             sample_hashes = set() 
             new_samples = []
 
+            # remember how many samples with the same label have the two words (same order)
+            real_sample_count = 0  
+            count_w1 = 0
+            count_w2 = 0        
 
             # iterate over all data
-            for sent1, sent2, _ in self.samples:
+            for sent1, sent2, sample_label in self.samples:
 
-                # iterate over all sentences
-                for sent in [sent1, sent2]:
+                searched_s1_w1 = False
+                searched_s2_w1 = False
+                searched_s1_w2 = False
+                searched_s2_w2 = False
 
-                    # remember seen sentences
-                    hashed_sent = hash(sent)
-                    if hashed_sent not in seen_sentences:
-                        seen_sentences.add(hashed_sent)
+                s1_contains_w1 = None
+                s2_contains_w1 = None
+                s1_contains_w2 = None
+                s2_contains_w2 = None
 
-                        if replace == 'any':
+                # check if natural sample
+                if sample_label ==  label:
+                    s1_contains_w1 = regexp1.search(sent1)
+                    s2_contains_w2 = regexp2.search(sent2)
+                    searched_s1_w1 = True
+                    searched_s2_w2 = True
+
+                    if s1_contains_w1 and s2_contains_w2:
+                        real_sample_count += 1
+
+                # always check if word not counted yet
+                if not counted_w1:
+                    if not searched_s1_w1:
+                        s1_contains_w1 = regexp1.search(sent1)
+                        searched_s1_w1 = True
+
+                    # sent 2 can't be checked yet
+                    s2_contains_w1 = regexp1.search(sent2)
+                    searched_s2_w1 = True
+
+                    # count
+                    if s1_contains_w1:
+                        count_w1 += 1
+                    if s2_contains_w1:
+                        count_w1 += 1
+
+                # same as above for other word
+                if not counted_w2:
+                    if not searched_s2_w2:
+                        s2_contains_w2 = regexp2.search(sent2)
+                        searched_s2_w2 = True
+
+                    # sent 1 can't be checked yet
+                    s1_contains_w2 = regexp2.search(sent1)
+                    searched_s1_w2 = True
+
+                    # count
+                    if s1_contains_w2:
+                        count_w2 += 1
+                    if s2_contains_w2:
+                        count_w2 += 1
+
+                # now check for sentences to generate
+                both_sents = [
+                    (searched_s1_w1, s1_contains_w1, searched_s1_w2, s1_contains_w2, sent1),
+                    (searched_s2_w1, s2_contains_w1, searched_s2_w2, s2_contains_w2, sent2)
+                ]
+                for checked_w1, contains_w1, checked_w2, contains_w2, sent in both_sents:
+
+                    swap_with_w1 = False
+                    swap_with_w2 = False
+
+                    if replace == 'any':
+                        if not checked_w1:
                             contains_w1 = regexp1.search(sent)
-                            contains_w2 = regexp2.search(sent)
-                        elif replace == 'w1':
-                            contains_w1 = regexp1.search(sent)
-                            contains_w2 = False
-                        else:
-                            contains_w1 = False
+                        if not checked_w2:
                             contains_w2 = regexp2.search(sent)
 
                         if contains_w1:
-                            replaced_w1 = self._replace_in_sent(sent, regexp1, w2)
-                            hashed_sample = hash(sent+replaced_w1)
-                            if hashed_sample not in sample_hashes:
-                                sample_hashes.add(hashed_sample)
-                                new_samples.append((sent, replaced_w1, label, '1'))
+                            swap_with_w1 = True
                         if contains_w2:
-                            replaced_w2 = self._replace_in_sent(sent, regexp2, w1)
-                            hashed_sample = hash(replaced_w2+sent)
-                            if hashed_sample not in sample_hashes:
-                                sample_hashes.add(hashed_sample)
-                                new_samples.append((replaced_w2, sent, label, '2'))
+                            swap_with_w2 = True
+
+                    elif replace == 'w1':
+                        if not checked_w1:
+                            contains_w1 = regexp1.search(sent)
+
+                        swap_with_w1 = contains_w1
+
+                    else:
+                        if not checked_w2:
+                            contains_w2 = regexp2.search(sent)
+
+                        swap_with_w2 = contains_w2
+
+
+                    # Generate samples by swapping
+                    if swap_with_w1:
+                        replaced_w1 = self._replace_in_sent(sent, regexp1, w2)
+                        hashed_sample = hash(sent+replaced_w1)
+                        if hashed_sample not in sample_hashes:
+                            sample_hashes.add(hashed_sample)
+                            new_samples.append((sent, replaced_w1, label, '1'))
+
+                    if swap_with_w2:
+                        replaced_w2 = self._replace_in_sent(sent, regexp2, w1)
+                        hashed_sample = hash(replaced_w2+sent)
+                        if hashed_sample not in sample_hashes:
+                            sample_hashes.add(hashed_sample)
+                            new_samples.append((replaced_w2, sent, label, '2'))
+
             
+            # Here: Checked all data for samples and generated if possible, counted everything
+            
+            # Update counts
+            if not counted_w1:
+                counter[w1] = count_w1
+
+            if not counted_w2:
+                counter[w2] = count_w2
+
+            # remove results if not both words are in data
+            if counter[w1] < 1 or counter[w2] < 1:
+                new_samples = []
+
+
             # add data to container
             if len(new_samples) > 0:
-                replacement_holder.add_samples(w1, w2, label, new_samples)
+                replacement_holder.add_samples(w1, w2, label, real_sample_count, new_samples)
                 print('Added', len(new_samples), 'samples for replacing:', w1, direction_output[replace], w2)
             else:
                 print('No samples found for:', w1, direction_output[replace], w2)
 
+        
+        replacement_holder.update_counts(counter)
+        print('Specified words NOT within data:', '; '.join([w for w in counter if counter[w] == 0]))
         return replacement_holder
 
     def _replace_in_sent(self, sent, regexp, replacing_str):
