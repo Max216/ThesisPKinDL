@@ -12,6 +12,9 @@ def read_strp_lines(file):
 def uknown_words(words):
     return [w for w in words if w in vocab]
 
+def synonym_from_two_lists(list_a, list_b):
+    return [(list_a[i], list_b[i], 'entailment') for i in range(len(list_a))]
+
 def all_incompatible(words, exclude_words=[]):
 
     def is_excluded(w1, w2, exclude_words):
@@ -51,42 +54,76 @@ def nationalities():
     exclude_words = [set(['American', 'Canadian'])]
     return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
 
+def colors():
+    colors = 'red,blue,yellow,purple,green,orange,brown,grey,black,white'.split(',')
+    return ('colors', [], [], all_incompatible(colors))
+
+def numbers():
+    numbers_written = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
+    numbers_digits = '2,3,4,5,6,7,8,9,10,11,12'.split(',')
+    synonym_numbers = synonym_from_two_lists(numbers_written, numbers_digits)
+    synonym_numbers.extend(synonym_from_two_lists(numbers_digits, numbers_written))
+    return ('numbers', [], [], synonym_numbers)
 
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
+
+def test_out():
+    name, rep1only, rep2only, repany = numbers()
+    print('## replace w1 only')
+    for p,h,lbl in rep1only:
+        print(p, '-', h, '-', lbl)
+    print('## replace w2 only')
+    for p,h,lbl in rep2only:
+        print(p, '-', h, '-', lbl)
+    print('## replace any')
+    for p,h,lbl in repany:
+        print(p, '-', h, '-', lbl)
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
     Usage:
-        dataset_creator.py <out_name>
+        dataset_creator.py create <out_name>
+        dataset_creator.py test 
+        dataset_creator.py show -a <amount> (-w <words>)...
     """)
 
-    out_name = args['<out_name>']
-    all_fn = [
-        countries,
-        nationalities
-        #test
-    ]
 
-    datahandler = data_manipulator.DataManipulator().load()
+    if args['test']:
+        test_out()
+    elif args['show']:
+        max_amount = int(args['<amount>'])
+        words = args['<words>']
+        datahandler = data_manipulator.DataManipulator().load()
+        datahandler.print_sents(words, max_amount)
+    else:
+        out_name = args['<out_name>']
+        all_fn = [
+            countries,
+            nationalities,
+            colors
+            #test
+        ]
 
-    groups = []
-    for fn in all_fn:
-        name, replace_w1_only, replace_w2_only, replace_any = fn()
+        datahandler = data_manipulator.DataManipulator().load()
 
-        generated_sample_holder = datahandler.generate_by_replacement(replace_w1_only, replace='w1')
-        generated_sample_holder.merge(datahandler.generate_by_replacement(replace_w2_only, replace='w2'))
-        generated_sample_holder.merge(datahandler.generate_by_replacement(replace_any, replace='any'))
-        
-        groups.append(name)
-        directory = os.path.join(out_name, name)
-        generated_sample_holder.write_summary(directory)
-        generated_sample_holder.write_dataset(directory)
+        groups = []
+        for fn in all_fn:
+            name, replace_w1_only, replace_w2_only, replace_any = fn()
 
-    with open(os.path.join(out_name, 'data.txt'), 'w') as f_out:
-        for g in groups:
-            f_out.write(g + '\n')
+            generated_sample_holder = datahandler.generate_by_replacement(replace_w1_only, replace='w1')
+            generated_sample_holder.merge(datahandler.generate_by_replacement(replace_w2_only, replace='w2'))
+            generated_sample_holder.merge(datahandler.generate_by_replacement(replace_any, replace='any'))
+            
+            groups.append(name)
+            directory = os.path.join(out_name, name)
+            generated_sample_holder.write_summary(directory)
+            generated_sample_holder.write_dataset(directory)
+
+        with open(os.path.join(out_name, 'data.txt'), 'w') as f_out:
+            for g in groups:
+                f_out.write(g + '\n')
 
 if __name__ == '__main__':
     main()

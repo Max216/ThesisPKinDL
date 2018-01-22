@@ -1,0 +1,6 @@
+{"amount": 4, "rel_path": "red__orange.jsonl", "real_sample_count": 0, "word_p": "red", "word_h": "orange", "sents_with_word_h": 9, "sents_with_word_p": 3, "assumed_label": "contradiction", "generate_replace": "any"}
+{"amount": 3, "rel_path": "red__brown.jsonl", "real_sample_count": 0, "word_p": "red", "word_h": "brown", "sents_with_word_h": 4, "sents_with_word_p": 3, "assumed_label": "contradiction", "generate_replace": "any"}
+{"amount": 4, "rel_path": "orange__red.jsonl", "real_sample_count": 0, "word_p": "orange", "word_h": "red", "sents_with_word_h": 3, "sents_with_word_p": 9, "assumed_label": "contradiction", "generate_replace": "any"}
+{"amount": 5, "rel_path": "orange__brown.jsonl", "real_sample_count": 0, "word_p": "orange", "word_h": "brown", "sents_with_word_h": 4, "sents_with_word_p": 9, "assumed_label": "contradiction", "generate_replace": "any"}
+{"amount": 3, "rel_path": "brown__red.jsonl", "real_sample_count": 0, "word_p": "brown", "word_h": "red", "sents_with_word_h": 3, "sents_with_word_p": 4, "assumed_label": "contradiction", "generate_replace": "any"}
+{"amount": 5, "rel_path": "brown__orange.jsonl", "real_sample_count": 0, "word_p": "brown", "word_h": "orange", "sents_with_word_h": 9, "sents_with_word_p": 4, "assumed_label": "contradiction", "generate_replace": "any"}

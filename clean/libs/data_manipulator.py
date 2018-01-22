@@ -126,6 +126,35 @@ class DataManipulator:
         '''
         self.samples = data    
 
+    def print_sents(self, words, max_amount):
+        '''
+        prints (up to max amount) sentences containing the specified word
+        :param words        list of interested words
+        :param max_amount   maximum amount of sentences to print
+        '''
+
+        for word in words:
+            counter = 0
+            regexp = re.compile('\\b' + word + '\\b')
+            print('# Looking for:', word)
+            already_seen = set()
+            for sent1, sent2, _ in self.samples:
+                for sent in [sent1, sent2]:
+                    if regexp.search(sent):
+                        hashed = hash(sent)
+                        if hashed not in already_seen:
+                            print(sent)
+                            already_seen.add(hashed)
+                            counter += 1
+
+                if counter >= max_amount:
+                    break
+            print('Found', counter, 'examples')
+            print()
+
+
+
+
 
     def load(self, path=config.PATH_TRAIN_DATA, valid_labels=data_tools.DEFAULT_VALID_LABELS):
         '''
