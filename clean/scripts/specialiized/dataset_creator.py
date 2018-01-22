@@ -46,9 +46,6 @@ def countries():
 
     return ('countries', [], [], all_incompatible(countries, exclude_words=exclude_words))
 
-def test():
-    return ('test', [('over a', 'monkeeeeee', 'contradiction')], [('The', 'monkey', 'contradiction')], [('man', 'woman', 'contradiction')])
-
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
@@ -59,7 +56,7 @@ def main():
 
     out_name = args['<out_name>']
     all_fn = [
-        test
+        countries
     ]
 
     datahandler = data_manipulator.DataManipulator().load()
