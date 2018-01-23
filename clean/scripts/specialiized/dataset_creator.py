@@ -87,7 +87,7 @@ def test():
 def test_out():
 
     words='come to,arrive at,leave,depart from,leaves,departs from,hide,cover,hides,covers,utilize,use,utilizes,uses,kill,execute,kills,executes,falls,drops,beginning,start,begins,starts,begin,start,finish,stop,finishs,stops,end,ends,new,fresh,old,aged,false,wrong,true,right,fast,quick,quickly,rapid,rapidly,warm,heated,silent,quiet,loudly,loud,noisy,nobody, no one,strange,abnormal,angry,mad,furious,happy,pleased,delighted,joyful,sad,miserable,awful,dreadful,terrible,dangerous,risky,fantastic,wonderfulbeautiful,pretty,answer,reply,answers,replies,asks,questions'
-
+    words = words.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 def main():
