@@ -69,7 +69,7 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-    words = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
+    words = '2,3,4,5,6,7,8,9,10,11,12'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 20)
 def main():
