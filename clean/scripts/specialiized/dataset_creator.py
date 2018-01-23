@@ -69,17 +69,9 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-    name, rep1only, rep2only, repany = numbers()
-    print('## replace w1 only')
-    for p,h,lbl in rep1only:
-        print(p, '-', h, '-', lbl)
-    print('## replace w2 only')
-    for p,h,lbl in rep2only:
-        print(p, '-', h, '-', lbl)
-    print('## replace any')
-    for p,h,lbl in repany:
-        print(p, '-', h, '-', lbl)
-
+    words = 'America,China,India,England,Japan,Russia,Canada,Germany,Australia,Holland,France,Israel,Spain,Brazil,Jordan,Sweden,Greece,Italy,Ireland,Mexico,Switzerland,Singapore,Turkey,Ukraine,Egypt,Malaysia,Norway,Indonesia,Vietnam'.split(',')
+    datahandler = data_manipulator.DataManipulator().load()
+    datahandler.print_sents(words, 20)
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
