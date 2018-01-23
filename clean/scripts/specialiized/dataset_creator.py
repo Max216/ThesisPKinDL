@@ -85,8 +85,7 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-
-    words='come to,arrive at,leave,depart from,leaves,departs from,hide,cover,hides,covers,utilize,use,utilizes,uses,kill,execute,kills,executes,falls,drops,beginning,start,begins,starts,begin,start,finish,stop,finishs,stops,end,ends,new,fresh,old,aged,false,wrong,true,right,fast,quick,quickly,rapid,rapidly,warm,heated,silent,quiet,loudly,loud,noisy,nobody, no one,strange,abnormal,angry,mad,furious,happy,pleased,delighted,joyful,sad,miserable,awful,dreadful,terrible,dangerous,risky,fantastic,wonderfulbeautiful,pretty,answer,reply,answers,replies,asks,questions'
+    words = 'depart from the,leave the,depart from a,leave a,murder,kill,murderer,killer,fantastic,wonderful,large,big,empty,blank,vacant,wide,broad,fertile,fruitful,glad,happy,difficult,hard,huge,enormous,intelligent,clever,mad,crazy,modern,new,nice,kind,ancient,old,rich,wealthy,rude,impolite,sad,unhappy,slim,slender,well-known,famous,stupid,dumb,idiotic,excellent,outstanding,phenomenal,interesting,fascinating,challenging,a lot of,plenty of'
     words = words.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
