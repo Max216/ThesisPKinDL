@@ -69,7 +69,7 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-    words = 'American,Chinese,English,Japanese,Russian,Canadian,Australian,Dutch,French,Israeli,Spanish,Brazilian,Jordanian,Swedish,Greek,Italian,Irish,Mexican,Swiss,Singaporean,Turkish,Ukrainian,Egyptian,Norwegian,Indonesian,Vietnamese'.split(',')
+    words = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 20)
 def main():
