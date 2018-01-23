@@ -44,13 +44,13 @@ def incompatible_to_first(words1, words2):
 
 
 def countries():
-    countries = 'America,China,India,England,Japan,Russia,Canada,Germany,Australia,Holland,France,Israel,Spain,Brazil,Jordan,Sweden,Greece,Italy,Ireland,Mexico,Switzerland,Singapore,Turkey,Ukraine,Egypt,Malaysia,Norway,Indonesia,Vietnam'.split(',')
+    countries = 'America,China,India,England,Japan,Russia,Canada,Germany,Australia,Holland,France,Israel,Spain,Brazil,Sweden,Greece,Italy,Ireland,Mexico,Switzerland,Singapore,Turkey,Ukraine,Egypt,Malaysia,Norway,Vietnam'.split(',')
     exclude_words = [set(['America', 'Canada'])]
 
     return ('countries', [], [], all_incompatible(countries, exclude_words=exclude_words))
 
 def nationalities():
-    nationalities = 'American,Chinese,English,Japanese,Russian,Canadian,Australian,Dutch,French,Israeli,Spanish,Brazilian,Jordanian,Swedish,Greek,Italian,Irish,Mexican,Swiss,Singaporean,Turkish,Ukrainian,Egyptian,Norwegian,Indonesian,Vietnamese'.split(',')
+    nationalities = 'African American,Chinese,English,Japanese,Russian,Canadian,Australian,Dutch,French,Israeli,Spanish,Brazilian,Swedish,Greek,Italian,Irish,Mexican,Swiss,Turkish,Ukrainian,Egyptian,Norwegian,Indonesian,Vietnamese'.split(',')
     exclude_words = [set(['American', 'Canadian'])]
     return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
 
@@ -104,9 +104,9 @@ def main():
         for fn in all_fn:
             name, replace_w1_only, replace_w2_only, replace_any = fn()
 
-            generated_sample_holder = datahandler.generate_by_replacement(replace_w1_only, replace='w1')
-            generated_sample_holder.merge(datahandler.generate_by_replacement(replace_w2_only, replace='w2'))
-            generated_sample_holder.merge(datahandler.generate_by_replacement(replace_any, replace='any'))
+            generated_sample_holder = datahandler.generate_simply(replace_w1_only, replace='w1')
+            generated_sample_holder.merge(datahandler.generate_simply(replace_w2_only, replace='w2'))
+            generated_sample_holder.merge(datahandler.generate_simply(replace_any, replace='any'))
             
             groups.append(name)
             directory = os.path.join(out_name, name)

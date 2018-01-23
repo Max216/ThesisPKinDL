@@ -6,6 +6,25 @@ import json
 
 from libs import data_tools, config
 
+def create_regexp_replace_a_an(w_find, w_replace):
+    return [
+        (re.compile('\\b' + 'A ' +  w_find + '\\b'), 'An ' + w_replace),
+        (re.compile('\\b' + 'a ' +  w_find + '\\b'), 'an ' + w_replace)
+    ]
+
+def create_regexp_replace_an_a(w_find, w_replace):
+    return [
+        (re.compile('\\b' + 'An ' +  w_find + '\\b'), 'A ' + w_replace),
+        (re.compile('\\b' + 'an ' +  w_find + '\\b'), 'a ' + w_replace)
+    ]
+
+
+def create_regexp_dict(w_find, w_replace):
+    regexp_dict = dict()
+    regexp_dict['replace_a_to_an'] = create_regexp_replace_a_an(w_find, w_replace)
+    regexp_dict['replace_an_to_a'] = create_regexp_replace_an_a(w_find, w_replace)
+    return regexp_dict
+
 class ReplacedDataHolder:
     '''
     Maintains replaced data
@@ -169,6 +188,108 @@ class DataManipulator:
         
         return self
 
+    def generate_simply(self, replacements, replace='any', check_a_an=True):
+        ALLOWED_REPLACEMENTS = ['any', 'w1', 'w2']
+        direction_output = dict([('any', '<-->'), ('w1', '--->'), ('w2', '<---')])
+
+        regexp_start_with_vocal = re.compile('^[AEIOUaeiou]')
+
+        if replace not in ALLOWED_REPLACEMENTS:
+            print('replace method must be one of the following:',ALLOWED_REPLACEMENTS)
+            1/0
+
+        # Iterate over all replacement samples
+        replacement_holder = ReplacedDataHolder()
+        counter = dict()
+
+        for w1, w2, assumed_label in replacements:
+            regexp_tools1 = create_regexp_dict(w1, w2)
+            regexp_tools2 = create_regexp_dict(w2, w1)
+
+            regexp1 = re.compile('\\b' + w1 + '\\b')
+            regexp2 = re.compile('\\b' + w2 + '\\b')
+
+            regexp_tools1['start_vocal'] = regexp_start_with_vocal.search(w1)
+            regexp_tools2['start_vocal'] = regexp_start_with_vocal.search(w2)
+
+            
+            count_w1 = 0
+            count_w2 = 0
+            natural_samples = 0
+
+            sample_hashes = set()
+            new_samples = []
+
+            for premise, hypothesis, sample_label in self.samples:
+                # Check if natural sample
+                if sample_label == assumed_label and regexp1.search(premise) and regexp2.search(hypothesis):
+                    natural_samples += 1
+
+                # Check every sentence
+                for sent in [premise, hypothesis]:
+
+                    # replace 
+                    generated_from_w1 = self._generate_from_sent(sent, regexp1, w2, regexp_tools1, regexp_tools2)
+                    generated_from_w2 = self._generate_from_sent(sent, regexp2, w1, regexp_tools2, regexp_tools1)
+
+                    # update counts
+                    if generated_from_w1:
+                        count_w1 += 1
+                    if generated_from_w2:
+                        count_w2 += 1
+
+                    # add to samples
+                    if generated_from_w1 and (replace == 'any' or replace == 'w1'):
+                        hashed_sample = hash(sent + generated_from_w1)
+                        if hashed_sample not in sample_hashes:
+                            new_samples.append((sent, generated_from_w1, assumed_label, '1'))
+                            sample_hashes.add(hashed_sample)
+
+                    if generated_from_w2 and (replace == 'any' or replace == 'w2'):
+                        hashed_sample = hash(generated_from_w2 + sent)
+                        if hashed_sample not in sample_hashes:
+                            new_samples.append((generated_from_w2, sent, assumed_label, '2'))
+                            sample_hashes.add(hashed_sample)
+
+            # Update counts
+            counter[w1] = count_w1
+            counter[w2] = count_w2
+
+            # remove results if not both words are in data
+            if count_w1 < 1 or count_w2 < 1:
+                new_samples = []
+
+            # add data to container
+            if len(new_samples) > 0:
+                replacement_holder.add_samples(w1, w2, assumed_label, replace, natural_samples, new_samples)
+                print('Added', len(new_samples), 'samples for replacing:', w1, direction_output[replace], w2)
+            else:
+                print('No samples found for:', w1, direction_output[replace], w2)
+
+        replacement_holder.update_counts(counter)
+        print('Specified words NOT within data:', '; '.join([w for w in counter if counter[w] == 0]))
+        return replacement_holder
+
+
+
+
+    def _generate_from_sent(self, sent, regexp_replace, replacing_word, tools_replaced, tools_replacing): 
+        if regexp_replace.search(sent):
+
+            if tools_replaced['start_vocal'] and not tools_replacing['start_vocal']:
+                for find, replace in tools_replaced['replace_an_to_a']:
+                    if find.search(sent):
+                        return re.sub(find, replace, sent)
+            elif tools_replacing['start_vocal'] and not tools_replaced['start_vocal']:
+                for find, replace in tools_replaced['replace_a_to_an']:
+                    if find.search(sent):
+                        return re.sub(find, replace, sent)
+            return re.sub(regexp_replace, replacing_word, sent)
+        else:
+            return False
+
+
+
     def generate_by_replacement(self, replacements, replace='any'):
         '''
         Generate new samples by replacing regexp
@@ -177,7 +298,6 @@ class DataManipulator:
                                         if any word occurence can be replaced ('any')
                                         if only sentences containing string1 can be replaced ('w1')
                                         if only sentences containing string2 can be replaced ('w2')
-        :param ignore_case          ignores the case by finding matches. Upper cased get only replaced by upper cased and vice versa.
         '''
 
         ALLOWED_REPLACEMENTS = ['any', 'w1', 'w2']
