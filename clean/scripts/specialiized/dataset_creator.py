@@ -109,7 +109,7 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words='alert,watchful,allow,permit,allows,permits,ascending,rising,aid,assistance,timid,shy,cite,quote,cites,quotes,colossal,enormous,clue,hint,confirm,verify,confirms,verifies,detests,hates,fury,rage,fiasco,disaster,inevitable,unavoidable,inn,hotel,invincible,unbeatable,imply,suggest,implies,suggests,implying,suggesting,launch,begin,launches,begins,little,small,procrastinate,delay,habit,practice,rely,depend,relies on,depends on,destroy,ruin,destroys,ruins,toxic,poisonous'.split(',')
+    words = 'injured,hurt,,tiny,small,speech,talk,speak,talk,presents,gifts,chefs,cooks,accidents,crashs,roady,streets,cabs,taxis,hotels,inns,turquoise,violet,olive,aqua,beige,silver'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 
