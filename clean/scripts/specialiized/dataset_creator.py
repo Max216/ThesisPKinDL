@@ -53,6 +53,17 @@ def incompatible_to_first(words1, words2, exclude_words=[], symmetric=True):
 
     return results
 
+def incompatible_pairs(pairs, symmetric=True):
+    results = []
+    for first_words, second_words in pairs:
+        for w1 in first_words.split(','):
+            for w2 in second_words.split(','):
+                results.append((w1, w2, 'contradiction'))
+                if symmetric:
+                    results.append((w2, w1, 'contradiction'))
+
+    return results
+
 def synonyms():
     two_way_synonyms1 = 'poisonous,relies on,hotel,detests,colossal,cabs,cab,father,sofa,near,roads,road,garbage,mom,speaking,shouts,shout,coworker,demolish,announce,dead,starts,quickly,noisy,no one,angry,angry,aweful,dangerous,beautiful,fantastic,enormous,wealthy,famous,stupid,interesting,a lot of'.split(',')
     two_way_synonyms2 = 'toxic,depends on,inn,hates,enormous,taxis,taxi,dad,ouch,close to,streets,street,trash,mother,talking,yells,yell,colleague,destroy,declare,lifeless,begins,rapidly,loud,nobody,furious,mad,terrible,risky,pretty,wonderful,huge,rich,well-known,dumb,fascinating,plenty of'.split(',')
@@ -125,18 +136,23 @@ def antonyms_adj_adv():
         ('dry','wet'),('early','late'),('external','internal'),('innocent','guilty'),('healthy','unhealthy'),('vertical','horizontal'),
         ('intentionally','accidentally'),('proud','embarrassed'),('legal','illegal'),('foolish','wise'),('likely','unlikely'),('minor','major'),
         ('mature','immature'),('minimum','maximum'),('obedient','disobedient'),('permanently','temporarily'),('rude','polite'),('drunk','sober'),
-        ('artificial','natural'),('pleased','displeased'),('silent','noisy,loud'),('slim,slender','fat')
+        ('artificial','natural'),('pleased','displeased'),('silent','noisy,loud'),('slim,slender','fat'),('amateur','professional'),
+        ('annoyed','satisfied')
     ]
     antonyms_replace_only_first = [
         ('slow,slowly','fast'),('noisy,loud','quiet'),('new','old'),('young','old'),('slim,slender','thick'),('asleep','awake'),
         ('narrow','broad'),('cold','warm,hot'),('cruel,vicious,rude','kind'),('shallow','deep'),('easy','difficult,hard'),('empty','full'),
         ('soft','hard'),('sick,ill','healthy'),('long','short'),('tight','loose'),('impatient','patient'),('temporary','permanent'),
         ('impossible','possible'),('private','public'),('fake','real'),('invisible','visible'),('complicated','simple'),('wrong','right'),
-        ('a different','the same')
+        ('a different','the same'),('hilly','flat')
 
     ]
 
-    pass
+    replace_any = incompatible_pairs(antonyms_replace_any)
+    replace_first = incompatible_pairs(antonyms_replace_only_first, symmetric=False)
+    replace_second = incompatible_pairs([(b, a) for a, b in antonyms_replace_only_first], symmetric=False)
+
+    return ('antonyms_adj_adv', replace_first, replace_second, replace_any)
 
 def antonyms_nn_vb():
     antonyms_replace_any = [
@@ -145,24 +161,39 @@ def antonyms_nn_vb():
         ('accepts','declines'),('agree','disagree'),('approves','disapproves'),('praise','blame'),('conceal','reveal'),
         ('conceals','reveals'),('concealing','revealing'),('enters','exits'),('fail','succeed'),('failing','succeeding'),
         ('remembered','forgot'),('remembers','forgets'),('ascend','descend'),('include','exclude'),('including','excluding'),
-        ('ascends','descends'),('ascending','descending'),('attacks','defends'),('attacking','defending'),('pleases','displeases')
+        ('ascends','descends'),('ascending','descending'),('attacks','defends'),('attacking','defending'),('pleases','displeases'),
+        ('amuses','bores'),('annoy','satisfy'),('good luck','bad luck'),('sell','buy'),('sells','buys'),('buying','selling'),
+        ('compliment','insult'),('noon','morning,midnight'),('morning','midnight'),('moon','sun'),('whisper','shout,yell,scream'),
+        ('whispers','shouts,yells,screams')
     ]
 
     antonyms_replace_only_first = [
         ('enemy','ally,friend'),('west','east'),('loss','win'),('departure','arrival'),('start','end,finish'),('accept','decline'),
         ('bless','curse'),('build','destroy'),('builds','destroys'),('cannot,can not','can'),('enter','exit'),('remember','forget'),
-        ('defend','attack')
+        ('defend','attack'),('fixes','breaks'),('bought','sold')
     ]
+
+    replace_any = incompatible_pairs(antonyms_replace_any)
+    replace_first = incompatible_pairs(antonyms_replace_only_first, symmetric=False)
+    replace_second = incompatible_pairs([(b, a) for a, b in antonyms_replace_only_first], symmetric=False)
+
+    return ('antonyms_nn_vb', replace_first, replace_second, replace_any)
 
 def antonyms_other():
     antonyms_replace_any = [
-        ('far from,far away from','close to','near'),('inside','outside'),('always','never,sometimes,often'),('never','sometimes,often'),
-        ('forward','backward'),('downwards','upwards'),('before','after'),('above','below')
+        ('far from,far away from','close to,near'),('inside','outside'),('always','never,sometimes,often'),('never','sometimes,often'),
+        ('forward','backward'),('downwards','upwards'),('before','after'),('above','below'),('behind of','in front of')
     ]
 
     antonyms_replace_only_first = [
         ('without','with'),('more','less')
     ]
+
+    replace_any = incompatible_pairs(antonyms_replace_any)
+    replace_first = incompatible_pairs(antonyms_replace_only_first, symmetric=False)
+    replace_second = incompatible_pairs([(b, a) for a, b in antonyms_replace_only_first], symmetric=False)
+
+    return ('antonyms_other', replace_first, replace_second, replace_any)
 
 def numbers():
     numbers_written = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
@@ -190,23 +221,23 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words = 'add,subtract,remove,adds,subtracts,removes,added,subtracted,removed,allow,forbit,allows,forbids,allowing,forbidding,amateur,professional,amuse,bore,amuses,bores,annoy,satisfy,annoys,satisfies,annoyed,satisfied,approximately,exactly,background,foreground,bad luck,good luck,beauty,ugliness,behind of,in front of,breaks,repairs,fixes,busy,lazy,buy,sell,buys,sells,bought,sold,buying,selling,ceiling,floor,clean,dirty,compliment,insult,compliments,insults,dictatorship,democracy,divide,unite,divides,unites,dividing,uniting,domestic,foreign,everything,nothing,hilly,flat,midnight,noon,moon,sun,thankful,thankless,whisper,scream,yell,shout'.split(',')
-    datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words, 30)
+    #words = 'add,subtract,remove,adds,subtracts,removes,added,subtracted,removed,allow,forbit,allows,forbids,allowing,forbidding,amateur,professional,amuse,bore,amuses,bores,annoy,satisfy,annoys,satisfies,annoyed,satisfied,approximately,exactly,background,foreground,bad luck,good luck,beauty,ugliness,behind of,in front of,breaks,repairs,fixes,busy,lazy,buy,sell,buys,sells,bought,sold,buying,selling,ceiling,floor,clean,dirty,compliment,insult,compliments,insults,dictatorship,democracy,divide,unite,divides,unites,dividing,uniting,domestic,foreign,everything,nothing,hilly,flat,midnight,noon,moon,sun,thankful,thankless,whisper,scream,yell,shout'.split(',')
+    #datahandler = data_manipulator.DataManipulator().load()
+    #datahandler.print_sents(words, 30)
 
-    #name, repl1, repl2, repl_a = colors()
-    #print('repl first')
-    #for p, h, lbl in repl1:
-    #    print(p, '--', h, '--', lbl)
-    #print()
-    #print('repl second')
-    #for p, h, lbl in repl2:
-    #    print(p, '--', h, '--', lbl)
-    #print()
-    #print('repl any')
-    #for p, h, lbl in repl_a:
-    #    print(p, '--', h, '--', lbl)
-    #print()
+    name, repl1, repl2, repl_a = antonyms_other()
+    print('repl first')
+    for p, h, lbl in repl1:
+        print(p, '--', h, '--', lbl)
+    print()
+    print('repl second')
+    for p, h, lbl in repl2:
+        print(p, '--', h, '--', lbl)
+    print()
+    print('repl any')
+    for p, h, lbl in repl_a:
+        print(p, '--', h, '--', lbl)
+    print()
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
@@ -228,11 +259,14 @@ def main():
     else:
         out_name = args['<out_name>']
         all_fn = [
-            #countries,
-            #nationalities,
-            #colors,
-            #numbers
-            test
+            countries,
+            nationalities,
+            colors,
+            numbers,
+            antonyms_adj_adv,
+            antonyms_nn_vb,
+            antonyms_other
+            #test
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
