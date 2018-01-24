@@ -265,7 +265,8 @@ def main():
             numbers,
             antonyms_adj_adv,
             antonyms_nn_vb,
-            antonyms_other
+            antonyms_other,
+            synonyms
             #test
         ]
 
