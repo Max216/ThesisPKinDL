@@ -43,7 +43,16 @@ def incompatible_to_first(words1, words2, exclude_words=[], symmetric=True):
 
     return results
 
+def synonyms():
+    two_way_synonyms1 = 'starts,quickly,noisy,no one,angry,angry,aweful,dangerous,beautiful,fantastic,enormous,intelligent,wealthy,famous,stupid,interesting,a lot of'.split(',')
+    two_way_synonyms2 = 'begins,rapidly,loud,nobody,furious,mad,terrible,risky,pretty,wonderful,huge,clever,rich,well-known,dumb,fascinating,plenty of'.split(',')
 
+    syn_group1 = 'happy,pleased,delighted,joyful,glad'.split(',')
+    syn_group2 = 'sad,miserable,unhappy'.split(',')
+    syn_group3 = 'excellent,outstanding,phenomenal'.split(',')
+
+    replace_only_first = 'begin,quickly,rapidly,silent,crazy,ancient,a different'.split(',')
+    not_replace_second = 'start,fast,fast,quiet,mad,old,the same'.split(',')
 
 def countries():
     countries = 'America,China,India,England,Japan,Russia,Canada,Germany,Australia,Holland,France,Israel,Spain,Brazil,Sweden,Greece,Italy,Ireland,Mexico,Switzerland,Singapore,Turkey,Ukraine,Egypt,Malaysia,Norway,Vietnam'.split(',')
@@ -52,8 +61,16 @@ def countries():
     return ('countries', [], [], all_incompatible(countries, exclude_words=exclude_words))
 
 def nationalities():
-    nationalities = 'African American,Chinese,English,Japanese,Russian,Canadian,Australian,Dutch,French,Israeli,Spanish,Brazilian,Swedish,Greek,Italian,Irish,Mexican,Swiss,Turkish,Ukrainian,Egyptian,Norwegian,Indonesian,Vietnamese'.split(',')
-    exclude_words = [set(['American', 'Canadian'])]
+    exclude_words = []
+
+    nationalities_same_singular_plural = 'Chinese,English,Japanese,Dutch,French,Spanish,Swedish,Irish,Turkish,Vietnamese'.split(',')
+    nationalities_different_plural_singular = 'Russian,Canadian,German,Australian,Israeli,Brazilian,Greek,Italian,Mexican,Ukrainian,Egyptian,Norwegian,Indonesian'.split(',')
+    nationalities_different_plural_plural = 'Russians,Canadians,Germans,Australians,Israelis,Brazilians,Greeks,Italians,Mexicans,Ukrainians,Egyptians,Norwegians,Indonesians'.split(',')
+    
+    replace_any = all_incompatible(nationalities_same_singular_plural)
+    replace_any.extend(all_incompatible(nationalities_different_plural_plural))
+    replace_any.extend(all_incompatible(nationalities_different_plural_singular))
+
     return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
 
 def colors():
@@ -85,8 +102,7 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-    words = 'depart from the,leave the,depart from a,leave a,murder,kill,murderer,killer,fantastic,wonderful,large,big,empty,blank,vacant,wide,broad,fertile,fruitful,glad,happy,difficult,hard,huge,enormous,intelligent,clever,mad,crazy,modern,new,nice,kind,ancient,old,rich,wealthy,rude,impolite,sad,unhappy,slim,slender,well-known,famous,stupid,dumb,idiotic,excellent,outstanding,phenomenal,interesting,fascinating,challenging,a lot of,plenty of'
-    words = words.split(',')
+    words = 'Russians,Canadians,Germans,Australians,Israelis,Brazilians,Greeks,Italians,Mexicans,Ukrainians,Egyptians,Norwegians,Indonesians'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 def main():
