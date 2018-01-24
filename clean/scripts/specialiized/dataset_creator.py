@@ -22,6 +22,16 @@ def uknown_words(words):
 def synonym_from_two_lists(list_a, list_b):
     return [(list_a[i], list_b[i], 'entailment') for i in range(len(list_a))]
 
+
+def all_compatible(words):
+    results = []
+    for w1 in words:
+        for w2 in words:
+            if w1 != w2:
+                results.append((w1, w2, 'entailment'))
+
+    return results
+
 def all_incompatible(words, exclude_words=[]):
 
     results = []
@@ -44,15 +54,30 @@ def incompatible_to_first(words1, words2, exclude_words=[], symmetric=True):
     return results
 
 def synonyms():
-    two_way_synonyms1 = 'starts,quickly,noisy,no one,angry,angry,aweful,dangerous,beautiful,fantastic,enormous,intelligent,wealthy,famous,stupid,interesting,a lot of'.split(',')
-    two_way_synonyms2 = 'begins,rapidly,loud,nobody,furious,mad,terrible,risky,pretty,wonderful,huge,clever,rich,well-known,dumb,fascinating,plenty of'.split(',')
+    two_way_synonyms1 = 'poisonous,relies on,hotel,detests,colossal,cabs,cab,father,sofa,near,roads,road,garbage,mom,speaking,shouts,shout,coworker,demolish,announce,dead,starts,quickly,noisy,no one,angry,angry,aweful,dangerous,beautiful,fantastic,enormous,wealthy,famous,stupid,interesting,a lot of'.split(',')
+    two_way_synonyms2 = 'toxic,depends on,inn,hates,enormous,taxis,taxi,dad,ouch,close to,streets,street,trash,mother,talking,yells,yell,colleague,destroy,declare,lifeless,begins,rapidly,loud,nobody,furious,mad,terrible,risky,pretty,wonderful,huge,rich,well-known,dumb,fascinating,plenty of'.split(',')
 
     syn_group1 = 'happy,pleased,delighted,joyful,glad'.split(',')
     syn_group2 = 'sad,miserable,unhappy'.split(',')
     syn_group3 = 'excellent,outstanding,phenomenal'.split(',')
+    syn_group4 = 'clever,smart,intelligent'.split(',')
+    syn_group5 = 'tiny,small,little'.split(',')
 
-    replace_only_first = 'begin,quickly,rapidly,silent,crazy,ancient,a different'.split(',')
-    not_replace_second = 'start,fast,fast,quiet,mad,old,the same'.split(',')
+    replace_only_first = 'speech,timid,assistance,allow,watchful,accident,chefs,chef,gifts,gift,speaks,speak,destroys,demolish,destroy,injured,different,begin,quickly,rapidly,silent,crazy,ancient,a different'.split(',')
+    not_replace_second = 'talk,shy,aid,permit,alert,crash,cooks,cook,presents,present,talks,talk,ruins,ruin,ruin,hurt,distinct,start,fast,fast,quiet,mad,old,the same'.split(',')
+
+    replace_any = synonym_from_two_lists(two_way_synonyms1, two_way_synonyms2)
+    replace_any.extend(synonym_from_two_lists(two_way_synonyms2, two_way_synonyms1))
+    replace_any.extend(all_compatible(syn_group1))
+    replace_any.extend(all_compatible(syn_group2))
+    replace_any.extend(all_compatible(syn_group3))
+    replace_any.extend(all_compatible(syn_group4))
+    replace_any.extend(all_compatible(syn_group5))
+
+    replace_first = synonym_from_two_lists(replace_only_first, not_replace_second)
+    replace_second = synonym_from_two_lists(not_replace_second, replace_only_first)
+
+    return ('synonyms', replace_first, replace_second, replace_any)
 
 def countries():
     countries = 'America,China,India,England,Japan,Russia,Canada,Germany,Australia,Holland,France,Israel,Spain,Brazil,Sweden,Greece,Italy,Ireland,Mexico,Switzerland,Singapore,Turkey,Ukraine,Egypt,Malaysia,Norway,Vietnam'.split(',')
@@ -80,8 +105,14 @@ def nationalities():
     return ('nationalities', replace_first, replace_second, replace_any)
 
 def colors():
-    colors = 'red,blue,yellow,purple,green,orange,brown,grey,black,white'.split(',')
-    return ('colors', [], [], all_incompatible(colors))
+    colors = 'red,blue,yellow,purple,green,brown,grey,black,white,turquoise,violet,beige,silver,pink'.split(',')
+    exclude_pairs = [set(['turquoise', 'blue']), set(['violet', 'purple', 'pink'])]
+
+    replace_any = all_incompatible(colors, exclude_pairs)
+    replace_first = incompatible_to_first(colors, ['orange'], symmetric=False)
+    replace_second = incompatible_to_first(['orange'], colors, symmetric=False)
+
+    return ('colors', replace_first, replace_second, replace_any)
 
 def numbers():
     numbers_written = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
@@ -109,11 +140,11 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words = 'injured,hurt,,tiny,small,speech,talk,speak,talk,presents,gifts,chefs,cooks,accidents,crashs,roady,streets,cabs,taxis,hotels,inns,turquoise,violet,olive,aqua,beige,silver'.split(',')
+    words = 'start,end,starts,ends,finish,finishs,fast,slow,slowly,silent,quiet,noisy,loudly,loud,nobody,everybody,angry,furious,calm,ugly,beautiful,new,old,young,dead,living,alive,near,close to,far from,far away from,detests,hates,loves,rich,poor,plenty of,a lot of,a few,famous,unknown,slim,slender,thick,fat,absent,present,accept,decline,accepts,declines,advantage,disadvantage,agree,disagree,agreement,disagreement,agrees,diagrees,ally,enemy,always,never,sometimes,ancient,modern,apart from,together to,appear,disappear,vanish,approve,disapprove,approves,disapproves,disappearing,appearing,disappears,appears,awake,asleep,sleeping,backward,forward,before,after,below,above,best,worst,better,worse,blame,praise,blames,praises,blaming,praising,bless,curse,bitter,sweet,bottom,top,brave,cowardly,build,destroy,builds,destroys,bound,unbound,broad,narrow,can,cannot,can not,capable,incapable,captive,free,careful,careless,carefully,carelessly,cheap,expensive,cheerful,cloudy,clear,clumsy,graceful,cold,hot,comfort,discomfort,comforts,discomforts,comforting,discomforting,common,rare,often,never,always,rarely,with,without,conceal,reveal,conceals,reveals,concealed,revealed,concealing,revealing,correct,incorrect,wrong,cruel,friendly,kind,compulsory,voluntarily,dangerous,safe,dark,light,day,night,daytime,nighttime,decrease,increase,decreasing,increasing,decreases,increases,deep,shallow,definite,indefinite,demands,supplies,demand,supply,demanding,supplying,downwards,upwards,dry,wet,early,late,east,west,easy,difficult,empty,full,enter,exit,enters,exits,export,import,exports,imports,exporting,importing,exterior,interior,external,internal,fail,succeed,fails,succeeds,failing,succeeding,find,lose,finds,loses,found,lost,first,last,forget,remember,forgot,remembered,forgets,remembers,friend,enemy,fortunate,unfortunate,giant,grant,refuse,grants,refuses,granting,refusing,grow,shrink,grows,shrinks,guilty,innocent,soft,hard,harmful,harmless,healthy,sick,ill,heaven,hell,help,hinder,helps,hinders,helping,hindering,high,low,horizontal,vertical,humble,proud,include,exclude,includes,excludes,including,excluding,inferior,superior,inner,outer,unintelligent,interesting,boring,uninterestingintentional,accidental,intentionally,accidentally,junior,senior,justice,injustice,lawful,illegal,unlawful,leader,follower,left,right,lengthen,shorten,lengthens,shortens,less,more,love,dislike,loves,dislikes,likely,unlikely,long,short,loose,tight,loss,win,loyal,disloyal,major,minor,mature,immature,maximum,minimum,melt,freeze,minority,majority,misunderstands,misunderstands,misunderstood,understood,misunderstand,understand,no,yes,none,some,north,south,obedient,disobedient,optimistic,pessimistic,over,under,past,present,patient,impatient,peace,war,permanent,temporary,permanently,temporarily,plentiful,scarce,polite,rude,possible,impossible,powerful,weak,private,public,qualified,unqualified,real,fake,safe,unsafe,satisfactory,unsatisfactory,satisfied,unsatisfied,secure,insecure,sober,drunk,sorrow,joy,sour,sweet,sunny,cloudy,unfold,fold,unfolds,folds,useful,useless,vacant,occupied,vanish,vanished,vanishing,vanishs,victory,defeat,visible,invisible,zip,unzip'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 
-    #name, repl1, repl2, repl_a = synonyms()
+    #name, repl1, repl2, repl_a = colors()
     #print('repl first')
     #for p, h, lbl in repl1:
     #    print(p, '--', h, '--', lbl)
