@@ -65,13 +65,19 @@ def nationalities():
 
     nationalities_same_singular_plural = 'Chinese,English,Japanese,Dutch,French,Spanish,Swedish,Irish,Turkish,Vietnamese'.split(',')
     nationalities_different_plural_singular = 'Russian,Canadian,German,Australian,Israeli,Brazilian,Greek,Italian,Mexican,Ukrainian,Egyptian,Norwegian,Indonesian'.split(',')
-    nationalities_different_plural_plural = 'Russians,Canadians,Germans,Australians,Israelis,Brazilians,Greeks,Italians,Mexicans,Ukrainians,Egyptians,Norwegians,Indonesians'.split(',')
+    nationalities_different_plural_plural = 'Russians,Canadians,Germans,Australians,Italians,Mexicans,Ukrainians,Norwegians,Indonesians'.split(',')
     
     replace_any = all_incompatible(nationalities_same_singular_plural)
     replace_any.extend(all_incompatible(nationalities_different_plural_plural))
     replace_any.extend(all_incompatible(nationalities_different_plural_singular))
 
-    return ('nationalities', [], [], all_incompatible(nationalities, exclude_words=exclude_words))
+    replace_first = incompatible_to_first(nationalities_different_plural_singular, nationalities_same_singular_plural, symmetric=False)
+    replace_first.extend(incompatible_to_first(nationalities_different_plural_plural, nationalities_same_singular_plural, symmetric=False))
+
+    replace_second = incompatible_to_first(nationalities_same_singular_plural, nationalities_different_plural_singular, symmetric=False)
+    replace_second.extend(incompatible_to_first(nationalities_same_singular_plural, nationalities_different_plural_plural, symmetric=False))
+
+    return ('nationalities', replace_first, replace_second, replace_any)
 
 def colors():
     colors = 'red,blue,yellow,purple,green,orange,brown,grey,black,white'.split(',')
@@ -102,9 +108,24 @@ def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
-    words = 'Russians,Canadians,Germans,Australians,Israelis,Brazilians,Greeks,Italians,Mexicans,Ukrainians,Egyptians,Norwegians,Indonesians'.split(',')
+    words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
+
+    #name, repl1, repl2, repl_a = synonyms()
+    #print('repl first')
+    #for p, h, lbl in repl1:
+    #    print(p, '--', h, '--', lbl)
+    #print()
+    #print('repl second')
+    #for p, h, lbl in repl2:
+    #    print(p, '--', h, '--', lbl)
+    #print()
+    #print('repl any')
+    #for p, h, lbl in repl_a:
+    #    print(p, '--', h, '--', lbl)
+    #print()
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -125,11 +146,11 @@ def main():
     else:
         out_name = args['<out_name>']
         all_fn = [
-            countries,
-            nationalities,
-            colors,
-            numbers
-            #test
+            #countries,
+            #nationalities,
+            #colors,
+            #numbers
+            test
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
@@ -142,14 +163,15 @@ def main():
             generated_sample_holder.merge(datahandler.generate_simply(replace_w2_only, replace='w2'))
             generated_sample_holder.merge(datahandler.generate_simply(replace_any, replace='any'))
             
-            groups.append(name)
+            count_wordpairs, count_samples = generated_sample_holder.get_counts()
+            groups.append((name, count_wordpairs, count_samples))
             directory = os.path.join(out_name, name)
             generated_sample_holder.write_summary(directory)
             generated_sample_holder.write_dataset(directory)
 
         with open(os.path.join(out_name, 'data.txt'), 'w') as f_out:
-            for g in groups:
-                f_out.write(g + '\n')
+            for name, wordpair_count, sample_count in groups:
+                f_out.write(' '.join([name, str(wordpair_count), str(sample_count)]) + '\n')
 
 if __name__ == '__main__':
     main()

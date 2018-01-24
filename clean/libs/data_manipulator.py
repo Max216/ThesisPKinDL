@@ -63,6 +63,15 @@ class ReplacedDataHolder:
         self._add_real_sample_count(w1, w2, amount_real_samples)
         self.pairs.append((w1, w2, label, generation_type, samples))
 
+    def get_counts(self):
+        '''
+        Get the counts of word pairs and absolute number of samples.
+        :return (amount-ofword-pairs, amount-of-total-samples)
+        '''
+
+        stats = self.get_internal_stats()
+        return (len(stats), sum([amount_samples for w1,w2,lbl,gen,file,amount_samples in stats]))
+
     def get_internal_stats(self):
         '''
         Get info about the amount of samples generated per example
