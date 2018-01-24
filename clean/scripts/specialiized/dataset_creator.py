@@ -221,23 +221,29 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    #words = 'add,subtract,remove,adds,subtracts,removes,added,subtracted,removed,allow,forbit,allows,forbids,allowing,forbidding,amateur,professional,amuse,bore,amuses,bores,annoy,satisfy,annoys,satisfies,annoyed,satisfied,approximately,exactly,background,foreground,bad luck,good luck,beauty,ugliness,behind of,in front of,breaks,repairs,fixes,busy,lazy,buy,sell,buys,sells,bought,sold,buying,selling,ceiling,floor,clean,dirty,compliment,insult,compliments,insults,dictatorship,democracy,divide,unite,divides,unites,dividing,uniting,domestic,foreign,everything,nothing,hilly,flat,midnight,noon,moon,sun,thankful,thankless,whisper,scream,yell,shout'.split(',')
-    #datahandler = data_manipulator.DataManipulator().load()
-    #datahandler.print_sents(words, 30)
+    words1 = 'fork,knife,spoon,cake slide,ladle,scissors,tin opener,whisk,chopsticks,pizza cutter'.split(',')
+    words2 = 'stove,coffee machine,barbecue,microwave,food mixer,toaster'.split(',')
+    words3 = 'cup,plate,pot,frying pan,glass,jug,kettle,bottle,bowl,carafe,jar'.split(',')
+    words5 = 'dishwahser,sink'.split(',')
+    container = 'shelves,basket,bin'
 
-    name, repl1, repl2, repl_a = antonyms_other()
-    print('repl first')
-    for p, h, lbl in repl1:
-        print(p, '--', h, '--', lbl)
-    print()
-    print('repl second')
-    for p, h, lbl in repl2:
-        print(p, '--', h, '--', lbl)
-    print()
-    print('repl any')
-    for p, h, lbl in repl_a:
-        print(p, '--', h, '--', lbl)
-    print()
+    words = words1+words2+words3+words5
+    datahandler = data_manipulator.DataManipulator().load()
+    datahandler.print_sents(words, 30)
+
+    #name, repl1, repl2, repl_a = antonyms_other()
+    #print('repl first')
+    #for p, h, lbl in repl1:
+    #    print(p, '--', h, '--', lbl)
+    #print()
+    #print('repl second')
+    #for p, h, lbl in repl2:
+    #    print(p, '--', h, '--', lbl)
+    #print()
+    #print('repl any')
+    #for p, h, lbl in repl_a:
+    #    print(p, '--', h, '--', lbl)
+    #print()
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
