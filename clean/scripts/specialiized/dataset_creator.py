@@ -114,6 +114,56 @@ def colors():
 
     return ('colors', replace_first, replace_second, replace_any)
 
+def antonyms_adj_adv():
+    antonyms_replace_any = [
+        ('slow','rapid,quick'),('slowly','rapidly,quickly'),('silently,quietly','loudly'),('calm','angry,furious'),
+        ('pretty,beautiful','ugly'),('intelligent,clever,smart','stupid'),('small,little,tiny','big,giant,huge'),
+        ('famous,well-known','unknown'),('rich','poor'),('dead','alive'),('awful,terrible','wonderful,fantastic'),
+        ('ancient,antique,old-fashioned','modern'),('best','worst'),('better','worse'),('capable','incapable'),('careful','careless'),
+        ('carefully','carelessly'),('expensive,costly','cheap'),('cheerful,happy,delighted,joyful,glad','sad,unhappy,sorrowful,depressed'),
+        ('cloudy','sunny'),('clumsy','graceful'),('correct','wrong'),('cruel,vicious,rude','friendly'),('dangerous,unsafe','safe'),
+        ('dry','wet'),('early','late'),('external','internal'),('innocent','guilty'),('healthy','unhealthy'),('vertical','horizontal'),
+        ('intentionally','accidentally'),('proud','embarrassed'),('legal','illegal'),('foolish','wise'),('likely','unlikely'),('minor','major'),
+        ('mature','immature'),('minimum','maximum'),('obedient','disobedient'),('permanently','temporarily'),('rude','polite'),('drunk','sober'),
+        ('artificial','natural'),('pleased','displeased'),('silent','noisy,loud'),('slim,slender','fat')
+    ]
+    antonyms_replace_only_first = [
+        ('slow,slowly','fast'),('noisy,loud','quiet'),('new','old'),('young','old'),('slim,slender','thick'),('asleep','awake'),
+        ('narrow','broad'),('cold','warm,hot'),('cruel,vicious,rude','kind'),('shallow','deep'),('easy','difficult,hard'),('empty','full'),
+        ('soft','hard'),('sick,ill','healthy'),('long','short'),('tight','loose'),('impatient','patient'),('temporary','permanent'),
+        ('impossible','possible'),('private','public'),('fake','real'),('invisible','visible'),('complicated','simple'),('wrong','right'),
+        ('a different','the same')
+
+    ]
+
+    pass
+
+def antonyms_nn_vb():
+    antonyms_replace_any = [
+        ('everybody','nobody,no one'),('comfort','discomfort'),('day','night'),('daytime','nighttime'),('north','south'),
+        ('injustice','justice'),('presence','absence'),('approval','disapproval'),('loves','detests,hates,dislikes'),
+        ('accepts','declines'),('agree','disagree'),('approves','disapproves'),('praise','blame'),('conceal','reveal'),
+        ('conceals','reveals'),('concealing','revealing'),('enters','exits'),('fail','succeed'),('failing','succeeding'),
+        ('remembered','forgot'),('remembers','forgets'),('ascend','descend'),('include','exclude'),('including','excluding'),
+        ('ascends','descends'),('ascending','descending'),('attacks','defends'),('attacking','defending'),('pleases','displeases')
+    ]
+
+    antonyms_replace_only_first = [
+        ('enemy','ally,friend'),('west','east'),('loss','win'),('departure','arrival'),('start','end,finish'),('accept','decline'),
+        ('bless','curse'),('build','destroy'),('builds','destroys'),('cannot,can not','can'),('enter','exit'),('remember','forget'),
+        ('defend','attack')
+    ]
+
+def antonyms_other():
+    antonyms_replace_any = [
+        ('far from,far away from','close to','near'),('inside','outside'),('always','never,sometimes,often'),('never','sometimes,often'),
+        ('forward','backward'),('downwards','upwards'),('before','after'),('above','below')
+    ]
+
+    antonyms_replace_only_first = [
+        ('without','with'),('more','less')
+    ]
+
 def numbers():
     numbers_written = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve'.split(',')
     numbers_digits = '2,3,4,5,6,7,8,9,10,11,12'.split(',')
@@ -140,7 +190,7 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words = 'antique,old-fashioned,aged,costly,low-cost,low-priced,warm,frosty,inhuman,inhumane,vicious,unkind,heartless,hateful'.split(',')
+    words = 'add,subtract,remove,adds,subtracts,removes,added,subtracted,removed,allow,forbit,allows,forbids,allowing,forbidding,amateur,professional,amuse,bore,amuses,bores,annoy,satisfy,annoys,satisfies,annoyed,satisfied,approximately,exactly,background,foreground,bad luck,good luck,beauty,ugliness,behind of,in front of,breaks,repairs,fixes,busy,lazy,buy,sell,buys,sells,bought,sold,buying,selling,ceiling,floor,clean,dirty,compliment,insult,compliments,insults,dictatorship,democracy,divide,unite,divides,unites,dividing,uniting,domestic,foreign,everything,nothing,hilly,flat,midnight,noon,moon,sun,thankful,thankless,whisper,scream,yell,shout'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 
