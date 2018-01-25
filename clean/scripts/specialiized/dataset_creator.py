@@ -241,9 +241,10 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'fastfood,fastfoods,kebab,kebabs,french fries,hamburger,cheeseburger,chips,sandwich,taco,chicken nuggets,onion rings,fish and chips,falafel,popcorn,pizza,pizzas'.split(',')
+    words = 'ride to,rides to,crawl to,crawls to,run to,runs to,walk to,walks to,hurry to,hurries to,rush to,rushs to,stroll to,strolls to,drive to,drives to,fly to,flys to,swim to,swims to'.split(',')
+    words_single = 'ride,rides,crawl,crawls,run,runs,jog,jogs,walk,walks,hurry,hurries,rush,rushs,stroll,strolls,drive,drives,swim,swims'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words + nonalcohol, 30)
+    datahandler.print_sents(words + words_single, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
