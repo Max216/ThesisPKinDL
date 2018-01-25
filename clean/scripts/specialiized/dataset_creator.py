@@ -258,6 +258,12 @@ def verb_at():
 
     replace_other_only ='jump at,jumps at,'
 
+def rooms():
+    words = 'basement,bathroom,bedroom,living room,kitchen,dining room,prison cell,cellar,garage,hallway,lounge,playroom,common room,courtroom,hotel room'.split(',')
+    add = ['in a '+w for w in words] # minus playroom,pantry (a_an),suite
+
+    replace_other_only = 'office,classroom,lounge,room' + '?building,house,dwelling?'
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -266,8 +272,7 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'basement,bathroom,bedroom,room,living room,kitchen,dining room,office,prison cell,classroom,cellar,garage,hallway,lounge,pantry,playroom,salon,suite,classroom,common room,courtroom,hotel room'.split(',')
-    add = ['in a '+w for w in words]
+    words = 'accordion,accordions,banjo,banjos,bongos,cello,cellos,clarinet,drum,flute,guitar,guitars,harmonica,harmonicas,harp,harps,kettledrum,kettledrums,oboe,piano,pianos,saxophone,saxophones,trumpet,trumpets,violin,violins,xylophone,xylophones,tuba,tubas,didgeridoo,didgeridoos,acoustic guitar,instrument,french horn'
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words+add, 30)
 
