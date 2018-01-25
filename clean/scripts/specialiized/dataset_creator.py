@@ -225,9 +225,14 @@ def fruits():
     replace_other_than = 'fruit,lime,peach'
 
 def vegetables():
-    words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
+    words = 'avocado,avocados,carrot,carrots,celery,cucumber,cucumbers,eggplant,eggplants,onion,onions,potato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini'.split(',')
+    replace_other='pumpkin,pumpkins'
 
-
+def drinks():
+    words = 'beer,beers,champagne,whisky,wine,wines,gin,vodka,tequila,cider'
+    replace_this_only = 'alcohol'
+    nonalcohol = 'hot chocolate,lemonade,soft drink,soft drinks,coka-cola,coke,sprite'.split(',')
+    only_replacE_other = 'coffee,espresso,juice,tea'
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -236,8 +241,7 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'beer,beers,champagne,champagnes,alcohol,whisky,wine,wines,gin,liqueur,liqueurs,vodka,tequila,cider,ciders,liquor,strong drink'
-    nonalcohol = 'hot chocolate,coffee,espresso,juice,lemonade,milk,soft drink,soft drinks,tea,cola,coke,fanta,sprite'.split(',')
+    words = 'fastfood,fastfoods,kebab,kebabs,french fries,hamburger,cheeseburger,chips,sandwich,taco,chicken nuggets,onion rings,fish and chips,falafel,popcorn,pizza,pizzas'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words + nonalcohol, 30)
 
