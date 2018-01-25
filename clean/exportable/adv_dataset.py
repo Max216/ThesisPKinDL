@@ -154,7 +154,7 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None):
                 word_p, word_h, sample_amount, gold_label, word_pair_rel_path, word_p_cnt, word_h_cnt, real_sample_cnt = word_pairs[i]
                 line = [
                     word_p, word_h, gold_label,
-                    strround(all_corrects[i] / all_totals[i]),
+                    strround(all_corrects[i] / all_totals[i]), str(all_totals[i]),
                     str(all_pred_dicts[i]['entailment']), str(all_pred_dicts[i]['neutral']), str(all_pred_dicts[i]['contradiction']),
                     str(word_p_cnt), str(word_h_cnt), str(real_sample_cnt), '-'
                 ]
