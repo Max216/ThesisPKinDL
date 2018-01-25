@@ -259,7 +259,7 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'sit,sits,stand,stands,lie,lies,sits at,sit at,stand at,stands at,lie at,lies at,walk at,walks at,run at,runs at,craw at,crawls at,drives at,drive at,jump at,jumps at,climb at,climbs at,sleep at,sleeps at'.split('')
+    words = 'sit,sits,stand,stands,lie,lies,sits at,sit at,stand at,stands at,lie at,lies at,walk at,walks at,run at,runs at,craw at,crawls at,drives at,drive at,jump at,jumps at,climb at,climbs at,sleep at,sleeps at'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 
