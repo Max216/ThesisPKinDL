@@ -241,6 +241,16 @@ def fastfoods():
 def movements():
     words = 'ride to,rides to,crawl to,run to,runs to,walks to,hurries to,stroll to,strolls to,drive to,drives to,fly to,swims to'.split(',')
     replace_other = 'walk to'
+
+def materials():
+    words= 'brick,cement,glass,metal,plastic,sand,stone,wood,cotton,leather,nylon,wool,titanium'.split(',')
+    metals = 'zinc,uranium,tin,steel,silver,platinum,nickel,mercury,magnesium,iron,gold,copper,bronze,aluminium'.split(',')
+
+def planets():
+    planets = 'Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
+
+
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -249,11 +259,9 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words= 'brick,cement,glass,metal,plastic,sand,stone,wood,cotton,leather,nylon,wool,titanium'.split(',')
-    metals = 'zinc,uranium,tin,steel,silver,platinum,nickel,mercury,magnesium,iron,gold,copper,bronze,aluminium'.split(',')
-    planets = 'Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
+    words = 'sit,sits,stand,stands,lie,lies,sits at,sit at,stand at,stands at,lie at,lies at,walk at,walks at,run at,runs at,craw at,crawls at,drives at,drive at,jump at,jumps at,climb at,climbs at,sleep at,sleeps at'.split('')
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words + metals + planets, 30)
+    datahandler.print_sents(words, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
