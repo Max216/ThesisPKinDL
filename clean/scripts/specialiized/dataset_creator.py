@@ -272,9 +272,9 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'accordion,accordions,banjo,banjos,bongos,cello,cellos,clarinet,drum,flute,guitar,guitars,harmonica,harmonicas,harp,harps,kettledrum,kettledrums,oboe,piano,pianos,saxophone,saxophones,trumpet,trumpets,violin,violins,xylophone,xylophones,tuba,tubas,didgeridoo,didgeridoos,acoustic guitar,instrument,french horn'
+    words = 'accordion,accordions,banjo,banjos,bongos,cello,cellos,clarinet,drum,flute,guitar,guitars,harmonica,harmonicas,harp,harps,kettledrum,kettledrums,oboe,piano,pianos,saxophone,saxophones,trumpet,trumpets,violin,violins,xylophone,xylophones,tuba,tubas,didgeridoo,didgeridoos,acoustic guitar,instrument,french horn'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words+add, 30)
+    datahandler.print_sents(words, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
