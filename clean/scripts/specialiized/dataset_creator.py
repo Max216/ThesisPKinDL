@@ -233,6 +233,15 @@ def drinks():
     replace_this_only = 'alcohol'
     nonalcohol = 'hot chocolate,lemonade,soft drink,soft drinks,coka-cola,coke,sprite'.split(',')
     only_replacE_other = 'coffee,espresso,juice,tea'
+
+
+def fastfoods():
+    words = 'fastfood(=pl),kebab,kebabs,french fries,hamburger,cheeseburger,sandwich,taco,chicken nuggets,onion rings,fish and chips,falafel,popcorn,pizza,pizzas'.split(',')
+
+def movements():
+     words = 'ride to,rides to,crawl to,crawls to,run to,runs to,walk to,walks to,hurry to,hurries to,rush to,rushs to,stroll to,strolls to,drive to,drives to,fly to,flys to,swim to,swims to'.split(',')
+    words_single = 'ride,rides,crawl,crawls,run,runs,jog,jogs,walk,walks,hurry,hurries,rush,rushs,stroll,strolls,drive,drives,swim,swims'.split(',')
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -241,10 +250,11 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'ride to,rides to,crawl to,crawls to,run to,runs to,walk to,walks to,hurry to,hurries to,rush to,rushs to,stroll to,strolls to,drive to,drives to,fly to,flys to,swim to,swims to'.split(',')
-    words_single = 'ride,rides,crawl,crawls,run,runs,jog,jogs,walk,walks,hurry,hurries,rush,rushs,stroll,strolls,drive,drives,swim,swims'.split(',')
+    words= 'brick,cement,glass,metal,plastic,sand,stone,wood,cotton,leather,nylon,wool,titanium'.split(',')
+    metals = 'zinc,uranium,tin,steel,silver,platinum,nickel,mercury,magnesium,iron,gold,copper,bronze,aluminium'.split(',')
+    planets = 'Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words + words_single, 30)
+    datahandler.print_sents(words + metals + planets, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
