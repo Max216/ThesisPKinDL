@@ -239,9 +239,8 @@ def fastfoods():
     words = 'fastfood(=pl),kebab,kebabs,french fries,hamburger,cheeseburger,sandwich,taco,chicken nuggets,onion rings,fish and chips,falafel,popcorn,pizza,pizzas'.split(',')
 
 def movements():
-     words = 'ride to,rides to,crawl to,crawls to,run to,runs to,walk to,walks to,hurry to,hurries to,rush to,rushs to,stroll to,strolls to,drive to,drives to,fly to,flys to,swim to,swims to'.split(',')
-    words_single = 'ride,rides,crawl,crawls,run,runs,jog,jogs,walk,walks,hurry,hurries,rush,rushs,stroll,strolls,drive,drives,swim,swims'.split(',')
-
+    words = 'ride to,rides to,crawl to,run to,runs to,walks to,hurries to,stroll to,strolls to,drive to,drives to,fly to,swims to'.split(',')
+    replace_other = 'walk to'
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
