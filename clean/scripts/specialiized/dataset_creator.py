@@ -216,18 +216,18 @@ def numbers():
 
     return ('numbers', replace_first, replace_second, replace_any)
 
+def tools():
+    kitchen = 'knife,fork,spoon' + 'knives,forks,spoons'
+    cutting = 'knife,scissor' + 'knives,scissors'
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words1 = 'fork,knife,spoon,ladle,scissors,whisk,chopsticks'.split(',') # scissors and knife extra
-    words2 = 'stove,microwave,toaster'.split(',')
-    words3 = 'cup,plate,pot,frying pan,glass,jug,kettle,bottle,bowl,carafe,jar'.split(',')
-    words5 = 'dishwahser,sink'.split(',')
-    container = 'shelves,basket,bin'
+    
 
-    words = words1+words2+words3+words5
+    words = 'apple,apples,apricot,apricots,banana,bananas,blueberry,blueberries,berry,berries,fruit,fruits,cherry,cherries,coconut,coconuts,fig,grape,grapes,kiwifruit,kiwifruits,lemon,lemons,lime,limes,lychee,lychees,mango,mangos,nectarine,nectarines,passion fruit,passion fruits,peach,peaches,pear,pears,pineapple,pineapples,plum,plums,quince,quinces,raspberry,raspberries,strawberry,strawberries,watermelon,watermelons'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
     datahandler.print_sents(words, 30)
 

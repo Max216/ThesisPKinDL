@@ -70,19 +70,70 @@ def _print_samples(out_path, word_premise, word_hypothesis, assumed_label, sente
 
 
 
-def evaluate(prediction_fn, dataset_path, output_path, print_samples=None):
+def _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples):
+
+    def pass_min_w_cnt(cnt1, cnt2):
+        if min_cnt_word != None:
+            if cnt1 < min_cnt_word or cnt2 < min_cnt_word:
+                return False
+        return True
+
+    def pass_max_w_cnt_single(cnt1, cnt2):
+        if max_cnt_word_single != None:
+            if cnt1 > max_cnt_word_single or cnt2 > max_cnt_word_single:
+                return False
+        return True
+
+    def pass_max_w_cnt_both(cnt1, cnt2):
+        if max_cnt_word_both != None:
+            if cnt1 > max_cnt_word_both and cnt2 > max_cnt_word_both:
+                return False
+        return True
+
+    def pass_max_real_samples(cnt):
+        if max_real_samples != None:
+            if cnt > max_real_samples:
+                return False
+        return True
+
+    def pass_min_generated_samples(cnt):
+        if min_generated_samples != None:
+            if cnt < min_generated_samples:
+                return False
+        return True
+
+    return [
+        (w1, w2, num_samples, lbl, relpath, cnt_w1, cnt_w2, cnt_real_samples)
+        for w1, w2, num_samples, lbl, relpath, cnt_w1, cnt_w2, cnt_real_samples in word_pairs
+        if pass_min_w_cnt(cnt_w1, cnt_w2) and pass_max_w_cnt_single(cnt_w1, cnt_w2) and pass_max_w_cnt_both(cnt_w1, cnt_w2) and pass_max_real_samples(cnt_real_samples) and pass_min_generated_samples(num_samples)
+    ]
+
+
+def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_cnt_word=None, max_cnt_word_single=None, max_cnt_word_both=None, max_real_samples=None, min_generated_samples=None):
     '''
     Evaluate a model on the generated dataset. This will output the model's performance over all data and also over every
     specific replacement that has been done to create the adversarial samples.
 
-    :param prediction_fn    Function to predict the label of samples. Input sentences are not tokenized or
-                            preprocessed in any way.
-                            input: list of samples: [(premise, hypothesis), ... ]
-                            output: list of predicted labels (strings): ['predicted_label_1', ... ]
-    :param dataset_path     Path to the 'data.txt' of the generated dataset (in the root folder)
-    :param output_path      Path to the folder that will be used to store the results of the evaluation
-    :print_samples          Set to the amount of samples that should be stored per word-pair per predicted label
-                            (default: None)
+    :param prediction_fn            Function to predict the label of samples. Input sentences are not tokenized or
+                                    preprocessed in any way.
+                                    input: list of samples: [(premise, hypothesis), ... ]
+                                    output: list of predicted labels (strings): ['predicted_label_1', ... ]
+    :param dataset_path             Path to the 'data.txt' of the generated dataset (in the root folder)
+    :param output_path              Path to the folder that will be used to store the results of the evaluation
+    :print_samples                  Set to the amount of samples that should be stored per word-pair per predicted label
+                                    (default: None)
+    :param min_cnt_word             Filters out all word pairs if not both of them have been in at least <min_cnt_word> sentences in the train data
+                                    (default:None)
+    :param max_cnt_word_single      Filters out all word pairs if at least one of the words have been in more than <max_cnt_word_single> sentences
+                                    in the train data. 
+                                    (default: None)
+    :param max_cnt_word_both        Filter out all word pairs if both of the words have been in more than <max_cnt_word_both> sentences in the train data.
+                                    (default: None)
+    :param max_real_samples         Filters out all word pairs if there have been more than <max_real_samples> samples in the training set containing
+                                    the first word within the premise, the 2nd word within the hypothesis and the same label as specified in the word pair.
+                                    (default: None)
+    :param min_generated_samples    Filters out all word pairs if not at least <min_generated_samples> samples could be generated.
+                                    (default: None)
     '''
 
     dataset_groups = _parse_data_txt(dataset_path)
@@ -103,6 +154,7 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None):
     for group_name, amount_group_pairs, amount_group_samples in dataset_groups:
         word_pairs_folder = os.path.join(dataset_base_folder, group_name)
         word_pairs = _parse_group_summary(word_pairs_folder)
+        word_pairs = _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
         
         word_pair_results = []
         sample_output_path = os.path.join(output_path, group_name + '.txt')
@@ -137,6 +189,7 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None):
 
         # Update evaluation for total
         all_word_pair_accuracies.extend(accuracies)
+
         all_corrects, all_totals, all_pred_dicts = map(list, zip(*word_pair_results))
         all_word_pair_correct += sum(all_corrects)
         all_word_pair_total += sum(all_totals)
