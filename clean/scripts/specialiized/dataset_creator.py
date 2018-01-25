@@ -220,6 +220,14 @@ def tools():
     kitchen = 'knife,fork,spoon' + 'knives,forks,spoons'
     cutting = 'knife,scissor' + 'knives,scissors'
 
+def fruits():
+    words = 'apple,apples,apricots,banana,bananas,blueberry,blueberries,berry,berries,fruits,cherry,cherries,coconut,coconuts,fig,grape,grapes,lemon,lemons,limes,mango,mangos,peaches,pear,pears,pineapple,pineapples,raspberry,raspberries,strawberry,strawberries,watermelon,watermelons'.split(',')
+    replace_other_than = 'fruit,lime,peach'
+
+def vegetables():
+    words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
+
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -227,10 +235,11 @@ def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
     
 
-    #words = 'apple,apples,apricot,apricots,banana,bananas,blueberry,blueberries,berry,berries,fruit,fruits,cherry,cherries,coconut,coconuts,fig,grape,grapes,kiwifruit,kiwifruits,lemon,lemons,lime,limes,lychee,lychees,mango,mangos,nectarine,nectarines,passion fruit,passion fruits,peach,peaches,pear,pears,pineapple,pineapples,plum,plums,quince,quinces,raspberry,raspberries,strawberry,strawberries,watermelon,watermelons'.split(',')
-    words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
+    #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
+    words = 'beer,beers,champagne,champagnes,alcohol,whisky,wine,wines,gin,liqueur,liqueurs,vodka,tequila,cider,ciders,liquor,strong drink'
+    nonalcohol = 'hot chocolate,coffee,espresso,juice,lemonade,milk,soft drink,soft drinks,tea,cola,coke,fanta,sprite'.split(',')
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words, 30)
+    datahandler.print_sents(words + nonalcohol, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
