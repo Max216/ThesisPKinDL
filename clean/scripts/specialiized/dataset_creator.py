@@ -221,8 +221,8 @@ def test():
 
 def test_out():
     #words = 'equal,distinct,different,hurt,injure,danger,risk,facts,data,dead,lifeless,deadly,mortal,decide,determine,resolve,decision,conclusion,declare,announce,decrease,reduce,happyness,joy,gladness,demolish,destroy,denial,refusal,deny,refuse,denies,refuses,destination,goal,destiny,fate,colleague,coworker,small,tiiny,shout,yell,shouts,yells,speaks,talks,speaking,talking,clever,smart,present,gift,mother,mom,bunny,rabbit,garbage,trash,shuts,closes,shop,store,sees,looks,see,look,alike,same,chef,cook,crash,accident,raise,lift,stone,rock,stones,rocks,street,road,street,roads,near,close to,couch,sofa,father,dad,tired,sleepy,taxi,cab'.split(',')
-    words1 = 'fork,knife,spoon,cake slide,ladle,scissors,tin opener,whisk,chopsticks,pizza cutter'.split(',')
-    words2 = 'stove,coffee machine,barbecue,microwave,food mixer,toaster'.split(',')
+    words1 = 'fork,knife,spoon,ladle,scissors,whisk,chopsticks'.split(',') # scissors and knife extra
+    words2 = 'stove,microwave,toaster'.split(',')
     words3 = 'cup,plate,pot,frying pan,glass,jug,kettle,bottle,bowl,carafe,jar'.split(',')
     words5 = 'dishwahser,sink'.split(',')
     container = 'shelves,basket,bin'

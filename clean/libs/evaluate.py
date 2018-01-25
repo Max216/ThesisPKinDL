@@ -7,10 +7,29 @@ from torch.utils.data import DataLoader
 import torch.autograd as autograd
 
 
-from libs import collatebatch
+from libs import collatebatch, data_tools
 from libs import model as m
 
 ZERO = 0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+
+def predict_untokenized(classifier, embedding_holder, p_sentence, h_sentence, twister=None, index_to_tag=data_tools.DEFAULT_VALID_LABELS):
+    p = data_tools._tokenize(p_sentence)
+    h = data_tools._tokenize(h_sentence)
+
+    p_batch = torch.LongTensor(len(p), 1)
+    h_batch = torch.LongTensor(len(h), 1)
+
+    p_batch[:,0] = torch.LongTensor([embedding_holder.word_index(w) for w in p])
+    h_batch[:,0] = torch.LongTensor([embedding_holder.word_index(w) for w in h])
+    
+    scores = classifier(
+        m.cuda_wrap(autograd.Variable(p_batch)), 
+        m.cuda_wrap(autograd.Variable(h_batch)), 
+        output_sent_info=False,
+        twister=twister)
+
+    _, predicted_idx = torch.max(scores, dim=1)
+    return index_to_tag[predicted_idx.data[0]]
 
 def eval(classifier, data, batch_size, padding_token, twister=None):
     '''

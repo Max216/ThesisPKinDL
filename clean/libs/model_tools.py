@@ -51,12 +51,9 @@ def params_from_model_name(name):
 
     # parse category2
     cat2 = categories[1].split('_')
-    print(cat2)
     opts = [(splitted[0], splitted[1]) for splitted in [s.split('=') for s in cat2]]
-    print('settings:', opts)
     result['opts'] = m.ModelSettings(opts)
 
-    print(result)
     return result
 
 def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings(), hint=None):
