@@ -243,13 +243,20 @@ def movements():
     replace_other = 'walk to'
 
 def materials():
-    words= 'brick,cement,glass,metal,plastic,sand,stone,wood,cotton,leather,nylon,wool,titanium'.split(',')
-    metals = 'zinc,uranium,tin,steel,silver,platinum,nickel,mercury,magnesium,iron,gold,copper,bronze,aluminium'.split(',')
+    words= 'brick,cement,metal,plastic,sand,stone,wood,titanium,bronze,copper,aluminium'.split(',')
+    replace_other_only = 'glass'
+    separate= ',leather,nylon,wool'
+    replace_other_only='cotton'
 
 def planets():
-    planets = 'Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
+    planets = 'Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
+    replace_other_only='Mercury'
 
+def verb_at():
+    words = 'sit,sits,stand,stands,lie,lies'
+    with_movments = 'sits at,sit at,stand at,stands at,lies at,walk at,walks at,run at,runs at,crawls at,climb at,climbs at,sleep at,sleeps at'.split(',')
 
+    replace_other_only ='jump at,jumps at,'
 
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
@@ -259,9 +266,10 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'sit,sits,stand,stands,lie,lies,sits at,sit at,stand at,stands at,lie at,lies at,walk at,walks at,run at,runs at,craw at,crawls at,drives at,drive at,jump at,jumps at,climb at,climbs at,sleep at,sleeps at'.split(',')
+    words = 'basement,bathroom,bedroom,room,living room,kitchen,dining room,office,prison cell,classroom,cellar,garage,hallway,lounge,pantry,playroom,salon,suite,classroom,common room,courtroom,hotel room'.split(',')
+    add = ['in a '+w for w in words]
     datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words, 30)
+    datahandler.print_sents(words+add, 30)
 
     #name, repl1, repl2, repl_a = antonyms_other()
     #print('repl first')
