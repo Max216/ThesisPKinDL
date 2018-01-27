@@ -6,7 +6,11 @@ import json
 
 import spacy
 import nltk
-nlp = spacy.load('en')
+
+from libs import config
+
+if not config.ONLY_TEST:
+    nlp = spacy.load('en')
 
 DEFAULT_DATA_FORMAT = 'snli'
 DEFAULT_VALID_LABELS = ['neutral', 'contradiction', 'entailment']
@@ -74,8 +78,14 @@ def _load_snli_nltk(lines, valid_labels=DEFAULT_VALID_LABELS):
         return [(p, h, lbl) for (p, h, lbl) in samples if lbl in valid_labels]
 
 
-def _tokenize(sent):
+def _tokenize_spacy(sent):
     doc = nlp(sent,  parse=False, tag=False, entity=False)
     return [token.text for token in doc]
-#def _tokenize(sent):
-#    return nltk.word_tokenize(sent)
+def _tokenize_nltk(sent):
+    return nltk.word_tokenize(sent)
+
+_tokenize = None
+if config.ONLY_TEST:
+    _tokenize = _tokenize_nltk
+else:
+    _tokenize = _tokenize_spacy

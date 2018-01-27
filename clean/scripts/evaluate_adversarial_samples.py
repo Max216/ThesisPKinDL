@@ -28,7 +28,7 @@ def main():
         # use normal model
         classifier_name, classifier, embedding_holder = model_tools.load(model_path)
 
-    def prediction_fn(samples):
+    def prediction_fn(samples, wp_path):
         return [evaluate.predict_untokenized(classifier, embedding_holder, p, h) for p,h in samples]
 
 

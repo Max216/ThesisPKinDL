@@ -22,6 +22,16 @@ def uknown_words(words):
 def synonym_from_two_lists(list_a, list_b):
     return [(list_a[i], list_b[i], 'entailment') for i in range(len(list_a))]
 
+def compatible_to_first(words1, words2, exclude_words=[], symmetric=True):
+    results = []
+    for w1 in words1:
+        for w2 in words2:
+            if not is_excluded(w1, w2, exclude_words):
+                results.append((w1, w2, 'entailment'))
+                if symmetric:
+                    results.append((w2, w1, 'entailment'))
+
+    return results
 
 def all_compatible(words):
     results = []
@@ -216,53 +226,167 @@ def numbers():
 
     return ('numbers', replace_first, replace_second, replace_any)
 
-def tools():
-    kitchen = 'knife,fork,spoon' + 'knives,forks,spoons'
-    cutting = 'knife,scissor' + 'knives,scissors'
 
 def fruits():
-    words = 'apple,apples,apricots,banana,bananas,blueberry,blueberries,berry,berries,fruits,cherry,cherries,coconut,coconuts,fig,grape,grapes,lemon,lemons,limes,mango,mangos,peaches,pear,pears,pineapple,pineapples,raspberry,raspberries,strawberry,strawberries,watermelon,watermelons'.split(',')
-    replace_other_than = 'fruit,lime,peach'
+    singular = 'watermelon,strawberry,raspberry,pineapple,pear,apple,banana,blueberry,cherry,coconut,fig,grape,lemon,mango'.split(',')
+    plural = 'watermelons,strawberries,raspberries,pineapples,pears,apples,apricots,bananas,blueberries,cherries,coconuts,grapes,lemons,limes,mangos,peaches'.split(',')
+    dont_replace_singular = 'lime,peach'.split(',')
+
+    replace_any = all_incompatible(singular)
+    replace_any.extend(all_incompatible(plural))
+
+    replace_first = incompatible_to_first(singular, dont_replace_singular, symmetric=False)
+    replace_second = incompatible_to_first(dont_replace_singular, singular, symmetric=False)
+
+    replace_first.extend(compatible_to_first(singular, ['fruit'], symmetric=False))
+    replace_first.extend(compatible_to_first(plural, ['fruits'], symmetric=False))
+
+    return ('fruits', replace_first, replace_second, replace_any)
 
 def vegetables():
-    words = 'avocado,avocados,carrot,carrots,celery,cucumber,cucumbers,eggplant,eggplants,onion,onions,potato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini'.split(',')
-    replace_other='pumpkin,pumpkins'
+    singular = 'zucchini,tomato,potato,onion,eggplant,cucumber,celery,carrot,avocado'.split(',')
+    plural = 'tomatoes,potatoes,onions,eggplants,cucumbers,carrots,avocados'.split(',')
+    dont_replace_singular = ['pumpkin']
+    dont_replace_plural = ['pumpkins']
+
+    replace_any = all_incompatible(singular)
+    replace_any.extend(all_incompatible(plural))
+
+    replace_first = incompatible_to_first(singular, dont_replace_singular, symmetric=False)
+    replace_first.extend(incompatible_to_first(plural, dont_replace_plural, symmetric=False))
+
+    replace_second = incompatible_to_first(dont_replace_singular, singular, symmetric=False)
+    replace_second.extend(incompatible_to_first(dont_replace_plural, plural, symmetric=False))
+
+    replace_first.extend(compatible_to_first(singular, ['vegetable'], symmetric=False))
+    replace_first.extend(compatible_to_first(plural, ['vegetables'], symmetric=False))
+    
+    return ('vegetables', replace_first, replace_second, replace_any)
 
 def drinks():
-    words = 'beer,beers,champagne,whisky,wine,wines,gin,vodka,tequila,cider'
-    replace_this_only = 'alcohol'
-    nonalcohol = 'hot chocolate,lemonade,soft drink,soft drinks,coka-cola,coke,sprite'.split(',')
-    only_replacE_other = 'coffee,espresso,juice,tea'
+    alcohol = 'beer,champagne,whisky,wine,gin,vodka,tequila,cider'.split(',')
+    plural = ['beers', 'wines']
+    non_alcohol = 'hot chocolate,lemonade,coka-cola,coke,sprite'.split(',')
+    replace_other_only = 'coffee,espresso,juice,tea'.split(',')
+    exclude_words = [set(['coka-cola', 'coke', 'lemonade']), set(['lemonade', 'sprite'])]
+    replace_any = all_incompatible(alcohol)
+    replace_any.extend(all_incompatible(plural))
+    replace_any.extend(all_incompatible(non_alcohol, exclude_words=exclude_words))
+
+    replace_first = incompatible_to_first(non_alcohol, replace_other_only, symmetric=False)
+    replace_second = incompatible_to_first(replace_other_only, non_alcohol, symmetric=False)
+
+    return ('drinks', replace_first, replace_second, replace_any)
 
 
 def fastfoods():
-    words = 'fastfood(=pl),kebab,kebabs,french fries,hamburger,cheeseburger,sandwich,taco,chicken nuggets,onion rings,fish and chips,falafel,popcorn,pizza,pizzas'.split(',')
+    singular = 'kebab,hamburger,cheeseburger,sandwich,taco,pizza'.split(',')
+    plural = 'kebabs,french fries,chicken nuggets,onion rings,fish and chips,falafel,pizzas'.split(',')
+
+    replace_any = all_incompatible(singular)
+    replace_any.extend(all_incompatible(plural))
+
+    return ('fastfood', [], [], replace_any)
 
 def movements():
-    words = 'ride to,rides to,crawl to,run to,runs to,walks to,hurries to,stroll to,strolls to,drive to,drives to,fly to,swims to'.split(',')
-    replace_other = 'walk to'
+    thrird_person = 'swims to,drives to,strolls to,runs to,rides to'.split(',')
+    infinitiv = 'fly to,drive to,stroll to,ride to,crawl to,run to'.split(',')
+
+    replace_other = 'walk to, walks to'.split(',')
+    replace_any = all_incompatible(thrird_person)
+    replace_any.extend(all_incompatible(infinitiv))
+
+    replace_first = incompatible_to_first(thrird_person, ['walks to'], symmetric=False)
+    replace_second = incompatible_to_first(['walks to'], thrird_person, symmetric = False)
+
+    replace_first.extend(incompatible_to_first(infinitiv, ['walk to'], symmetric=False))
+    replace_second.extend(incompatible_to_first(['walk to'], infinitiv, symmetric=False))
+
+
+    return ('movements', replace_first, replace_second, replace_any)
 
 def materials():
-    words= 'brick,cement,metal,plastic,sand,stone,wood,titanium,bronze,copper,aluminium'.split(',')
-    replace_other_only = 'glass'
-    separate= ',leather,nylon,wool'
-    replace_other_only='cotton'
+    group1 = 'brick,cement,plastic,sand,stone,wood,titanium,bronze,copper,aluminium'.split(',')
+    group1_replace_other=['glass']
+    group_metals = 'titanium,bronze,copper,aluminium'.split(',')
+
+    group2 = 'leather,nylon,wool'.split(',')
+    group_2_replace_other = ['cotton']
+
+    replace_any = all_incompatible(group1)
+    replace_any.extend(all_incompatible(group2))
+
+    replace_first = incompatible_to_first(group1, group1_replace_other, symmetric=False)
+    replace_first.extend(incompatible_to_first(group2, group_2_replace_other, symmetric=False))
+
+    replace_second = incompatible_to_first(group1_replace_other, group1, symmetric=False)
+    replace_second.extend(incompatible_to_first(group_2_replace_other, group2, symmetric=False))
+
+    replace_any.extend(compatible_to_first(group_metals, ['metal'], symmetric=False))
+
+    return ('materials', replace_first, replace_second, replace_any)
 
 def planets():
     planets = 'Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,Pluto'.split(',')
-    replace_other_only='Mercury'
+    replace_any = all_incompatible(planets)
+    replace_first = incompatible_to_first(planets, ['Mercury'], symmetric=False)
+    replace_second = incompatible_to_first(['Mercury'], planets, symmetric=False)
+
+    return ('planets', replace_first, replace_second, replace_any)
 
 def verb_at():
-    words = 'sit,sits,stand,stands,lie,lies'
-    with_movments = 'sits at,sit at,stand at,stands at,lies at,walk at,walks at,run at,runs at,crawls at,climb at,climbs at,sleep at,sleeps at'.split(',')
+    base_words1 = 'sit,stand,lie'.split(',')
+    base_words2 = 'sits,stands,lies'.split(',')
+
+    with_at1 = 'sit at,stand at,walk at,run at,climb at,sleep at'.split(',')
+    with_at2 = 'sits at,stands at,lies at,walks at,runs at,crawls at,climbs at,sleeps at'.split(',')
+    exclude_pairs = [set(['sleeps at','lies at']), set(['sleeps at', 'sits at']), set(['sleeps at', 'stands at'])]
+    exclude_pairs.extend([set(['lies at', 'crawls at']), set(['sleep at', 'sit at']), set(['sleep at', 'stand at'])])
 
     replace_other_only ='jump at,jumps at,'
 
-def rooms():
-    words = 'basement,bathroom,bedroom,living room,kitchen,dining room,prison cell,cellar,garage,hallway,lounge,playroom,common room,courtroom,hotel room'.split(',')
-    add = ['in a '+w for w in words] # minus playroom,pantry (a_an),suite
+    replace_any = all_incompatible(base_words1)
+    replace_any.extend(all_incompatible(base_words2))
+    replace_any.extend(all_incompatible(with_at1, exclude_pairs))
+    replace_any.extend(all_incompatible(with_at2, exclude_pairs))
 
-    replace_other_only = 'office,classroom,lounge,room' + '?building,house,dwelling?'
+    replace_first = incompatible_to_first(with_at1, ['jump at'], symmetric=False)
+    replace_second = incompatible_to_first(['jump at'], with_at1, symmetric=False)
+
+    replace_first.extend(incompatible_to_first(with_at2, ['jumps at'], symmetric=False))
+    replace_second.extend(incompatible_to_first(['jumps at'], with_at2, symmetric=False))
+
+    return ('at-verbs', replace_first, replace_second, replace_any)
+
+def rooms():
+    words = 'basement,bathroom,bedroom,living room,kitchen,dining room,prison cell,cellar,garage,hallway,lounge,playroom,common room,courtroom'.split(',')
+    replace_other_only = 'office,classroom,lounge'.split(',')
+    general_words = 'in a building,in a room'.split(',')
+    exclude_words = [set(['room', 'garage'])]
+
+    replace_any = all_incompatible(words)
+    replace_first = incompatible_to_first(words, replace_other_only, symmetric=False)
+    replace_second = incompatible_to_first(replace_other_only, words, symmetric=False)
+    
+    
+    in_a_room = ['in a '+w for w in words if w not in ['playroom', 'pantry', 'suite']]
+    replace_first.extend(compatible_to_first(in_a_room, general_words, exclude_words=exclude_words, symmetric=False))
+
+    return ('rooms', replace_first, replace_second, replace_any)
+
+
+def instruments():
+    singular = 'french horn,didgeridoo,tuba,xylophone,violin,trumpet,saxophone,piano,oboe,harp,accordion,banjo,cello,clarinet,flute,electric guitar,acoustic guitar,harmonica'.split(',')
+    plural = 'didgeridoos,tubas,xylophones,violins,trumpets,saxophones,pianos,harmonicas,accordions,banjos,bongos,cellos'.split(',')
+    words = 'instrument,'.split(',')
+
+    replace_any = all_incompatible(singular)
+    replace_any.extend(all_incompatible(plural))
+
+    replace_first = compatible_to_first(singular, ['instrument'], symmetric=False)
+    replace_first.extend(compatible_to_first(plural, ['instruments'], symmetric=False))
+
+    return ('instruments', replace_first, [], replace_any)
 
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
@@ -272,23 +396,23 @@ def test_out():
     
 
     #words = 'avocado,avocados,carrot,carrots,celery,celeries,chick peas,cucumber,cucumbers,eggplant,eggplants,onion,onions,pumpkin,pumpkins,paotato,potatoes,tomato,tomatoes,vegetable,vegetables,zucchini,zucchinis'.split(',')
-    words = 'accordion,accordions,banjo,banjos,bongos,cello,cellos,clarinet,drum,flute,guitar,guitars,harmonica,harmonicas,harp,harps,kettledrum,kettledrums,oboe,piano,pianos,saxophone,saxophones,trumpet,trumpets,violin,violins,xylophone,xylophones,tuba,tubas,didgeridoo,didgeridoos,acoustic guitar,instrument,french horn'.split(',')
-    datahandler = data_manipulator.DataManipulator().load()
-    datahandler.print_sents(words, 30)
+    #words = 'accordion,accordions,banjo,banjos,bongos,cello,cellos,clarinet,drum,flute,guitar,guitars,harmonica,harmonicas,harp,harps,kettledrum,kettledrums,oboe,piano,pianos,saxophone,saxophones,trumpet,trumpets,violin,violins,xylophone,xylophones,tuba,tubas,didgeridoo,didgeridoos,acoustic guitar,french horn'.split(',')
+    #datahandler = data_manipulator.DataManipulator().load()
+    #datahandler.print_sents(words, 30)
 
-    #name, repl1, repl2, repl_a = antonyms_other()
-    #print('repl first')
-    #for p, h, lbl in repl1:
-    #    print(p, '--', h, '--', lbl)
-    #print()
-    #print('repl second')
-    #for p, h, lbl in repl2:
-    #    print(p, '--', h, '--', lbl)
-    #print()
-    #print('repl any')
-    #for p, h, lbl in repl_a:
-    #    print(p, '--', h, '--', lbl)
-    #print()
+    name, repl1, repl2, repl_a = instruments()
+    print('repl first')
+    for p, h, lbl in repl1:
+        print(p, '--', h, '--', lbl)
+    print()
+    print('repl second')
+    for p, h, lbl in repl2:
+        print(p, '--', h, '--', lbl)
+    print()
+    print('repl any')
+    for p, h, lbl in repl_a:
+        print(p, '--', h, '--', lbl)
+    print()
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
@@ -317,7 +441,17 @@ def main():
             antonyms_adj_adv,
             antonyms_nn_vb,
             antonyms_other,
-            synonyms
+            synonyms,
+            fruits,
+            vegetables,
+            drinks,
+            fastfoods,
+            movements,
+            materials,
+            planets,
+            verb_at,
+            rooms,
+            instruments
             #test
         ]
 

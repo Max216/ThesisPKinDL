@@ -4,8 +4,38 @@ evaluation models on this data.
 
 USAGE:
 
+To evaluate run:
+    evaluate(prediction_fn, dataset_path, output_path, print_samples=None)
+
+    the prediction function should look like
+    def predict(samples, file_path):
+        # either use file_path
+        predictions = classifier.predict_labels(load_samples(file_path))
+        # or use samples
+        predictions = classifier.predict_labels(samples)
+
+        return predictions # ['entailment', 'entailment', 'neutral', ...]
+
+    This will create a *.csv file for each category and calculate the accuracy for
+        * every word pair swapping
+        * every category
+        * over all samples
+    For every cateory and as the total accuracy two values will be provided:
+        * accuracy (counting each sample the same)
+        * reqeighted accuracy (counting each distinct word pair swapping the same, regardless of how many samples
+        it contains.)
+
+To create a filtered subset of the data run the script:
+    $ python adv_dataset filter [..params]
+
+    This will create a new <name>.txt file in the root folder that points to all
+    data. This can then be used to evaluate.
+
+
+
 '''
 import os, json, collections
+from docopt import docopt
 
 def strround(val, digits=3):
     return str(round(val, digits))
@@ -17,20 +47,26 @@ def _parse_data_txt(in_path):
     with open(in_path) as f_in:
         lines = [line.strip().split(' ') for line in f_in.readlines()]
 
-    return [(line[0], int(line[1]), int(line[2])) for line in lines]
+    return [(line[0], int(line[1]), int(line[2]), line[3]) for line in lines]
 
-def _parse_group_summary(in_path):
+def _parse_group_summary(in_path, raw=False):
     '''
-    Parse the content of the SUMMARY.sjson file.
+    Parse the content of the <*.sjson> file.
     '''
-    with open(os.path.join(in_path, 'SUMMARY.sjson')) as f_in:
-        all_pairs = [json.loads(line.strip()) for line in f_in.readlines()]
+    with open(in_path) as f_in:
+        lines = [line.strip() for line in f_in.readlines()]
+        all_pairs = [json.loads(line) for line in lines]
 
-    return [(
+    parsed = [(
         pair['word_p'], pair['word_h'], pair['amount'], pair['assumed_label'],
         pair['rel_path'], pair['sents_with_word_p'], pair['sents_with_word_h'],
         pair['real_sample_count'] 
     ) for pair in all_pairs]
+
+    if raw:
+        return (parsed, lines)
+    else:
+        return parsed
 
 def _parse_word_pair(in_path):
     '''
@@ -103,25 +139,15 @@ def _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_wo
         return True
 
     return [
-        (w1, w2, num_samples, lbl, relpath, cnt_w1, cnt_w2, cnt_real_samples)
-        for w1, w2, num_samples, lbl, relpath, cnt_w1, cnt_w2, cnt_real_samples in word_pairs
+        i for i, (w1, w2, num_samples, lbl, relpath, cnt_w1, cnt_w2, cnt_real_samples) in enumerate(word_pairs)
         if pass_min_w_cnt(cnt_w1, cnt_w2) and pass_max_w_cnt_single(cnt_w1, cnt_w2) and pass_max_w_cnt_both(cnt_w1, cnt_w2) and pass_max_real_samples(cnt_real_samples) and pass_min_generated_samples(num_samples)
     ]
 
-
-def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_cnt_word=None, max_cnt_word_single=None, max_cnt_word_both=None, max_real_samples=None, min_generated_samples=None):
+def filter(dataset_path, name, min_cnt_word=None, max_cnt_word_single=None, max_cnt_word_both=None, max_real_samples=None, min_generated_samples=None):
     '''
-    Evaluate a model on the generated dataset. This will output the model's performance over all data and also over every
-    specific replacement that has been done to create the adversarial samples.
-
-    :param prediction_fn            Function to predict the label of samples. Input sentences are not tokenized or
-                                    preprocessed in any way.
-                                    input: list of samples: [(premise, hypothesis), ... ]
-                                    output: list of predicted labels (strings): ['predicted_label_1', ... ]
+    Filters the data in the dataset according to some criterias and makes them accessable via a new data.txt file
     :param dataset_path             Path to the 'data.txt' of the generated dataset (in the root folder)
-    :param output_path              Path to the folder that will be used to store the results of the evaluation
-    :print_samples                  Set to the amount of samples that should be stored per word-pair per predicted label
-                                    (default: None)
+    :param name                     Name of the filtered selection. This will result in <name>.txt (alternative to data.txt)
     :param min_cnt_word             Filters out all word pairs if not both of them have been in at least <min_cnt_word> sentences in the train data
                                     (default:None)
     :param max_cnt_word_single      Filters out all word pairs if at least one of the words have been in more than <max_cnt_word_single> sentences
@@ -133,6 +159,66 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_c
                                     the first word within the premise, the 2nd word within the hypothesis and the same label as specified in the word pair.
                                     (default: None)
     :param min_generated_samples    Filters out all word pairs if not at least <min_generated_samples> samples could be generated.
+                                    (default: None)
+    '''
+
+    # to differentiate between others
+    appendix = '_'.join([
+        'minw-' + str(min_cnt_word) if min_cnt_word is not None else 'x',
+        'maxwsingle-' + str(max_cnt_word_single) if max_cnt_word_single is not None else 'x',
+        'maxwboth-' + str(max_cnt_word_both) if max_cnt_word_both is not None else 'x',
+        'maxreal-' + str(max_real_samples) if max_real_samples is not None else 'x',
+        'minsamples-' + str(min_generated_samples) if min_generated_samples is not None else 'x'
+    ])
+
+    dataset_groups = _parse_data_txt(dataset_path)
+    dataset_base_folder = os.path.dirname(os.path.realpath(dataset_path))
+    write_out_groups = []
+
+    for group_name, amount_group_pairs, amount_group_samples, summary_file in dataset_groups: 
+        
+        # check each group
+        word_pairs_folder = os.path.join(dataset_base_folder, group_name)
+
+        word_pairs, lines = _parse_group_summary(os.path.join(word_pairs_folder, summary_file), raw=True)
+
+        # filter word pairs
+        remaining_indizes = _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
+
+        if len(word_pairs) > 0:
+            # write out new summary
+            group_summary = 'SUMMARY_' + appendix + '.sjson' 
+            with open(os.path.join(word_pairs_folder, group_summary), 'w') as f_out:
+                for i in remaining_indizes:
+                    f_out.write(lines[i] + '\n')
+
+            # add group to dataset
+            total_size = sum([sample_amount for word_p, word_h, sample_amount, gold_label, word_pair_rel_path, word_p_cnt, word_h_cnt, real_sample_cnt in word_pairs])
+            write_out_groups.append([group_name, str(len(word_pairs)), str(total_size), group_summary])
+
+
+    # write out dataset
+    if name.split('.')[-1] != 'txt':
+        name += '.txt'
+    with open(os.path.join(dataset_base_folder, name), 'w') as f_out:
+        for group in write_out_groups:
+            f_out.write(' '.join(group) + '\n')
+
+
+def evaluate(prediction_fn, dataset_path, output_path, print_samples=None):
+    '''
+    Evaluate a model on the generated dataset. This will output the model's performance over all data and also over every
+    specific replacement that has been done to create the adversarial samples.
+
+    :param prediction_fn            Function to predict the label of samples. Input sentences are not tokenized or
+                                    preprocessed in any way. 
+                                    function(samples, path): returns [labels]
+                                    input: list of samples: [(premise, hypothesis), ... ]
+                                    input2: string absolute path to data.jsonl 
+                                    output: list of predicted labels (strings): ['predicted_label_1', ... ]
+    :param dataset_path             Path to the 'data.txt' of the generated dataset (in the root folder)
+    :param output_path              Path to the folder that will be used to store the results of the evaluation
+    :print_samples                  Set to the amount of samples that should be stored per word-pair per predicted label
                                     (default: None)
     '''
 
@@ -151,10 +237,10 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_c
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    for group_name, amount_group_pairs, amount_group_samples in dataset_groups:
+    for group_name, amount_group_pairs, amount_group_samples, summary_file in dataset_groups:
         word_pairs_folder = os.path.join(dataset_base_folder, group_name)
-        word_pairs = _parse_group_summary(word_pairs_folder)
-        word_pairs = _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
+        word_pair_path = os.path.realpath(os.path.join(word_pairs_folder, summary_file))
+        word_pairs = _parse_group_summary(word_pair_path)
         
         word_pair_results = []
         sample_output_path = os.path.join(output_path, group_name + '.txt')
@@ -164,11 +250,12 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_c
         accuracies = []
         print('evaluate group:', group_name)
         for word_p, word_h, sample_amount, gold_label, word_pair_rel_path, word_p_cnt, word_h_cnt, real_sample_cnt in word_pairs:
-            sentences, replacements = _parse_word_pair(os.path.join(word_pairs_folder, word_pair_rel_path))
+            path_to_word_pair_file = os.path.join(word_pairs_folder, word_pair_rel_path)
+            sentences, replacements = _parse_word_pair(path_to_word_pair_file)
 
             # Evaluate
             prediction_dict = collections.defaultdict(int)
-            predicted_labels = prediction_fn(sentences)
+            predicted_labels = prediction_fn(sentences, path_to_word_pair_file)
             for predicted in predicted_labels:
                 prediction_dict[predicted] += 1
 
@@ -220,7 +307,7 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_c
         f_out.write('group,acc,re-weighted acc,# wordpairs,#samples\n')
 
         # print out results
-        for i, (group_name, amount_group_pairs, amount_group_samples) in enumerate(dataset_groups):
+        for i, (group_name, amount_group_pairs, amount_group_samples, summary_file) in enumerate(dataset_groups):
             line = [
                 group_name, 
                 strround(group_accuracies[i]), strround(reweighted_group_accuracies[i]),
@@ -235,10 +322,31 @@ def evaluate(prediction_fn, dataset_path, output_path, print_samples=None, min_c
 
     print('DONE.')
     print('Overall accuracy:', strround(overall_accuracy, 4))
-    print('Reweighted accuracy:', strround(overall_reweighted_accuracy, 4))
-
-                
+    print('Reweighted accuracy:', strround(overall_reweighted_accuracy, 4))            
 
 
+def main():
+    args = docopt("""Create a filtered subset of the data.
+
+    Usage:
+        adv_dataset.py filter <dataset_path> <name> [--min=<min_generated_samples>] [--min_word=<min_cnt_word>] [--max_cnt_s=<max_cnt_word_single>] [--max_cnt_b=<max_cnt_word_both>] [--max_samples=<max_real_samples>]
+    """)
+    print(args)
+
+    dataset_path = args['<dataset_path>']
+    name = args['<name>']
+    min_generated_samples = args['--min']
+    max_cnt_word_single = args['--max_cnt_s']
+    max_cnt_word_both = args['--max_cnt_b']
+    max_real_samples = args['--max_samples']
+    min_cnt_word = args['--min_word']
+
+    filter(dataset_path, name, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
+    print('Done.')
+
+
+
+if __name__ == '__main__':
+    main()
 
 
