@@ -60,6 +60,25 @@ def eval(classifier, data, batch_size, padding_token, twister=None):
 
     return correct / total
 
+def predict_outcomes(classifier, dataset, batch_size, padding_token, twister=None, idx_to_lbl=data_tools.DEFAULT_VALID_LABELS):
+    classifier.eval()
+    data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size,shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
+
+    predictions = []
+    for premise_batch, hyp_batch, lbl_batch in data_loader:
+        prediction = classifier(
+            autograd.Variable(m.cuda_wrap(premise_batch)),
+            autograd.Variable(m.cuda_wrap(hyp_batch)),
+            twister=twister
+        ).data
+
+        # count corrects
+        _, predicted_idx = torch.max(prediction, dim=1)
+        predictions.extend([idx_to_lbl[i] for i in predicted_idx])
+    
+    return predictions
+
+
 def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
     '''
     Create a dictionary with the prediction like dict[gold][predicted] = #amount. Batch size is one.

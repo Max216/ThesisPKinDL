@@ -126,3 +126,6 @@ def get_datahandler_dev(path=None):
     if path == None:
         path = config.PATH_DEV_DATA
     return Datahandler(path)
+
+def get_dataset(samples, embedding_holder, tag_to_idx):
+    return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx)
