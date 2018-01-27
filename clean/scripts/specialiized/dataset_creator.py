@@ -378,7 +378,7 @@ def rooms():
 def instruments():
     singular = 'french horn,didgeridoo,tuba,xylophone,violin,trumpet,saxophone,piano,oboe,harp,accordion,banjo,cello,clarinet,flute,electric guitar,acoustic guitar,harmonica'.split(',')
     plural = 'didgeridoos,tubas,xylophones,violins,trumpets,saxophones,pianos,harmonicas,accordions,banjos,bongos,cellos'.split(',')
-    words = 'instrument,'.split(',')
+    #words = 'instrument,'.split(',')
 
     replace_any = all_incompatible(singular)
     replace_any.extend(all_incompatible(plural))
@@ -434,13 +434,13 @@ def main():
     else:
         out_name = args['<out_name>']
         all_fn = [
-            countries,
-            nationalities,
-            colors,
-            numbers,
-            antonyms_adj_adv,
-            antonyms_nn_vb,
-            antonyms_other,
+            #countries,
+            #nationalities,
+            #colors,
+            #numbers,
+            #antonyms_adj_adv,
+            #antonyms_nn_vb,
+            #antonyms_other,
             synonyms,
             fruits,
             vegetables,

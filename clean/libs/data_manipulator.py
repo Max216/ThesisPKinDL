@@ -141,8 +141,9 @@ class ReplacedDataHolder:
         if w2 not in self.real_sample_counter[w1]:
             self.real_sample_counter[w1][w2] = amount
         else:
-            print('Should not happen. Alread have real sample info:', self.real_sample_counter[w1][w2],'. Want to override with', amount)
-            1/0
+            #print('Should not happen. Alread have real sample info:', self.real_sample_counter[w1][w2],'. Want to override with', amount)
+            #1/0
+            pass
 
 
 class DataManipulator:
