@@ -3,7 +3,7 @@ sys.path.append('./../')
 
 from docopt import docopt
 
-from libs import model_tools, compatability, evaluate
+from libs import model_tools, compatability, evaluate, data_handler, embeddingholder
 from exportable import adv_dataset
 
 def main():
@@ -28,8 +28,12 @@ def main():
         # use normal model
         classifier_name, classifier, embedding_holder = model_tools.load(model_path)
 
+    embedding_holder = embeddingholder.create_embeddingholder()
+
     def prediction_fn(samples, wp_path):
-        return [evaluate.predict_untokenized(classifier, embedding_holder, p, h) for p,h in samples]
+        dataholder = data_handler.Datahandler(wp_path)
+        return evaluate.predict_outcomes(classifier, dataholder.get_dataset(embedding_holder), 32, embedding_holder.padding())
+        #return [evaluate.predict_untokenized(classifier, embedding_holder, p, h) for p,h in samples]
 
 
     adv_dataset.evaluate(prediction_fn, dataset_path, output_path,print_samples=5)
