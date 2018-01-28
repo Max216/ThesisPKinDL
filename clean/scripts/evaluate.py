@@ -4,7 +4,8 @@
 import sys, os
 sys.path.append('./../')
 
-from libs import model_tools, embeddingholder, config, data_handler, evaluate
+from libs import model_tools, embeddingholder, config, data_handler
+from libs import evaluate as ev
 
 import torch
 import torch.autograd as autograd
@@ -55,7 +56,7 @@ def evaluate(model_path, data_path, new_embeddings=None, twister=None):
     print('Evaluate ...')
     classifier.eval()
 
-    print('Accuracy:', evaluate.eval(classifier, data, 32, embedding_holder.padding()))
+    print('Accuracy:', ev.eval(classifier, data, 32, embedding_holder.padding()))
 
 if __name__ == '__main__':
     main()
