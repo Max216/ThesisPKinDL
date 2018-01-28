@@ -34,7 +34,7 @@ To create a filtered subset of the data run the script:
 
 
 '''
-import os, json, collections
+import os, json, collections, random
 from docopt import docopt
 
 def strround(val, digits=3):
