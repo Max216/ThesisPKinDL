@@ -54,8 +54,6 @@ def evaluate(model_path, data_path, new_embeddings=None, twister=None):
     print(len(data), 'samples loaded.')
     print('Evaluate ...')
     classifier.eval()
-    classifier = m.cuda_wrap(classifier)
-
 
     print('Accuracy:', evaluate.eval(classifier, data, 32, embedding_holder.padding()))
 
