@@ -157,11 +157,11 @@ def sample(summary_path, amount):
         replaced = example_json['generation_replaced']
 
         if replaced == '1':
-            premise = '[p replaced: ' + w1 + '] ' + example_json['sentence1']
-            hypothesis = '[h] ' + example_json['sentence2']
-        elif replaced == '2':
             premise = '[p] ' + example_json['sentence1']
-            hypothesis = '[h replaced: ' + w2 + '] ' + example_json['sentence2']
+            hypothesis = '[h generated] ' + example_json['sentence2']
+        elif replaced == '2':
+            premise = '[p generated] ' + example_json['sentence1']
+            hypothesis = '[h] ' + example_json['sentence2']
 
         return (w1 + ' -- ' + w2, premise, hypothesis)
 
