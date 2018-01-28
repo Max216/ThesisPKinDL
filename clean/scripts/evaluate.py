@@ -42,7 +42,7 @@ def evaluate(model_path, data_path, new_embeddings=None, twister=None):
         embeddings_diff = embedding_holder.add_unknowns_from(embedding_holder_new)
 
     print('Load model ...')
-    classifier, _ = model_tools.load(model_path, embedding_holder=embedding_holder)
+    classifier, _, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
 
     # todo look with merging ....
     if len(embeddings_diff) != 0 and embeddings_diff.shape[1] != 0:
