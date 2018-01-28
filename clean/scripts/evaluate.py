@@ -6,6 +6,7 @@ sys.path.append('./../')
 
 from libs import model_tools, embeddingholder, config, data_handler
 from libs import evaluate as ev
+from libs import model as m
 
 import torch
 import torch.autograd as autograd
@@ -55,6 +56,7 @@ def evaluate(model_path, data_path, new_embeddings=None, twister=None):
     print(len(data), 'samples loaded.')
     print('Evaluate ...')
     classifier.eval()
+    classifier = m.cuda_wrap(classifier)
 
     print('Accuracy:', ev.eval(classifier, data, 32, embedding_holder.padding()))
 
