@@ -143,6 +143,39 @@ def _filter_word_pairs(word_pairs, min_cnt_word, max_cnt_word_single, max_cnt_wo
         if pass_min_w_cnt(cnt_w1, cnt_w2) and pass_max_w_cnt_single(cnt_w1, cnt_w2) and pass_max_w_cnt_both(cnt_w1, cnt_w2) and pass_max_real_samples(cnt_real_samples) and pass_min_generated_samples(num_samples)
     ]
 
+
+def sample(summary_path, amount):
+    '''
+    Sample sentences from a group
+    :param summary_path     name of the group summary file
+    :param amount           amount of samples to show
+    '''
+
+    group_directory = os.path.dirname(os.path.realpath(summary_path))
+
+    def compress_sent_pair_info(w1, w2, example_json):
+        replaced = example_json['generation_replaced']
+
+        if replaced == '1':
+            premise = '[p replaced: ' + w1 + '] ' + example_json['sentence1']
+            hypothesis = '[h] ' + example_json['sentence2']
+        elif replaced == '2':
+            premise = '[p] ' + example_json['sentence1']
+            hypothesis = '[h replaced: ' + w2 + '] ' + example_json['sentence2']
+
+        return (w1 + ' -- ' + w2, premise, hypothesis)
+
+    all_sent_pairs = []
+    for wp, wh, amount_samples, assumed_label, rel_path, cnt_p_sent, snt_h_sents, cnt_real_samples in _parse_group_summary(summary_path, raw=False):
+        with open(in_path) as f_in:
+            samples = [json.loads(line.strip()) for line in f_in.readlines()]
+            samples = [compress_sent_pair_info(wp, wh, sample) for sample in samples]
+        all_sent_pairs.extend(samples)
+
+    sampled = random.sample(all_sent_pairs, amount)
+    for title, premise, hypothesis in sampled:
+        print('\n'.join([title, premise, hypothesis, '']))
+
 def filter(dataset_path, name, min_cnt_word=None, max_cnt_word_single=None, max_cnt_word_both=None, max_real_samples=None, min_generated_samples=None):
     '''
     Filters the data in the dataset according to some criterias and makes them accessable via a new data.txt file
@@ -330,19 +363,25 @@ def main():
 
     Usage:
         adv_dataset.py filter <dataset_path> <name> [--min=<min_generated_samples>] [--min_word=<min_cnt_word>] [--max_cnt_s=<max_cnt_word_single>] [--max_cnt_b=<max_cnt_word_both>] [--max_samples=<max_real_samples>]
+        adv_dataset.py sample <summary_path> <amount>
     """)
-    print(args)
 
-    dataset_path = args['<dataset_path>']
-    name = args['<name>']
-    min_generated_samples = args['--min']
-    max_cnt_word_single = args['--max_cnt_s']
-    max_cnt_word_both = args['--max_cnt_b']
-    max_real_samples = args['--max_samples']
-    min_cnt_word = args['--min_word']
+    if args['filter']:
+        dataset_path = args['<dataset_path>']
+        name = args['<name>']
+        min_generated_samples = args['--min']
+        max_cnt_word_single = args['--max_cnt_s']
+        max_cnt_word_both = args['--max_cnt_b']
+        max_real_samples = args['--max_samples']
+        min_cnt_word = args['--min_word']
 
-    filter(dataset_path, name, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
-    print('Done.')
+        filter(dataset_path, name, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
+        print('Done.')
+    else:
+        summary_path = args['<dataset_path>']
+        amount = int(args['<amount>'])
+
+        sample(summary_path, amount)
 
 
 
