@@ -167,7 +167,7 @@ def sample(summary_path, amount):
 
     all_sent_pairs = []
     for wp, wh, amount_samples, assumed_label, rel_path, cnt_p_sent, snt_h_sents, cnt_real_samples in _parse_group_summary(summary_path, raw=False):
-        with open(in_path) as f_in:
+        with open(os.path.join(group_directory, rel_path)) as f_in:
             samples = [json.loads(line.strip()) for line in f_in.readlines()]
             samples = [compress_sent_pair_info(wp, wh, sample) for sample in samples]
         all_sent_pairs.extend(samples)
