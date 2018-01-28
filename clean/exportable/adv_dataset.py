@@ -378,7 +378,7 @@ def main():
         filter(dataset_path, name, min_cnt_word, max_cnt_word_single, max_cnt_word_both, max_real_samples, min_generated_samples)
         print('Done.')
     else:
-        summary_path = args['<dataset_path>']
+        summary_path = args['<summary_path>']
         amount = int(args['<amount>'])
 
         sample(summary_path, amount)
