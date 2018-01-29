@@ -575,6 +575,10 @@ def clean_group_words(directory, name, summary):
                 if not found:
                     keep.append(line)
 
+        with open(file_path, 'w') as f_out:
+            for line in keep:
+                f_out.write(line)
+
 
     parsed = _parse_group_summary(summary)
     for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
