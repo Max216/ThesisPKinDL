@@ -448,9 +448,7 @@ def clean_group(category_dir, name, summary):
     keep_lines = []
     parsed, lines = _parse_group_summary(summary, raw = True)
     for i, (w1, w2, amount, lbl, rel_path, any1, any2, any3) in enumerate(parsed):
-        if name == 'countries':
-            pass
-        elif name == 'nationalities':
+        if name == 'nationalities':
             remove_set1 = set('Australian,Canadian,English,Irish'.split(','))
             remove_set2 = set('Spanish,Argentinian,Mexican'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
@@ -560,7 +558,6 @@ def clean_group(category_dir, name, summary):
 def clean_group_words(directory, name, summary):
 
     def remove_sentences_containing(file_path, words):
-        print('in remove', file_path)
         regexps = [(re.compile('\\b' + w + '\\b')) for w in words]
         keep = []
         with open(file_path) as f_in:
@@ -581,12 +578,9 @@ def clean_group_words(directory, name, summary):
 
     parsed = _parse_group_summary(summary)
     for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
-        print(' in cat', name)
         if name == 'countries':
             file_path = os.join(directory, rel_path)
-            print('summary:', w1, w2)
             if w1 == 'France' or w2 == 'France':
-                print('check')
                 remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
 
 def clean_words(dataset_name):
@@ -597,7 +591,6 @@ def clean_words(dataset_name):
     categories = [(line[0], line[3]) for line in lines]
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
-        print('clean group', name)
         clean_group_words(category_dir, name, os.path.join(category_dir, path))
 
 
