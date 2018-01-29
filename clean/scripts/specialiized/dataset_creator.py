@@ -565,7 +565,10 @@ def clean(dataset_name):
         remove_files = clean_group(category_dir, name, os.path.join(category_dir, path))
         
         for file in remove_files:
-            os.remove(file)
+            try:
+                os.remove(file)
+            except FileNotFoundError:
+                print('not found:', file)
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
