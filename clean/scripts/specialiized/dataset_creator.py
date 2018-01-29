@@ -443,6 +443,7 @@ def clean_group(category_dir, name, summary):
         if name == 'countries':
             pass
         elif name == 'nationalities':
+            print(w1, w2)
             remove_set1 = set('Australian,Canadian,English,Irish'.split(','))
             remove_set2 = set('Spanish,Argentinian,Mexican'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
