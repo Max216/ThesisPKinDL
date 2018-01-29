@@ -388,6 +388,12 @@ def instruments():
 
     return ('instruments', replace_first, [], replace_any)
 
+
+def fix():
+    replace_any = incompatible_pairs([('behind','in front of'), ('at night', 'during the day')])
+
+    return ('fix', [], [], replace_any)
+
 def test():
     return ('test', [('a', 'HORSE', 'contradiction'), ('NOOO WAY', 'a', 'contradiction')], [('NOOO WAY', 'the', 'contradiction'), ('omelette', 'airplane', 'contradiction')], [('horse', 'omelette', 'contradiction')])
 
@@ -600,18 +606,19 @@ def main():
             #antonyms_adj_adv,
             #antonyms_nn_vb,
             #antonyms_other,
-            synonyms,
-            fruits,
-            vegetables,
-            drinks,
-            fastfoods,
-            movements,
-            materials,
-            planets,
-            verb_at,
-            rooms,
-            instruments
+            #synonyms,
+            #fruits,
+            #vegetables,
+            #drinks,
+            #fastfoods,
+            #movements,
+            #materials,
+            #planets,
+            #verb_at,
+            #rooms,
+            #instruments
             #test
+            fix
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
