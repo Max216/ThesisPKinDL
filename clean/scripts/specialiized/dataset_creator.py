@@ -538,9 +538,9 @@ def clean_group(category_dir, name, summary):
                 keep_lines.append(i)
 
         else:
-            pass
+            keep_lines.append(i)
 
-
+    print
     lines = list(set([lines[i] for i in keep_lines]))
     print('keep:', lines)
 
