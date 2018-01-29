@@ -560,6 +560,7 @@ def clean_group(category_dir, name, summary):
 def clean_group_words(directory, name, summary):
 
     def remove_sentences_containing(file_path, words):
+        print('in remove', file_path)
         regexps = [(re.compile('\\b' + w + '\\b')) for w in words]
         keep = []
         with open(file_path) as f_in:
