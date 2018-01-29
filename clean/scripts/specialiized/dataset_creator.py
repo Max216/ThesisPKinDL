@@ -581,6 +581,7 @@ def clean_group_words(directory, name, summary):
 
     parsed = _parse_group_summary(summary)
     for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+        print(' in cat', name)
         if name == 'countries':
             file_path = os.join(directory, rel_path)
             print('summary:', w1, w2)
@@ -596,6 +597,7 @@ def clean_words(dataset_name):
     categories = [(line[0], line[3]) for line in lines]
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
+        print('clean group', name)
         clean_group_words(category_dir, name, os.path.join(category_dir, path))
 
 
@@ -637,6 +639,7 @@ def main():
     elif args['clean_simple']:
         clean(args['<dataset_name>'])
     elif args['clean']:
+        print('correct method')
         clean_words(args['<dataset_name>'])
     else:
         out_name = args['<out_name>']
