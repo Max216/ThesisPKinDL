@@ -585,7 +585,7 @@ def clean_group_words(directory, name, summary):
             if w1 == 'France' or w2 == 'France':
                 remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
 
-def clean_words():
+def clean_words(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
         lines = [line.strip().split(' ') for line in f_in.readlines()]
@@ -633,8 +633,8 @@ def main():
         datahandler.print_sents(words, max_amount)
     elif args['clean_simple']:
         clean(args['<dataset_name>'])
-    elif args['<clean>']:
-        clean_words()
+    elif args['clean']:
+        clean_words(args['<dataset_name>'])
     else:
         out_name = args['<out_name>']
         all_fn = [
