@@ -4,7 +4,7 @@ sys.path.append('./../')
 
 from docopt import docopt
 
-def split_dataset(path_data, path_out_neutral_entailment, path_put_contradiction):
+def split_dataset(path_data, path_out_neutral_entailment, path_out_contradiction):
     '''
     Splits the dataset into samples containing neutral/entailment and contadiction
     :param path_data                    Path to dataset to split
