@@ -390,7 +390,7 @@ def instruments():
 
 
 def fix():
-    replace_any = incompatible_pairs([('behind','in front of'), ('at night', 'during the day')])
+    replace_any = incompatible_pairs([('in the morning', 'at midnight')])
 
     return ('fix', [], [], replace_any)
 
