@@ -440,11 +440,9 @@ def clean_group(category_dir, name, summary):
 
     remove_files = []
     for w1, w2, amount, lbl, rel_path, any1, any2, any3 in _parse_group_summary(summary):
-        print(w1,w2)
         if name == 'countries':
             pass
         elif name == 'nationalities':
-            print(w1, w2)
             remove_set1 = set('Australian,Canadian,English,Irish'.split(','))
             remove_set2 = set('Spanish,Argentinian,Mexican'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
@@ -522,7 +520,7 @@ def clean_group(category_dir, name, summary):
         else:
             print('NOTHING FOR', name)
 
-        return remove_files
+    return remove_files
 
 
 
