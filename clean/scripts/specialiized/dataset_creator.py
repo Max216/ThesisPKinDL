@@ -5,6 +5,9 @@ from docopt import docopt
 
 from libs import data_manipulator
 
+import collections
+import nltk
+
 def read_strp_lines(file):
     with open (file) as f_in:
         return [line.strip() for line in f_in]
@@ -587,6 +590,46 @@ def clean_group_words(directory, name, summary):
             if w1 == 'France' or w2 == 'France':
                 remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
 
+def print_bigram_fails(dataset_name):
+
+    bigram_counts = dict()
+    with open(os.path.realpath('~/data/bigrams/bigram_EN.dat')) as f_in:
+        for line in f_in:
+            splitted = line.split()
+            if len(splitted) > 0:
+                print('Oh no', splitted)
+            else:
+                if splitted[1] not in bigram_counts:
+                    bigram_counts[splitted[1]] = dict()
+                bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
+
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+
+        parsed = _parse_group_summary(summary)
+        for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+            with open(os.path.join(category_dir, rel_path)) as f_in:
+                for line in f_in:
+                    sample = json.loads(line.strip())
+                    if sample['generation_replaced'] == '1':
+                        sent = sample['sentence2']
+                    else:
+                        sent = sample['sentence1']
+
+                    tokenized = nltk.word_tokenize(sent)
+                    index = tokenized.index(w2)
+                    if index < 0:
+                        print('Leaving out:', w2, w2, '->', sent)
+                    else:
+                        bigrams = []
+                        if index > 0:
+                            bigrams.append
+
 def clean_words(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
@@ -623,6 +666,7 @@ def main():
         dataset_creator.py show -a <amount> (-w <words>)...
         dataset_creator.py clean_simple <dataset_name>
         dataset_creator.py clean <dataset_name>
+        dataset_creator.py bigrams <dataset_name>
     """)
 
 
@@ -636,8 +680,9 @@ def main():
     elif args['clean_simple']:
         clean(args['<dataset_name>'])
     elif args['clean']:
-        print('correct method')
         clean_words(args['<dataset_name>'])
+    elif args['bigrams']:
+        print_bigram_fails(args['<dataset_name>'])
     else:
         out_name = args['<out_name>']
         all_fn = [
