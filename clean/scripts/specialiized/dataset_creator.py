@@ -542,9 +542,13 @@ def clean_group(category_dir, name, summary):
 
     print
     lines = list(set([lines[i] for i in keep_lines]))
-    print('keep:', lines)
+    
+    # update
+    with open(summary, 'w') as f_out:
+        for line in lines:
+            f_out.write(line + '\n')
 
-    return remove_files
+    return [os.path.join(category_dir, file) for file in remove_files]
 
 
 
@@ -559,8 +563,9 @@ def clean(dataset_name):
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
         remove_files = clean_group(category_dir, name, os.path.join(category_dir, path))
-        print(name)
-        print(remove_files)
+        
+        for file in remove_files:
+            os.remove(file)
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
