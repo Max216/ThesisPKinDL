@@ -439,7 +439,9 @@ def clean_group(category_dir, name, summary):
         return w1 in remove_set and w2 in remove_set
 
     remove_files = []
-    for w1, w2, amount, lbl, rel_path, any1, any2, any3 in _parse_group_summary(summary):
+    keep_lines = []
+    parsed, lines = _parse_group_summary(summary, raw = True)
+    for i, (w1, w2, amount, lbl, rel_path, any1, any2, any3) in enumerate(parsed):
         if name == 'countries':
             pass
         elif name == 'nationalities':
@@ -447,9 +449,13 @@ def clean_group(category_dir, name, summary):
             remove_set2 = set('Spanish,Argentinian,Mexican'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
         elif name == 'fruits':
             if (w1 == 'coconut' and w2 == 'fruit') or (w1 == 'coconuts' and w2 == 'fruits'):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
         elif name == 'vegetables':
             invalid_p1 = set('avocado,pumpkin,tomato'.split(','))
             invalid_h1 = set(['vegetable'])
@@ -460,28 +466,38 @@ def clean_group(category_dir, name, summary):
                 remove_files.append(rel_path)
             elif w1 in invalid_p2 and w2 in invalid_h2:
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'fastfood':
             remove_set1 = set('cheeseburger,hamburger,sandwich'.split(','))
             remove_set2 = set('french fries,fish and chips'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'movements':
             remove_set = set('stroll to,strolls to,walk to,walks to'.split(','))
             if include_both(w1, w2, remove_set):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'materials':
             remove_set1 = set('brick,stone'.split(','))
             remove_set2 = set('cement,sand'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'at-verbs':
             remove_set = set('climb at,stand at,climbs at,stands at'.split(','))
             if include_both(w1, w2, remove_set):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'rooms':
             remove_set1 = set('basement,cellar'.split(','))
@@ -509,6 +525,8 @@ def clean_group(category_dir, name, summary):
                 remove_files.append(rel_path)
             elif (w1 == 'office' and w2 not in keep_set3) or (w2 == 'office' and w1 not in keep_set3):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         elif name == 'colors':
             remove_set1 = set('beige,brown'.split(','))
@@ -516,9 +534,15 @@ def clean_group(category_dir, name, summary):
             remove_set3 = set('grey,white'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1,w2,remove_set2) or include_both(w1,w2,remove_set3):
                 remove_files.append(rel_path)
+            else:
+                keep_lines.append(i)
 
         else:
-            print('NOTHING FOR', name)
+            pass
+
+
+    lines = list(set([lines[i] for i in keep_lines]))
+    print('keep:', lines)
 
     return remove_files
 
