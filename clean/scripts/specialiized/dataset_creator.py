@@ -414,6 +414,128 @@ def test_out():
         print(p, '--', h, '--', lbl)
     print()
 
+def _parse_group_summary(in_path, raw=False):
+    '''
+    Parse the content of the <*.sjson> file.
+    '''
+    with open(in_path) as f_in:
+        lines = [line.strip() for line in f_in.readlines()]
+        all_pairs = [json.loads(line) for line in lines]
+
+    parsed = [(
+        pair['word_p'], pair['word_h'], pair['amount'], pair['assumed_label'],
+        pair['rel_path'], pair['sents_with_word_p'], pair['sents_with_word_h'],
+        pair['real_sample_count'] 
+    ) for pair in all_pairs]
+
+    if raw:
+        return (parsed, lines)
+    else:
+        return parsed
+
+def clean_group(category_dir, name, summary):
+
+    def include_both(w1, w2, remove_set):
+        return w1 in remove_set and w2 in remove_set
+
+    remove_files = []
+    for w1, w2, amount, lbl, rel_path, any1, any2, any3 in _parse_group_summary(summary):
+        if name == 'countries':
+            pass
+        elif name == 'nationalities':
+            remove_set1 = set('Australian,Canadian,English,Irish'.split(','))
+            remove_set2 = set('Spanish,Argentinian,Mexican'.split(','))
+            if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
+                remove_files.append(rel_path)
+        elif name == 'fruits':
+            if (w1 == 'coconut' and w2 == 'fruit') or (w1 == 'coconuts' and w2 = 'fruits'):
+                remove_files.append(rel_path)
+        elif name == 'vegetables':
+            invalid_p1 = set('avocado,pumpkin,tomato'.split(','))
+            invalid_h1 = set(['vegetable'])
+            invalid_p2 = set('avocados,pumkins,tomatoes'.split(','))
+            invalid_h2 = set(['vegetables'])
+
+            if w1 in invalid_p1 and w2 in invalid_h1:
+                remove_files.append(rel_path)
+            elif w1 in invalid_p2 and w2 in invalid_h2:
+                remove_files.append(rel_path)
+
+        elif name == 'fastfood':
+            remove_set1 = set('cheeseburger,hamburger,sandwich'.split(','))
+            remove_set2 = set('french fries,fish and chips'.split(','))
+            if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
+                remove_files.append(rel_path)
+
+        elif name == 'movements':
+            remove_set = set('stroll to,strolls to,walk to,walks to'.split(','))
+            if include_both(w1, w2, remove_set):
+                remove_files.append(rel_path)
+
+        elif name == 'materials':
+            remove_set1 = set('brick,stone'.split(','))
+            remove_set2 = set('cement,sand'.split(','))
+            if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
+                remove_files.append(rel_path)
+
+        elif name == 'at-verbs':
+            remove_set = set('climb at,stand at,climbs at,stands at'.split(','))
+            if include_both(w1, w2, remove_set):
+                remove_files.append(rel_path)
+
+        elif name == 'rooms':
+            remove_set1 = set('basement,cellar'.split(','))
+            keep_set1 = set('in a house,in a building'.split(','))
+
+            remove_set2 = set('classroom,common room'.split(','))
+            remove_set3 = set('common room,living room,playroom'.split(','))
+            remove_set4 = set('garage,playroom'.split(','))
+            remove_set5 = set('living room,playroom,dining room,kitchen'.split(','))
+            remove_set6 = set('bathroom,bedroom,living room'.split(','))
+            keep_set2 = set('classroom,courtroom,prison cell,garage'.split(','))
+            keep_set3 = set('classroom,prison cell,garage'.split(','))
+            
+            if w1 in remove_set1 or w2 in remove_set1
+                remove_files.append(rel_path)
+            elif  w1 in remove_set1 and w2 not in keep_set1:
+                remove_files.append(rel_path)
+            elif include_both(w1, w2, remove_set2) or include_both(w1, w2, remove_set3) or include_both(w1,w2,remove_set4):
+                remove_files.append(rel_path)
+            elif (w1 == 'common room' and w2 in remove_set5) or (w2 == 'common room' and w1 in remove_set5):
+                remove_files.append(rel_path)
+            elif (w1 == 'prison cell' and w2 in remove_set6) or (w2 == 'prison cell' and w1 in remove_set6):
+                remove_files.append(rel_path)
+            elif (w1 == 'lounge' and w2 not in keep_set2) or (w2 == 'lounge' and w1 not in keep_set2):
+                remove_files.append(rel_path)
+            elif (w1 == 'office' and w2 not in keep_set3) or (w2 == 'office' and w1 not in keep_set3):
+                remove_files.append(rel_path)
+
+        elif name == 'colors':
+            remove_set1 = set('beige,brown'.split(','))
+            remove_set2 = set('grey,black'.split(','))
+            remove_set3 = set('grey,white').split(',')
+            if include_both(w1, w2, remove_set1) or include_both(w1,w2,remove_set2) or include_both(w1,w2,remove_set3):
+                remove_files.append(rel_path)
+
+        else:
+            print('NOTHING FOR', name)
+
+
+
+
+
+def clean(dataset_name):
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+        remove_files = clean_group(category_dir, name, os.path.join(category_dir, path))
+
+        print(remove_files)
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -421,6 +543,7 @@ def main():
         dataset_creator.py create <out_name>
         dataset_creator.py test 
         dataset_creator.py show -a <amount> (-w <words>)...
+        dataset_creator.py clean_simple <dataset_name>
     """)
 
 
@@ -431,6 +554,8 @@ def main():
         words = args['<words>']
         datahandler = data_manipulator.DataManipulator().load()
         datahandler.print_sents(words, max_amount)
+    elif args['clean_simple']:
+        clean(args['<dataset_name>'])
     else:
         out_name = args['<out_name>']
         all_fn = [
