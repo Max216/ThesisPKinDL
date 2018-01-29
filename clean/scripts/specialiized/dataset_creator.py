@@ -533,7 +533,7 @@ def clean(dataset_name):
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
         remove_files = clean_group(category_dir, name, os.path.join(category_dir, path))
-
+        print(name)
         print(remove_files)
 
 def main():
