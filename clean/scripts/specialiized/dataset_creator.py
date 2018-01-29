@@ -448,7 +448,7 @@ def clean_group(category_dir, name, summary):
             if include_both(w1, w2, remove_set1) or include_both(w1, w2, remove_set2):
                 remove_files.append(rel_path)
         elif name == 'fruits':
-            if (w1 == 'coconut' and w2 == 'fruit') or (w1 == 'coconuts' and w2 = 'fruits'):
+            if (w1 == 'coconut' and w2 == 'fruit') or (w1 == 'coconuts' and w2 == 'fruits'):
                 remove_files.append(rel_path)
         elif name == 'vegetables':
             invalid_p1 = set('avocado,pumpkin,tomato'.split(','))
@@ -495,9 +495,9 @@ def clean_group(category_dir, name, summary):
             keep_set2 = set('classroom,courtroom,prison cell,garage'.split(','))
             keep_set3 = set('classroom,prison cell,garage'.split(','))
             
-            if w1 in remove_set1 or w2 in remove_set1
+            if (w1 in remove_set1 and w2 not in keep_set1) or (w1 == 'lounge' and w2 in keep_set1):
                 remove_files.append(rel_path)
-            elif  w1 in remove_set1 and w2 not in keep_set1:
+            elif w1 in remove_set1 or w2 in remove_set1
                 remove_files.append(rel_path)
             elif include_both(w1, w2, remove_set2) or include_both(w1, w2, remove_set3) or include_both(w1,w2,remove_set4):
                 remove_files.append(rel_path)
