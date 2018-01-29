@@ -513,12 +513,14 @@ def clean_group(category_dir, name, summary):
         elif name == 'colors':
             remove_set1 = set('beige,brown'.split(','))
             remove_set2 = set('grey,black'.split(','))
-            remove_set3 = set('grey,white').split(',')
+            remove_set3 = set('grey,white'.split(','))
             if include_both(w1, w2, remove_set1) or include_both(w1,w2,remove_set2) or include_both(w1,w2,remove_set3):
                 remove_files.append(rel_path)
 
         else:
             print('NOTHING FOR', name)
+
+        return remove_files
 
 
 
