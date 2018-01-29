@@ -1,4 +1,4 @@
-import sys, os, json
+import sys, os, json, re
 sys.path.append('./../')
 
 from docopt import docopt
@@ -557,7 +557,43 @@ def clean_group(category_dir, name, summary):
     return [os.path.join(category_dir, file) for file in remove_files]
 
 
+def clean_group_words(directory, name, summary):
 
+    def remove_sentences_containing(file_path, words):
+        regexps = [(re.compile('\\b' + w + '\\b')) for w in words]
+        keep = []
+        with open(file_path) as f_in:
+            for line in f_in:
+                parsed = json.loads(line.strip())
+                found = False
+                for regexp in regexps:
+                    if regexp.search(parsed['sentence1']) or regexp.search(parsed['sentence2']):
+                        print('remove')
+                        print('[p]', parsed['sentence1'])
+                        print('[h]', parsed['sentence2'] + '\n')
+                        found = True
+                        break
+
+                if not found:
+                    keep.append(line)
+
+
+    parsed = _parse_group_summary(summary)
+    for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+        if name == 'countries':
+            file_path = os.join(directory, rel_path)
+            if w1 == 'France' or w2 == 'France':
+                remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
+
+def clean_words():
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+        clean_group_words(category_dir, name, os.path.join(category_dir, path))
 
 
 def clean(dataset_name):
@@ -584,6 +620,7 @@ def main():
         dataset_creator.py test 
         dataset_creator.py show -a <amount> (-w <words>)...
         dataset_creator.py clean_simple <dataset_name>
+        dataset_creator.py clean <dataset_name>
     """)
 
 
@@ -596,6 +633,8 @@ def main():
         datahandler.print_sents(words, max_amount)
     elif args['clean_simple']:
         clean(args['<dataset_name>'])
+    elif args['<clean>']:
+        clean_words()
     else:
         out_name = args['<out_name>']
         all_fn = [
