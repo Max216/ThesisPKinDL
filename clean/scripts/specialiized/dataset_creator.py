@@ -583,7 +583,9 @@ def clean_group_words(directory, name, summary):
     for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
         if name == 'countries':
             file_path = os.join(directory, rel_path)
+            print('summary:', w1, w2)
             if w1 == 'France' or w2 == 'France':
+                print('check')
                 remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
 
 def clean_words(dataset_name):
