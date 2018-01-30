@@ -661,7 +661,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                             splitted_replaced_word = replaced_word.split(' ')
                             if len(splitted_replaced_word) > 1:
                                 multi_word1 = splitted_replaced_word[0]
-                                multi_word2 = splitted_replaced_word[1]
+                                multi_word2 = splitted_replaced_word[-1]
                                 index_first = tokenized.index(splitted_replaced_word[0])
                                 index_last = tokenized.index(splitted_replaced_word[-1])
                             else:
