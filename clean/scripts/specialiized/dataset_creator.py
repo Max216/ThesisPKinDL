@@ -652,7 +652,7 @@ def print_bigram_fails(dataset_name):
                                     counts = 0
 
                                 if counts == 0:
-                                    print(w1, w2, counts)
+                                    print(b1, b2, counts)
                                     print(sent)
 
 def clean_words(dataset_name):
