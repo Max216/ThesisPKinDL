@@ -641,6 +641,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                     if index < len(tokenized) - 1:
                         bigrams.append((replaced_word, tokenized[index + 1]))
 
+                    keep = True
                     for bigram in bigrams:
                         b1 = bigram[0].lower()
                         b2 = bigram[1].lower()
@@ -653,15 +654,20 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                                 counts = 0
 
                             if counts <= t:
-                                not_keep_samples.append(line)
-                            else:
-                                keep_samples.append(line)
+                                keep = False
+                                break
+
+                    if keep:
+                        keep_samples.append(line)
+                    else:
+                        not_keep_samples.append(line)
+
 
             # write out valid samples
             print(name, '>', rel_path, 'total:', count_total, 'keep:', len(keep_samples))
             current_dir = os.path.join(out_name, name)
             if not os.path.exists(current_dir):
-                os.makedirs(out_name)
+                os.makedirs(current_dir)
 
             if len(keep_samples) > 0:
                 with open(os.path.join(current_dir, rel_path), 'w') as f_out:
