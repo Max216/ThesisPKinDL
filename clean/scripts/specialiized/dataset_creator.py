@@ -664,12 +664,12 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                 os.makedirs(out_name)
 
             if len(keep_samples) > 0:
-                with open(os.path.join(current_dir, rel_path)) as f_out:
+                with open(os.path.join(current_dir, rel_path), 'w') as f_out:
                     for line in keep_samples:
                         f_out.write(line)
 
             if len(not_keep_samples) > 0:
-                with open(os.path.join(current_dir, 'removed-' + rel_path)) as f_out:
+                with open(os.path.join(current_dir, 'removed-' + rel_path), 'w') as f_out:
                     for line in not_keep_samples:
                         f_out.write(line)
 
