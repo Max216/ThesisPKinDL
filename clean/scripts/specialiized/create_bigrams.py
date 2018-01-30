@@ -21,7 +21,7 @@ def main():
     split_regexp = r'\t'
     # go through all files
     count = 0
-    for file in [os.path.join(folder, file) for file in os.listdir(folder) if file.startswith('googlebooks')]:
+    for file in [os.path.join(folder, file) for file in os.listdir(folder) if file.startswith('googlebooks-eng-all-2gram-20120701')]:
         print('Open:', file)
         with gzip.open(file, 'r') as f_in:
             for line in f_in:
