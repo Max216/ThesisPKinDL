@@ -809,7 +809,7 @@ def main():
     elif args['clean']:
         clean_words(args['<dataset_name>'])
     elif args['bigrams']:
-        print_bigram_fails(args['<dataset_name>'], args['<out_name>'])
+        print_bigram_fails(args['<dataset_name>'], args['<out_name>'], t=10)
     else:
         out_name = args['<out_name>']
         all_fn = [
