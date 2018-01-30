@@ -596,18 +596,13 @@ def print_bigram_fails(dataset_name):
 
     bigram_counts = dict()
     count = 0
-    with open(os.path.realpath('../../../data/bigrams/bigram_EN.dat')) as f_in:
+    with open(os.path.realpath('../../../data/bigrams/bigram_EN_snli.dat')) as f_in:
         for line in f_in:
             splitted = line.split()
-            if len(splitted) != 3:
-                print('Oh no', splitted)
-            else:
-                count += 1
-                if splitted[1] not in bigram_counts:
-                    bigram_counts[splitted[1]] = dict()
-                bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
+            if splitted[1] not in bigram_counts:
+                bigram_counts[splitted[1]] = dict()
+            bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
 
-    print('loaded', count, 'bigrams')
 
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
