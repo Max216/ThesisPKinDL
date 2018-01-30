@@ -600,7 +600,7 @@ def print_bigram_fails(dataset_name):
         for line in f_in:
             splitted = line.split()
             if splitted[1] not in bigram_counts:
-                bigram_counts[splitted[1]] = dict()
+                bigram_counts[splitted[1]] = collections.defaultdict(int)
             bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
 
 
@@ -632,7 +632,7 @@ def print_bigram_fails(dataset_name):
                         print('NOT FOUND',replaced_word,  tokenized)
                         index = -1
                     if index < 0:
-                        print('Leaving out:', w2, w2, '->', sent)
+                        print('Leaving out:', w1, w2, '->', sent)
                     else:
                         bigrams = []
                         if index > 0:
