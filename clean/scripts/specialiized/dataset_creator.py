@@ -423,6 +423,19 @@ def test_out():
         print(p, '--', h, '--', lbl)
     print()
 
+def _parse_all_summary(in_path):
+    with open(in_path) as f_in:
+        lines = [line.strip() for line in f_in.readlines()]
+        all_pairs = [json.loads(line) for line in lines]
+
+    parsed = [(
+        pair['word_p'], pair['word_h'], pair['amount'], pair['assumed_label'],
+        pair['rel_path'], pair['sents_with_word_p'], pair['sents_with_word_h'],
+        pair['real_sample_count'], pair['generate_replace']
+    ) for pair in all_pairs]
+
+    return parsed
+
 def _parse_group_summary(in_path, raw=False):
     '''
     Parse the content of the <*.sjson> file.
@@ -724,11 +737,25 @@ def clean_filtered(dataset_name):
     categories = [(line[0], line[3]) for line in lines]
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
-        parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
-        for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
-            pass
-
+        parsed = _parse_all_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         
+        write_out = []
+        for w1, w2, amount, lbl, rel_path, swp, swh, real_samples, generation in parsed:
+            if os.path.exists(os.path.join(category_dir, rel_path)):
+                with open(os.path.join(category_dir, rel_path)) as f_in:
+                    count = len(f_in.readlines())
+                if count > 0:
+                    write_out.append({
+                        'word_p': w1,
+                        'word_h': w2,
+                        'amount': count,
+                        'assumed_label', lbl,
+                        'rel_path': rel_path,
+                        'sents_with_word_p': swp,
+                        'sents_with_word_h': swh,
+                        'real_sample_count': real_samples,
+                        'generate_replace': generation
+                    })   
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
