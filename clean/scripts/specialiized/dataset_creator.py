@@ -749,7 +749,7 @@ def clean_filtered(dataset_name):
                         'word_p': w1,
                         'word_h': w2,
                         'amount': count,
-                        'assumed_label', lbl,
+                        'assumed_label': lbl,
                         'rel_path': rel_path,
                         'sents_with_word_p': swp,
                         'sents_with_word_h': swh,
