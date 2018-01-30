@@ -607,7 +607,7 @@ def print_bigram_fails(dataset_name):
                     bigram_counts[splitted[1]] = dict()
                 bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
 
-    print('loaded', counts, 'bigrams')
+    print('loaded', count, 'bigrams')
 
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
