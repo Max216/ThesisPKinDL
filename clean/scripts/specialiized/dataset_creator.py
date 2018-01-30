@@ -590,7 +590,7 @@ def clean_group_words(directory, name, summary):
             if w1 == 'France' or w2 == 'France':
                 remove_sentences_containing(file_path, ['tour de France', 'Tour de France', 'Tour De France'])
 
-def print_bigram_fails(dataset_name):
+def print_bigram_fails(dataset_name, out_name, t=0):
 
     exclude_bigrams = set(['.',',', '(', ')', ':'])
 
@@ -603,7 +603,6 @@ def print_bigram_fails(dataset_name):
                 bigram_counts[splitted[1]] = collections.defaultdict(int)
             bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
 
-
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
         lines = [line.strip().split(' ') for line in f_in.readlines()]
@@ -615,8 +614,11 @@ def print_bigram_fails(dataset_name):
         parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
             print('## Check:', name, '>>', rel_path)
+            count_total = 0
+            keep_samples = []
             with open(os.path.join(category_dir, rel_path)) as f_in:
                 for line in f_in:
+                    count_total += 1
                     sample = json.loads(line.strip())
                     if sample['generation_replaced'] == '1':
                         sent = sample['sentence2']
@@ -651,9 +653,20 @@ def print_bigram_fails(dataset_name):
                                 else: 
                                     counts = 0
 
-                                if counts == 0:
+                                if counts <= t:
                                     print(b1, b2, counts)
                                     print(sent)
+                                else:
+                                    keep_samples.append(line)
+
+            # write out valid samples
+            print(name, '>', rel_path, 'total:', count_total, 'keep:', len(keep_samples))
+            current_dir = os.path.join(out_name, name)
+            if not os.path.exists(current_dir):
+                os.makedirs(out_name)
+            with open(os.path.join(current_dir, rel_path)) as f_out:
+                for line in keep_samples:
+                    f_out.write(line)
 
 def clean_words(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
