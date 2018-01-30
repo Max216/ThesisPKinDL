@@ -670,7 +670,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                             #print('NOT FOUND',replaced_word,  tokenized)
                             index = -1
                             index_first = -1
-                            index_last = 100000000
+                            index_last = -1
 
                         bigrams = []
                         if index > 0:
@@ -680,7 +680,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
 
                         if index_first > 0:
                             bigrams.append((tokenized[index_first - 1], multi_word1))
-                        if index_last < len(tokenized) - 1:
+                        if index_last < len(tokenized) - 1 and index_last != -1:
                             bigrams.append((multi_word2, tokenized[index_last + 1]))
 
                         keep = True
