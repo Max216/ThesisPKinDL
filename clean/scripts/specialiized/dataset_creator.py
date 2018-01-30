@@ -726,6 +726,7 @@ def clean_filtered(dataset_name):
         category_dir = os.path.join(dataset_dir, name)
         parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+            pass
 
         
 
