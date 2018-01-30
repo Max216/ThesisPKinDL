@@ -614,16 +614,23 @@ def print_bigram_fails(dataset_name):
 
         parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+            print('## Check:', name, '>>', rel_path)
             with open(os.path.join(category_dir, rel_path)) as f_in:
                 for line in f_in:
                     sample = json.loads(line.strip())
                     if sample['generation_replaced'] == '1':
                         sent = sample['sentence2']
+                        replaced_word = w2
                     else:
                         sent = sample['sentence1']
+                        replaced_word = w1
 
                     tokenized = nltk.word_tokenize(sent)
-                    index = tokenized.index(w2)
+                    try:
+                        index = tokenized.index(replaced_word)
+                    except Exception:
+                        print('NOT FOUND',replaced_word,  tokenized)
+                        index = -1
                     if index < 0:
                         print('Leaving out:', w2, w2, '->', sent)
                     else:
