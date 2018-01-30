@@ -617,50 +617,60 @@ def print_bigram_fails(dataset_name, out_name, t=0):
             count_total = 0
             keep_samples = []
             not_keep_samples = []
+
+            skip = False
+            if len(w1.split(' ')) > 1 or len(w2.split(' ')) > 1:
+                print('# Skip:', w1 , ' -- ', w2)
+                skip = True
+
+
             with open(os.path.join(category_dir, rel_path)) as f_in:
-                for line in f_in:
-                    count_total += 1
-                    sample = json.loads(line.strip())
-                    if sample['generation_replaced'] == '1':
-                        sent = sample['sentence2']
-                        replaced_word = w2
-                    else:
-                        sent = sample['sentence1']
-                        replaced_word = w1
+                if skip:
+                    keep_samples = f_in.readlines()
+                else:
+                    for line in f_in:
+                        count_total += 1
+                        sample = json.loads(line.strip())
+                        if sample['generation_replaced'] == '1':
+                            sent = sample['sentence2']
+                            replaced_word = w2
+                        else:
+                            sent = sample['sentence1']
+                            replaced_word = w1
 
-                    tokenized = nltk.word_tokenize(sent)
-                    try:
-                        index = tokenized.index(replaced_word)
-                    except Exception:
-                        print('NOT FOUND',replaced_word,  tokenized)
-                        index = -1
+                        tokenized = nltk.word_tokenize(sent)
+                        try:
+                            index = tokenized.index(replaced_word)
+                        except Exception:
+                            print('NOT FOUND',replaced_word,  tokenized)
+                            index = -1
 
-                    bigrams = []
-                    if index > 0:
-                        bigrams.append((tokenized[index - 1], replaced_word))
-                    if index < len(tokenized) - 1:
-                        bigrams.append((replaced_word, tokenized[index + 1]))
+                        bigrams = []
+                        if index > 0:
+                            bigrams.append((tokenized[index - 1], replaced_word))
+                        if index < len(tokenized) - 1:
+                            bigrams.append((replaced_word, tokenized[index + 1]))
 
-                    keep = True
-                    for bigram in bigrams:
-                        b1 = bigram[0].lower()
-                        b2 = bigram[1].lower()
+                        keep = True
+                        for bigram in bigrams:
+                            b1 = bigram[0].lower()
+                            b2 = bigram[1].lower()
 
-                        if b1 not in exclude_bigrams and b2 not in exclude_bigrams:
-                            counts = 0
-                            if b1 in bigram_counts:
-                                counts = bigram_counts[b1][b2]
-                            else: 
+                            if b1 not in exclude_bigrams and b2 not in exclude_bigrams:
                                 counts = 0
+                                if b1 in bigram_counts:
+                                    counts = bigram_counts[b1][b2]
+                                else: 
+                                    counts = 0
 
-                            if counts <= t:
-                                keep = False
-                                break
+                                if counts <= t:
+                                    keep = False
+                                    break
 
-                    if keep:
-                        keep_samples.append(line)
-                    else:
-                        not_keep_samples.append(line)
+                        if keep:
+                            keep_samples.append(line)
+                        else:
+                            not_keep_samples.append(line)
 
 
             # write out valid samples
@@ -706,6 +716,19 @@ def clean(dataset_name):
             except FileNotFoundError:
                 print('not found:', file)
 
+def clean_filtered(dataset_name):
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+        parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
+        for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
+
+        
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -716,11 +739,14 @@ def main():
         dataset_creator.py clean_simple <dataset_name>
         dataset_creator.py clean <dataset_name>
         dataset_creator.py bigrams <dataset_name> <out_name>
+        dataset_creator.py clean_filtered <dataset_name>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['clean_filtered']:
+        clean_filtered(args['<dataset_name>'])
     elif args['show']:
         max_amount = int(args['<amount>'])
         words = args['<words>']
