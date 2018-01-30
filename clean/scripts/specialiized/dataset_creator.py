@@ -670,7 +670,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                             #print('NOT FOUND',replaced_word,  tokenized)
                             index = -1
                             index_first = -1
-                            index_last = -1
+                            index_last = 100000000
 
                         bigrams = []
                         if index > 0:
