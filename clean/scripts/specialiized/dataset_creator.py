@@ -632,9 +632,9 @@ def print_bigram_fails(dataset_name, out_name, t=0):
             not_keep_samples = []
 
             skip = False
-            if len(w1.split(' ')) > 1 or len(w2.split(' ')) > 1:
-                print('# Skip:', w1 , ' -- ', w2)
-                skip = True
+            #if len(w1.split(' ')) > 1 or len(w2.split(' ')) > 1:
+            #    print('# Skip:', w1 , ' -- ', w2)
+            #    skip = True
 
 
             with open(os.path.join(category_dir, rel_path)) as f_in:
@@ -652,17 +652,36 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                             replaced_word = w1
 
                         tokenized = nltk.word_tokenize(sent)
+                        index = -1
+                        index_first = -1
+                        index_last = -1
+                        multi_word1 = None
+                        multi_word2 = None
                         try:
-                            index = tokenized.index(replaced_word)
+                            splitted_replaced_word = replaced_word.split(' ')
+                            if len(splitted_replaced_word) > 1:
+                                multi_word1 = splitted_replaced_word[0]
+                                multi_word2 = splitted_replaced_word[1]
+                                index_first = tokenized.index(splitted_replaced_word[0])
+                                index_last = tokenized.index(splitted_replaced_word[-1])
+                            else:
+                                index = tokenized.index(replaced_word)
                         except Exception:
                             #print('NOT FOUND',replaced_word,  tokenized)
                             index = -1
+                            index_first = -1
+                            index_last = -1
 
                         bigrams = []
                         if index > 0:
                             bigrams.append((tokenized[index - 1], replaced_word))
                         if index < len(tokenized) - 1:
                             bigrams.append((replaced_word, tokenized[index + 1]))
+
+                        if index_first > 0:
+                            bigrams.append((tokenized[index_first - 1], multi_word1))
+                        if index_last < len(tokenized) - 1:
+                            bigrams.append((multi_word2, tokenized[index_last + 1]))
 
                         keep = True
                         for bigram in bigrams:
@@ -710,7 +729,7 @@ def clean_words(dataset_name):
     categories = [(line[0], line[3]) for line in lines]
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
-        clean_group_words(category_dir, name, os.path.join(category_dir, path))
+        clean_group_words(category_dir, name, os.path.join(category_dir, path), t=10)
 
 
 def clean(dataset_name):
