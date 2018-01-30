@@ -592,6 +592,8 @@ def clean_group_words(directory, name, summary):
 
 def print_bigram_fails(dataset_name):
 
+    exclude_bigrams = set(['.',',', '(', ')', ':'])
+
     bigram_counts = dict()
     with open(os.path.realpath('~/data/bigrams/bigram_EN.dat')) as f_in:
         for line in f_in:
@@ -628,7 +630,24 @@ def print_bigram_fails(dataset_name):
                     else:
                         bigrams = []
                         if index > 0:
-                            bigrams.append
+                            bigrams.append((tokenized[index - 1], w2))
+                        if index < len(tokenized) - 1:
+                            bigrams.append((w2, tokenized[index + 1]))
+
+                        for bigram in bigrams:
+                            b1 = bigram[0].lower()
+                            b2 = bigram[1].lower()
+
+                            if b1 not in exclude_bigrams and b2 not in exclude_bigrams:
+                                counts = 0
+                                if b1 in bigram_counts:
+                                    counts = bigram_counts[b1][b2]
+                                else: 
+                                    counts = 0
+
+                                if counts == 0:
+                                    print(w1, w2, counts)
+                                    print(sent)
 
 def clean_words(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
