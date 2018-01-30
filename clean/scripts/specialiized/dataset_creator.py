@@ -685,6 +685,8 @@ def print_bigram_fails(dataset_name, out_name, t=0):
 
                         keep = True
                         for bigram in bigrams:
+                            print(sent)
+                            print(bigram)
                             b1 = bigram[0].lower()
                             b2 = bigram[1].lower()
 
