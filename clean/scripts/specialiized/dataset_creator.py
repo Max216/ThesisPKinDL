@@ -595,15 +595,19 @@ def print_bigram_fails(dataset_name):
     exclude_bigrams = set(['.',',', '(', ')', ':'])
 
     bigram_counts = dict()
+    count = 0
     with open(os.path.realpath('../../../data/bigrams/bigram_EN.dat')) as f_in:
         for line in f_in:
             splitted = line.split()
             if len(splitted) != 3:
                 print('Oh no', splitted)
             else:
+                count += 1
                 if splitted[1] not in bigram_counts:
                     bigram_counts[splitted[1]] = dict()
                 bigram_counts[splitted[1]][splitted[2]] = int(splitted[0])
+
+    print('loaded', counts, 'bigrams')
 
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
@@ -613,7 +617,7 @@ def print_bigram_fails(dataset_name):
     for name, path in categories:
         category_dir = os.path.join(dataset_dir, name)
 
-        parsed = _parse_group_summary(summary)
+        parsed = _parse_group_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         for w1, w2, amount, lbl, rel_path, any1, any2, any3 in parsed:
             with open(os.path.join(category_dir, rel_path)) as f_in:
                 for line in f_in:
