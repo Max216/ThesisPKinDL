@@ -26,6 +26,13 @@ def main():
                     count += 1
                     bigram_dict[splitted[1]][splitted[2]] += int(splitted[0])
 
+        print('bigrams:', count)
+        with open(path_out, 'w') as f_out:
+            for key in bigram_dict:
+                current = bigram_dict[key]
+                for key2 in current:
+                    f_out.write(' '.join([str(current[key2]), key, key2]) + '\n')
+
     elif args['google']:
         folder = args['<folder>']
         vocab_path = args['<vocab_path>']
