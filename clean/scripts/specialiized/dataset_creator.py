@@ -781,6 +781,26 @@ def clean_filtered(dataset_name):
             for line in write_out:
                 f_out.write(json.dumps(line) + '\n')
 
+def summary(dataset_name):
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+
+        category_count_samples = 0
+        category_count_pairs = 0
+        parsed = _parse_all_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
+        print('##', name)
+        for w1, w2, amount, lbl, rel_path, swp, swh, real_samples, generation in parsed:
+            category_count_pairs += 1
+            category_count_samples += amount
+
+            print(w1, '--', w2, '--', lbl, '>', amount)
+
+        print('#', name, 'total pairs:', category_count_pairs, ', total samples:', category_count_samples)
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -792,11 +812,14 @@ def main():
         dataset_creator.py clean <dataset_name>
         dataset_creator.py bigrams <dataset_name> <out_name>
         dataset_creator.py clean_filtered <dataset_name>
+        dataset_creator.py summary <dataset_name>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['summary']:
+        summary(args['<dataset_name>'])
     elif args['clean_filtered']:
         clean_filtered(args['<dataset_name>'])
     elif args['show']:
