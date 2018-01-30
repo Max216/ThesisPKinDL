@@ -595,7 +595,7 @@ def print_bigram_fails(dataset_name):
     exclude_bigrams = set(['.',',', '(', ')', ':'])
 
     bigram_counts = dict()
-    with open(os.path.realpath('~/data/bigrams/bigram_EN.dat')) as f_in:
+    with open(os.path.realpath('../../../data/bigrams/bigram_EN.dat')) as f_in:
         for line in f_in:
             splitted = line.split()
             if len(splitted) > 0:
