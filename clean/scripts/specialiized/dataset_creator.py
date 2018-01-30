@@ -616,6 +616,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
             print('## Check:', name, '>>', rel_path)
             count_total = 0
             keep_samples = []
+            not_keep_samples = []
             with open(os.path.join(category_dir, rel_path)) as f_in:
                 for line in f_in:
                     count_total += 1
@@ -633,40 +634,44 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                     except Exception:
                         print('NOT FOUND',replaced_word,  tokenized)
                         index = -1
-                    if index < 0:
-                        print('Leaving out:', w1, w2, '->', sent)
-                    else:
-                        bigrams = []
-                        if index > 0:
-                            bigrams.append((tokenized[index - 1], replaced_word))
-                        if index < len(tokenized) - 1:
-                            bigrams.append((replaced_word, tokenized[index + 1]))
 
-                        for bigram in bigrams:
-                            b1 = bigram[0].lower()
-                            b2 = bigram[1].lower()
+                    bigrams = []
+                    if index > 0:
+                        bigrams.append((tokenized[index - 1], replaced_word))
+                    if index < len(tokenized) - 1:
+                        bigrams.append((replaced_word, tokenized[index + 1]))
 
-                            if b1 not in exclude_bigrams and b2 not in exclude_bigrams:
+                    for bigram in bigrams:
+                        b1 = bigram[0].lower()
+                        b2 = bigram[1].lower()
+
+                        if b1 not in exclude_bigrams and b2 not in exclude_bigrams:
+                            counts = 0
+                            if b1 in bigram_counts:
+                                counts = bigram_counts[b1][b2]
+                            else: 
                                 counts = 0
-                                if b1 in bigram_counts:
-                                    counts = bigram_counts[b1][b2]
-                                else: 
-                                    counts = 0
 
-                                if counts <= t:
-                                    print(b1, b2, counts)
-                                    print(sent)
-                                else:
-                                    keep_samples.append(line)
+                            if counts <= t:
+                                not_keep_samples.append(line)
+                            else:
+                                keep_samples.append(line)
 
             # write out valid samples
             print(name, '>', rel_path, 'total:', count_total, 'keep:', len(keep_samples))
             current_dir = os.path.join(out_name, name)
             if not os.path.exists(current_dir):
                 os.makedirs(out_name)
-            with open(os.path.join(current_dir, rel_path)) as f_out:
-                for line in keep_samples:
-                    f_out.write(line)
+
+            if len(keep_samples) > 0:
+                with open(os.path.join(current_dir, rel_path)) as f_out:
+                    for line in keep_samples:
+                        f_out.write(line)
+
+            if len(not_keep_samples) > 0:
+                with open(os.path.join(current_dir, 'removed-' + rel_path)) as f_out:
+                    for line in not_keep_samples:
+                        f_out.write(line)
 
 def clean_words(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
@@ -704,7 +709,7 @@ def main():
         dataset_creator.py show -a <amount> (-w <words>)...
         dataset_creator.py clean_simple <dataset_name>
         dataset_creator.py clean <dataset_name>
-        dataset_creator.py bigrams <dataset_name>
+        dataset_creator.py bigrams <dataset_name> <out_name>
     """)
 
 
@@ -720,7 +725,7 @@ def main():
     elif args['clean']:
         clean_words(args['<dataset_name>'])
     elif args['bigrams']:
-        print_bigram_fails(args['<dataset_name>'])
+        print_bigram_fails(args['<dataset_name>'], args['<out_name>'])
     else:
         out_name = args['<out_name>']
         all_fn = [
