@@ -642,7 +642,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                         try:
                             index = tokenized.index(replaced_word)
                         except Exception:
-                            print('NOT FOUND',replaced_word,  tokenized)
+                            #print('NOT FOUND',replaced_word,  tokenized)
                             index = -1
 
                         bigrams = []
