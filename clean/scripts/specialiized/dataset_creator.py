@@ -675,7 +675,7 @@ def print_bigram_fails(dataset_name, out_name, t=0):
                         bigrams = []
                         if index > 0:
                             bigrams.append((tokenized[index - 1], replaced_word))
-                        if index < len(tokenized) - 1:
+                        if index < len(tokenized) - 1 and index != -1:
                             bigrams.append((replaced_word, tokenized[index + 1]))
 
                         if index_first > 0:
