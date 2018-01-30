@@ -755,7 +755,12 @@ def clean_filtered(dataset_name):
                         'sents_with_word_h': swh,
                         'real_sample_count': real_samples,
                         'generate_replace': generation
-                    })   
+                    })  
+
+        # overwrite
+        with open(os.path.join(category_dir, 'SUMMARY.sjson'), 'w') as f_out:
+            for line in write_out:
+                f_out.write(json.dumps(line) + '\n')
 
 def main():
     args = docopt("""Create a new dataset based on the given type.
