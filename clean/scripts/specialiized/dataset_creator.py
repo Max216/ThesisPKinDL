@@ -1008,7 +1008,7 @@ def grep_dataset(sorted_name, out_name):
             while not group_end:
                 # get top samples for group
                 max_count, groupdata = get_list_for(current_group, data)
-                print('sublist:', len(groupdata), 'different prtemise, having', max_count, 'beautiful samples for the group.')
+                print('sublist:', len(groupdata), 'different premise, having', max_count, 'beautiful samples for the group.')
                 if grp_counter[current_group] >= stop_amount:
                     group_end = True
                     break
