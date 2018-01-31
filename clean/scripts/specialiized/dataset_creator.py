@@ -1196,7 +1196,7 @@ def main():
     elif args['grep_dataset']:
         grep_dataset(args['<sorted_name>'], args['<out_name>'])
     elif args['finalize_dataset']:
-        finalize_dataset(agrs['<setting_path>'], args['<src_dir>'])
+        finalize_dataset(args['<setting_path>'], args['<src_dir>'])
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary_sorted']:
