@@ -1173,7 +1173,7 @@ def finalize_dataset(settings, directory, out_path):
                 parsed_in = [json.loads(line) for line in lines_in]
 
             for content in contents:
-                group = content['goup']
+                group = content['group']
                 w1 = content['w1']
                 w2 = content['w2']
 
