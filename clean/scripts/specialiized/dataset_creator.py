@@ -893,6 +893,27 @@ def sort_data(dataset_name, out_path):
 
 
 
+def summary_sorted(sorted_name):
+    with open(sorted_name) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    # filter anything less than 5
+    parsed = [item for item in parsed if len(item['contents']) >= 5]
+    result_dict = collections.defaultdict(lambda: collections.defaultdict(int))
+
+    for item in parsed:
+        contents = item['contents']
+        groups = collections.Counter([content_item['group'] for content_item in contents])
+        for key, amount in groups.most_common():
+            if amount > 5:
+                amount = '5+'
+            result_dict[key][amount] += 1
+
+    # print out
+    for group in result_dict:
+        for counts in result_dict[group]:
+            print(group, 'having:', counts, '>', result_dict[group][counts])
+
 
 
 
@@ -919,6 +940,7 @@ def summary(dataset_name):
             print(w1, '--', w2, '--', lbl, '>', amount)
 
         print('#', name, 'total pairs:', category_count_pairs, ', total samples:', category_count_samples)
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -932,6 +954,7 @@ def main():
         dataset_creator.py clean_filtered <dataset_name>
         dataset_creator.py summary <dataset_name>
         dataset_creator.py datasort <dataset_name> <out_name>
+        dataset_creator.oy summary_sorted <sorted_name>
     """)
 
 
@@ -939,6 +962,8 @@ def main():
         test_out()
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
+    elif args['summary_sorted']:
+        summary_sorted(args['<sorted_name>'])
     elif args['summary']:
         summary(args['<dataset_name>'])
     elif args['clean_filtered']:
