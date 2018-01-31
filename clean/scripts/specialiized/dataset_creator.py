@@ -962,6 +962,9 @@ def grep_dataset(sorted_name, out_name):
         counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
         
+        # refilter
+        relevant_data = [(i, file, contents, count) for i, file, contents, count in relevant_data if len(contents) >= MIN_HYP_AMOUNT]
+
         if len(relevant_data) == 0:
             return (None, [])
 
