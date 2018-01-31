@@ -965,7 +965,7 @@ def grep_dataset(sorted_name, out_name):
         max_count = max([count for any1, any2, any3, count in relevant_data])
 
         # first consider max count the most
-        return [(i, file, contents, count) for i, file, contents, count in relevant_data if count == max_count]
+        return (max_count, [(i, file, contents, count) for i, file, contents, count in relevant_data if count == max_count])
         
 
     
@@ -975,7 +975,15 @@ def grep_dataset(sorted_name, out_name):
     priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
     w_counter = collections.Counter()
     grp_counter = collections.Counter()
-    used_premises = set()
+    used_files = collections.Counter()
+
+    grp_penalize_factor = dict()
+    for g in priority1:
+        grp_penalize_factor[g] = 1
+    for g in priority2:
+        grp_penalize_factor[g] = 500
+    for g in priority3:
+        grp_penalize_factor[g] = 100000
 
     with open(sorted_name) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
@@ -983,18 +991,134 @@ def grep_dataset(sorted_name, out_name):
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
     data = filter_below(data, MIN_HYP_AMOUNT)
 
-    # go through priority 1
+    # go through all priorities in order
+    final_dataset = []
+    used_groups = []
     for name, priority in [('1', priority1), ('2', priority2), ('3', priority3)]:
         print('# priority', name)
-        for group in priority:
+        for current_group in priority:
             # for each, until reached stop amount (or all used)
-            groupdata = get_list_for(group, data)
-            print(group, '->', len(groupdata))
+            group_end = False
+            used_groups.append(current_group)
+
+            while not group_end:
+                # get top samples for group
+                max_count, groupdata = get_list_for(current_group, data)
+                if grp_counter[current_group] >= stop_amount:
+                    group_end = True
+                    break
+                elif len(groupdata) == 0:
+                    group_end = True
+                    print('# end due to lack of samples.')
+                    break
+
+                sample_from = []
+
+                # penalize already occuring sentences
+                groupdata = [(i, file, contents, count, used_files[file]) for i, file, contents, count in groupdata]
+                least_used_sents = min([d[-1] for d in groupdata])
+                groupdata = [d for d in groupdata if d == least_used_sents]
+
+                # penalize already occuring words, full categories
+                for (idx, file, contents, count) in groupdata:
+                    # get all for group
+                    all_samples = [(group, w1, w2, w_counter[w1] + w_counter[w2]) for group, w1, w2 in contents]
+                    
+                    group_samples = [d for d in group_samples if d[0] == current_group]
+
+                    group_keep_samples = []
+                    least_word_penalty = -1
+                    while len(group_keep_samples) < count:
+                        least_word_penalty = min([d[-1] for d in group_samples if d[-1] > least_word_penalty])
+                        group_keep_samples.extend([d for d in group_samples if d[-1] == least_word_penalty]) 
+
+                    diff = MIN_HYP_AMOUNT - count
+                    add_sample = None
+                    if diff > 0:
+                        # find other categories to fill
+                        other_samples = [(group, w1, w2, w_penalty, grp_counter[group] * grp_penalize_factor[group]) for group, w1, w2,w_penalty in all_samples if group != current_group]
+                        
+                        least_group_penalty = -1
+                        other_keep_samples_1 = []
+                        while len(other_keep_samples_1) < diff:
+                            least_group_penalty = min([d[-1] for d in other_samples] if d[-1] > least_group_penalty)
+                            other_keep_samples_1.extend([d for d in other_samples if d[-1] == least_group_penalty])
+                        
+                        other_keep_samples_2 = []
+                        least_word_penalty = -1
+                        while len(other_keep_samples_2) < diff:
+                            least_word_penalty = min([d[-2] for d in other_samples if d[-2] > least_word_penalty])
+                            other_keep_samples_2.extend([d for d in other_samples if d != least_word_penalty])
+
+                        # add random sample
+                        # all from group (since less than needed)
+                        pick_from_group = [(group, w1, w2) for group, w1, w2, _ in group_keep_samples]
+                        pick_from_other = random.sample([(group, w1, w2) for group, w1, w2, any1,any2 in other_keep_samples_2], diff)
+                        add_sample = (idx, file, pick_from_group + pick_from_other)
+                    else:
+                        # just use the samples for the current group
+                        pick = random.sample([(group, w1, w2) for group, w1, w2, _ in group_keep_samples], MIN_HYP_AMOUNT)
+                        add_sample = (idx, file, pick)
+
+                    sample_from.append(add_sample)
+
+
+                # sample from them
+                final_pick = random.choice(sample_from)
+                final_dataset.append(final_pick)
+                # update counts
+                idx, file, sents = final_pick
+                for group, w1, w2 in sents:
+                    w_counter[w1] += 1
+                    w_counter[w2] += 1
+                    grp_counter[group] += 1
+                used_files[file] += 1
+
+                # update data and repeat
+                data_filename, data_contents = data[idx]
+                if data_filename != file:
+                    print('should not happen')
+                    1/0
+                # remove used samples
+                new_contents = []
+                for dgroup, dw1, dw2 in data_contents:
+                    add = True
+                    for pgroup, pw1, pw2 in sents:
+                        if dgroup == pgroup and dw1 == pw1 and dw2 == pw2:
+                            add = False
+                            break
+
+                    if add:
+                        new_contents.append((dgroup, dw1, dw2))
+                data[idx] = (data_filename, new_contents)
+
+                
+            # group done4
+            print('Finished with', current_group, grp_counter[current_group])
+            total_samples = sum(grp_counter.values())
+            total_finished = sum([grp_counter[g] for g in used_groups])
+            print('currently having:', total_samples,'/ 10000', 'samples')
+            missing = 10000 - total_finished
+
+            missing_group_amount = 18 - len(used_groups)
+            if missing_group_amount > 0:
+                stop_amount = missing / missing_group_amount
+            print(grp_counter.most_common())
             # greedily eat also other categories IF that includes many samples for that category (add to the other category some)
             
 
-            # if several options select least represented word pairs
-            # if ot reaching stop amount: update accordingly for remaining categories
+    with open(out_name, 'w') as f_out:
+        print('Done. Have: 5 x', len(final_dataset), 'samples.')
+        for idx, file, contents in final_dataset:
+            f_out.write(json.dumps({
+                'filename': file,
+                'contents': [{
+                    'group': group,
+                    'w1': w1,
+                    'w2': w2
+                } for group, w1, w2 in contents]
+            }) + '\n')
+
     
 
     # go through priority 2
