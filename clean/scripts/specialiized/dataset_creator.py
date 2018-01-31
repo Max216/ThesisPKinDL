@@ -436,6 +436,20 @@ def _parse_all_summary(in_path):
 
     return parsed
 
+
+def _parse_word_pair(in_path):
+    '''
+    Parse the content of a wordpair.jsonl file
+    '''
+    with open(in_path) as f_in:
+        all_samples = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    sentences = [(sample['sentence1'], sample['sentence2']) for sample in all_samples]
+    replaced = [int(sample['generation_replaced']) for sample in all_samples]
+
+    return (sentences, replaced)
+
+
 def _parse_group_summary(in_path, raw=False):
     '''
     Parse the content of the <*.sjson> file.
@@ -781,6 +795,109 @@ def clean_filtered(dataset_name):
             for line in write_out:
                 f_out.write(json.dumps(line) + '\n')
 
+
+
+def sort_data(dataset_name, out_path):
+    dataset_dir = os.path.dirname(dataset_name)
+    with open(dataset_name) as f_in:
+        lines = [line.strip().split(' ') for line in f_in.readlines()]
+
+    categories = [(line[0], line[3]) for line in lines]
+
+    premise_dict = collections.defaultdict(lambda:  [])
+
+    for name, path in categories:
+        category_dir = os.path.join(dataset_dir, name)
+        parsed = _parse_all_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
+        
+
+        for w1, w2, amount, lbl, rel_path, swp, swh, real_samples, generation in parsed:
+            wp_path = os.path.join(category_dir, rel_path)
+            sentences, replaced_sent_idx = _parse_word_pair(wp_path)
+
+            for i in range(len(sentences)):
+                premise, hypothesis = sentences[i]
+                replaced = replaced_sent_idx[i]
+
+                # only check for replaced premises
+                if replaced == 1:
+                    print('original:]]', premise)
+                    print('generated:]]', hypothesis)
+                    print()
+                    premise_dict[premise].append(hypothesis, name, w1, w2, lbl)
+
+    # filter out duplicates
+    print('Filter out duplicates ...')
+    count = 0
+    for premise, all_hyps in premise_dict.iteritems():
+        contains = set()
+        keep = []
+        for params in all_hyps:
+            if params[0] not in contains:
+                contains.add(params[0])
+                keep.append(params)
+            else:
+                count += 1
+
+        premise_dict[premise] = keep
+    print('Filtered out:', count)
+
+    # give summary
+    count_dict = collections.defaultdict(int)
+    for premise, all_hyps in premise_dict.iteritems():
+        count_dict[str(len(all_hyps))] += 1
+    for size, amount in count_dict.iteritems():
+        print('#premise with', size, 'hypothesis:', amount)
+
+    # write out
+
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    contents = collections.defaultdict(lambda: [])
+    for i, (premise, all_hyps) in enumerate(premise_dict.iteritems()):
+        filename = '_'.join([str(i)] + premise) + '.jsonl'
+        file_path = os.path.join(out_path, filename)
+
+        lines = [
+            json.dumps({
+                'sentence1': premise,
+                'sentence2': hyp,
+                'gold_label': label,
+                'replaced1': w_premise,
+                'replaced2': w_hypothesis,
+                'category': group_name 
+            }) + '\n'
+            for hyp, group_name, w_premise, w_hypothesis, label in all_hyps
+        ]
+
+        contents.append((filename, [(group, w_premise, w_hypothesis) for any1, group, w_premise, w_hypothesis, any2 in all_hyps]))
+        
+        with open(file_path, 'w') as f_out:
+            for line in lines:
+                f_out.write(line)
+
+    content_path = os.path.join(out_path, 'CONTENTS.jsonl')
+    with open(content_path, 'w') as f_out:
+        for filename, file_contents in contents:
+            f_out.write(json.dunps({
+                'filename': filename,
+                'contents': [{
+                    'group': group,
+                    'w1': w_premise,
+                    'w2': w_hypothesis
+                } for group, w_premise, w_hypothesis in file_contents]    
+            }) + '\n')
+
+
+
+
+
+
+
+
+            
+
 def summary(dataset_name):
     dataset_dir = os.path.dirname(dataset_name)
     with open(dataset_name) as f_in:
@@ -813,11 +930,14 @@ def main():
         dataset_creator.py bigrams <dataset_name> <out_name>
         dataset_creator.py clean_filtered <dataset_name>
         dataset_creator.py summary <dataset_name>
+        dataset_creator.py datasort <dataset_name>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['datasort']:
+        sort_data(args['dataset_name'])
     elif args['summary']:
         summary(args['<dataset_name>'])
     elif args['clean_filtered']:
