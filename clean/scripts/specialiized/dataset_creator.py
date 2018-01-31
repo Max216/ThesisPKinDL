@@ -954,7 +954,7 @@ def main():
         dataset_creator.py clean_filtered <dataset_name>
         dataset_creator.py summary <dataset_name>
         dataset_creator.py datasort <dataset_name> <out_name>
-        dataset_creator.oy summary_sorted <sorted_name>
+        dataset_creator.py summary_sorted <sorted_name>
     """)
 
 
