@@ -962,6 +962,9 @@ def grep_dataset(sorted_name, out_name):
         counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
         
+        if len(relevant_data) == 0:
+            return (None, [])
+            
         max_count = max([count for any1, any2, any3, count in relevant_data])
 
         # first consider max count the most
