@@ -856,7 +856,7 @@ def sort_data(dataset_name, out_path):
 
     contents = []
     for i, (premise, all_hyps) in enumerate(premise_dict.items()):
-        filename = str(i) + '_' + premise + '.jsonl'
+        filename = str(i) + '.jsonl'
         file_path = os.path.join(out_path, filename)
 
         lines = [
