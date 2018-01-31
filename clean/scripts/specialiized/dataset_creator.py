@@ -964,7 +964,7 @@ def grep_dataset(sorted_name, out_name):
         
         if len(relevant_data) == 0:
             return (None, [])
-            
+
         max_count = max([count for any1, any2, any3, count in relevant_data])
 
         # first consider max count the most
@@ -1041,8 +1041,17 @@ def grep_dataset(sorted_name, out_name):
                     group_keep_samples = []
                     least_word_penalty = -1
                     while len(group_keep_samples) < count:
-                        least_word_penalty = min([d[-1] for d in group_samples if d[-1] > least_word_penalty])
-                        group_keep_samples.extend([d for d in group_samples if d[-1] == least_word_penalty]) 
+                        remaining_items = [d[-1] for d in group_samples if d[-1] > least_word_penalty]
+                        if len(remaining_items) > 0:
+                            least_word_penalty = min(remaining_items)
+                            group_keep_samples.extend([d for d in group_samples if d[-1] == least_word_penalty]) 
+                        else:
+                            break
+
+                    if len(keep_samples) == 0:
+                        print(idx, file, contents, count)
+                        print('NOT GOOD')
+                        1/0
 
                     diff = MIN_HYP_AMOUNT - count
                     add_sample = None
