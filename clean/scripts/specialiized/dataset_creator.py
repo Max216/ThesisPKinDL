@@ -1165,9 +1165,9 @@ def finalize_dataset(settings, directory):
     # hard coded filtering
     others = []
     for p in parsed:
-        groups = [g for g,w1,w2 in p['contents']]
+        groups = [c['group'] for c in p['contents']]
         counter = collections.Counter(groups)
-        if counter['colors'] <5:
+        if counter['colors'] == 4:
             others.extend([g for g in groups if g != 'colors'])
         
 
