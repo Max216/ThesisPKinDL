@@ -930,14 +930,14 @@ def main():
         dataset_creator.py bigrams <dataset_name> <out_name>
         dataset_creator.py clean_filtered <dataset_name>
         dataset_creator.py summary <dataset_name>
-        dataset_creator.py datasort <dataset_name>
+        dataset_creator.py datasort <dataset_name> <out_name>
     """)
 
 
     if args['test']:
         test_out()
     elif args['datasort']:
-        sort_data(args['dataset_name'])
+        sort_data(args['dataset_name'], args['<out_name>'])
     elif args['summary']:
         summary(args['<dataset_name>'])
     elif args['clean_filtered']:
