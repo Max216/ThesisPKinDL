@@ -1136,6 +1136,7 @@ def grep_dataset(sorted_name, out_name):
             
 
     with open(out_name, 'w') as f_out:
+        print('Write to:', out_name)
         print('Done. Have: 5 x', len(final_dataset), 'samples.')
         for idx, file, contents in final_dataset:
             f_out.write(json.dumps({
