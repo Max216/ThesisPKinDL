@@ -844,8 +844,10 @@ def sort_data(dataset_name, out_path):
     count_dict = collections.defaultdict(int)
     for premise, all_hyps in premise_dict.items():
         count_dict[str(len(all_hyps))] += 1
-    for size, amount in count_dict.items():
-        print('#premise with', size, 'hypothesis:', amount)
+
+    sorted_summary = sorted([(size, amount) for size, amount in count_dict.items()], key=lambda x: -int(x[0]))
+    for size, amount in sorted_summary:
+        print('premise containing', size, 'hypothesis:', amount)
 
     # write out
 
@@ -854,7 +856,7 @@ def sort_data(dataset_name, out_path):
 
     contents = collections.defaultdict(lambda: [])
     for i, (premise, all_hyps) in enumerate(premise_dict.items()):
-        filename = '_'.join([str(i)] + premise) + '.jsonl'
+        filename = str(i) + '_' + premise + '.jsonl'
         file_path = os.path.join(out_path, filename)
 
         lines = [
