@@ -1160,7 +1160,7 @@ def finalize_dataset(settings, directory):
     with open(settings) as f_in:
         lines = [line.strip() for line in f_in.readline()]
 
-    parsed = [json.loads(line) for line in line]
+    parsed = [json.loads(line) for line in lines]
 
     # hard coded filtering
     colors = [p for p in parsed if collections.Counter(content['group'] for content in p['contents'])['colors'] == 4]
