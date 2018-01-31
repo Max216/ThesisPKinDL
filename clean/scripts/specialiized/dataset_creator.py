@@ -1048,7 +1048,7 @@ def grep_dataset(sorted_name, out_name):
                         else:
                             break
 
-                    if len(keep_samples) == 0:
+                    if len(group_keep_samples) == 0:
                         print(idx, file, contents, count)
                         print('NOT GOOD')
                         1/0
