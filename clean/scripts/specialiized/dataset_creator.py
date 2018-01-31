@@ -1163,12 +1163,13 @@ def finalize_dataset(settings, directory):
     parsed = [json.loads(line) for line in lines]
 
     # hard coded filtering
-    colors = [p for p in parsed if collections.Counter(content['group'] for content in p['contents'])['colors'] == 4]
     others = []
     for p in parsed:
-        for content in p['contents']:
-            if content['group'] != 'colors':
-                others.append(content['group'])
+        groups = [g for g,w1,w2 in p['contents']]
+        counter = collections.Counter(groups)
+        if counter['colors'] == 4:
+            others.extend([g for g in groups if g != 'colors'])
+        
 
     print(collections.Counter(others).most_common())
 
