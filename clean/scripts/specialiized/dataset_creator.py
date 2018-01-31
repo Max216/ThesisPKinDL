@@ -1041,7 +1041,7 @@ def grep_dataset(sorted_name, out_name):
                         least_group_penalty = -1
                         other_keep_samples_1 = []
                         while len(other_keep_samples_1) < diff:
-                            least_group_penalty = min([d[-1] for d in other_samples] if d[-1] > least_group_penalty)
+                            least_group_penalty = min([d[-1] for d in other_samples if d[-1] > least_group_penalty])
                             other_keep_samples_1.extend([d for d in other_samples if d[-1] == least_group_penalty])
                         
                         other_keep_samples_2 = []
