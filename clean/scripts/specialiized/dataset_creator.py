@@ -988,8 +988,10 @@ def grep_dataset(sorted_name, out_name):
     with open(sorted_name) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
 
+    print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
     data = filter_below(data, MIN_HYP_AMOUNT)
+    print('keep:', len(data))
 
     # go through all priorities in order
     final_dataset = []
@@ -1001,9 +1003,12 @@ def grep_dataset(sorted_name, out_name):
             group_end = False
             used_groups.append(current_group)
 
+            print('>>', current_group)
+
             while not group_end:
                 # get top samples for group
                 max_count, groupdata = get_list_for(current_group, data)
+                print('sublist:', len(groupdata), 'different prtemise, having', max_count, 'beautiful samples for the group.')
                 if grp_counter[current_group] >= stop_amount:
                     group_end = True
                     break
@@ -1018,6 +1023,8 @@ def grep_dataset(sorted_name, out_name):
                 groupdata = [(i, file, contents, count, used_files[file]) for i, file, contents, count in groupdata]
                 least_used_sents = min([d[-1] for d in groupdata])
                 groupdata = [d for d in groupdata if d == least_used_sents]
+
+                print('Only use those nice setnences', groupdata)
 
                 # penalize already occuring words, full categories
                 for (idx, file, contents, count) in groupdata:
@@ -1055,11 +1062,15 @@ def grep_dataset(sorted_name, out_name):
                         pick_from_group = [(group, w1, w2) for group, w1, w2, _ in group_keep_samples]
                         pick_from_other = random.sample([(group, w1, w2) for group, w1, w2, any1,any2 in other_keep_samples_2], diff)
                         add_sample = (idx, file, pick_from_group + pick_from_other)
+                        print('need 2 add more', diff)
                     else:
+
                         # just use the samples for the current group
                         pick = random.sample([(group, w1, w2) for group, w1, w2, _ in group_keep_samples], MIN_HYP_AMOUNT)
+                        print('have engough')
                         add_sample = (idx, file, pick)
 
+                    print('added', add_sample)
                     sample_from.append(add_sample)
 
 
