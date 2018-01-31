@@ -1,4 +1,4 @@
-import sys, os, json, re
+import sys, os, json, re, random
 sys.path.append('./../')
 
 from docopt import docopt
@@ -939,6 +939,62 @@ def summary(dataset_name):
 
         print('#', name, 'total pairs:', category_count_pairs, ', total samples:', category_count_samples)
 
+
+def grep_dataset(sorted_name, out_name):
+    random.seed(9)
+
+    def filter_below(filter_data, min_amount):
+        return [(file, contents) for file, contents in filter_data if len(contents) >= min_amount]
+
+    def get_list_for(group, data):
+
+        # for sort according to relevance
+        def count_cat(contents, group):
+            return len([cat for cat, any1, any2 in contents if cat == group])
+
+        counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
+        relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
+        
+        return relevant_data
+
+    def handle_group(group, data, stop_amount, used_premises, grp_counter, w_counter):
+        # for each, until reached stop amount (or all used)
+        groupdata = get_list_for(group, data)
+        print(group, '->', len(groupdata))
+        # greedily eat also other categories IF that includes many samples for that category (add to the other category some)
+        
+
+        # if several options select least represented word pairs
+        # if ot reaching stop amount: update accordingly for remaining categories
+
+    stop_amount = 10000 // 18
+    MIN_HYP_AMOUNT = 5
+
+    priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
+    priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
+    priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
+    w_counter = collections.Counter()
+    grp_counter = collections.Counter()
+    used_premises = set()
+
+    with open(sorted_name) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
+    data = filter_below(data, MIN_HYP_AMOUNT)
+
+    # go through priority 1
+    for name, priority in [('1', priority1), ('2', priority2), ('3', priority3)]:
+        print('# priority', name)
+        for group in priority:
+            samples, data = handle_group(group, data)
+    
+
+    # go through priority 2
+    # ...
+
+    # go through remeining
+    # ...
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -953,11 +1009,14 @@ def main():
         dataset_creator.py summary <dataset_name>
         dataset_creator.py datasort <dataset_name> <out_name>
         dataset_creator.py summary_sorted <sorted_name>
+        dataset_creator.py grep_dataset <sorted_name> <out_name>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['grep_dataset']:
+        grep_dataset(args['<sorted_name>'], args['<out_name>'])
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary_sorted']:
