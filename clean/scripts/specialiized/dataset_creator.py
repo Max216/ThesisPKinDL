@@ -855,6 +855,7 @@ def sort_data(dataset_name, out_path):
         os.makedirs(out_path)
 
     contents = []
+    total = len(premise_dict)
     for i, (premise, all_hyps) in enumerate(premise_dict.items()):
         filename = str(i) + '.jsonl'
         file_path = os.path.join(out_path, filename)
@@ -872,7 +873,7 @@ def sort_data(dataset_name, out_path):
         ]
 
         contents.append((filename, [(group, w_premise, w_hypothesis) for any1, group, w_premise, w_hypothesis, any2 in all_hyps]))
-        
+        print('Write out:', i, '/', total)
         with open(file_path, 'w') as f_out:
             for line in lines:
                 f_out.write(line)
@@ -880,7 +881,7 @@ def sort_data(dataset_name, out_path):
     content_path = os.path.join(out_path, 'CONTENTS.jsonl')
     with open(content_path, 'w') as f_out:
         for filename, file_contents in contents:
-            f_out.write(json.dunps({
+            f_out.write(json.dumps({
                 'filename': filename,
                 'contents': [{
                     'group': group,
