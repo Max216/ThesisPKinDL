@@ -1154,6 +1154,24 @@ def grep_dataset(sorted_name, out_name):
 
     # go through remeining
     # ...
+
+def finalize_dataset(settings, directory):
+    with open(settings) as f_in:
+        lines = [line.strip() for line in f_in.readline()]
+
+    parsed = [json.loads(line) for line in line]
+
+    # hard coded filtering
+    colors = [p for p in parsed if collections.Counter(content['group'] for content in p['contents'])['colors'] == 4]
+    others = []
+    for p in parsed:
+        for content in p['contents']:
+            if content['group'] != 'colors':
+                others.append(content['group'])
+
+    print(collections.Counter(others).most_common())
+
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -1169,6 +1187,7 @@ def main():
         dataset_creator.py datasort <dataset_name> <out_name>
         dataset_creator.py summary_sorted <sorted_name>
         dataset_creator.py grep_dataset <sorted_name> <out_name>
+        dataset_creator.py finalize_dataset <setting_path> <src_dir>
     """)
 
 
@@ -1176,6 +1195,8 @@ def main():
         test_out()
     elif args['grep_dataset']:
         grep_dataset(args['<sorted_name>'], args['<out_name>'])
+    elif args['finalize_dataset']:
+        finalize_dataset(agrs['<setting_path>'], args['<src_dir>'])
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary_sorted']:
