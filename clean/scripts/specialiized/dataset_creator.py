@@ -1177,8 +1177,8 @@ def finalize_dataset(settings, directory, out_path):
                 w1 = content['w1']
                 w2 = content['w2']
 
-                for i, parsed_in in enumerate(parsed_in):
-                    if parsed_in['category'] == group and parsed_in['replaced1'] == w1 and parsed_in['replaced2'] == w2:
+                for i, p_in in enumerate(parsed_in):
+                    if p_in['category'] == group and p_in['replaced1'] == w1 and p_in['replaced2'] == w2:
                         f_out.write(lines_in[i])
                         count += 1
                         break
