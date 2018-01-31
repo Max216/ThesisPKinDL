@@ -956,16 +956,7 @@ def grep_dataset(sorted_name, out_name):
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
         
         return relevant_data
-
-    def handle_group(group, data, stop_amount, used_premises, grp_counter, w_counter):
-        # for each, until reached stop amount (or all used)
-        groupdata = get_list_for(group, data)
-        print(group, '->', len(groupdata))
-        # greedily eat also other categories IF that includes many samples for that category (add to the other category some)
         
-
-        # if several options select least represented word pairs
-        # if ot reaching stop amount: update accordingly for remaining categories
 
     stop_amount = 10000 // 18
     MIN_HYP_AMOUNT = 5
@@ -987,7 +978,14 @@ def grep_dataset(sorted_name, out_name):
     for name, priority in [('1', priority1), ('2', priority2), ('3', priority3)]:
         print('# priority', name)
         for group in priority:
-            samples, data = handle_group(group, data)
+            # for each, until reached stop amount (or all used)
+            groupdata = get_list_for(group, data)
+            print(group, '->', len(groupdata))
+            # greedily eat also other categories IF that includes many samples for that category (add to the other category some)
+            
+
+            # if several options select least represented word pairs
+            # if ot reaching stop amount: update accordingly for remaining categories
     
 
     # go through priority 2
