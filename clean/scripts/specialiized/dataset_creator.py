@@ -1029,7 +1029,7 @@ def grep_dataset(sorted_name, out_name):
                 #print('Only use those nice setnences', groupdata)
 
                 # penalize already occuring words, full categories
-                for (idx, file, contents, count) in groupdata:
+                for (idx, file, contents, count, any1) in groupdata:
                     # get all for group
                     all_samples = [(group, w1, w2, w_counter[w1] + w_counter[w2]) for group, w1, w2 in contents]
                     
