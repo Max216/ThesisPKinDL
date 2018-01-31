@@ -827,7 +827,7 @@ def sort_data(dataset_name, out_path):
     # filter out duplicates
     print('Filter out duplicates ...')
     count = 0
-    for premise, all_hyps in premise_dict.iteritems():
+    for premise, all_hyps in premise_dict.items():
         contains = set()
         keep = []
         for params in all_hyps:
@@ -842,9 +842,9 @@ def sort_data(dataset_name, out_path):
 
     # give summary
     count_dict = collections.defaultdict(int)
-    for premise, all_hyps in premise_dict.iteritems():
+    for premise, all_hyps in premise_dict.items():
         count_dict[str(len(all_hyps))] += 1
-    for size, amount in count_dict.iteritems():
+    for size, amount in count_dict.items():
         print('#premise with', size, 'hypothesis:', amount)
 
     # write out
@@ -853,7 +853,7 @@ def sort_data(dataset_name, out_path):
         os.makedirs(out_path)
 
     contents = collections.defaultdict(lambda: [])
-    for i, (premise, all_hyps) in enumerate(premise_dict.iteritems()):
+    for i, (premise, all_hyps) in enumerate(premise_dict.items()):
         filename = '_'.join([str(i)] + premise) + '.jsonl'
         file_path = os.path.join(out_path, filename)
 
