@@ -942,6 +942,7 @@ def summary(dataset_name):
 
 def grep_dataset(sorted_name, out_name):
     random.seed(9)
+    MIN_HYP_AMOUNT = 5
 
     def filter_below(filter_data, min_amount):
         return [(file, contents) for file, contents in filter_data if len(contents) >= min_amount]
@@ -950,16 +951,21 @@ def grep_dataset(sorted_name, out_name):
 
         # for sort according to relevance
         def count_cat(contents, group):
-            return len([cat for cat, any1, any2 in contents if cat == group])
+            size = len([cat for cat, any1, any2 in contents if cat == group])
+            if size > MIN_HYP_AMOUNT:
+                size = MIN_HYP_AMOUNT
 
         counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
         
-        return relevant_data
+        max_count = max([count for any1, any2, any3, count in relevant_data])
+
+        # first consider max count the most
+        return [(i, file, contents, count) for i, file, contents, count in relevant_data if count == max_count]
         
 
     stop_amount = 10000 // 18
-    MIN_HYP_AMOUNT = 5
+    
 
     priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
     priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
