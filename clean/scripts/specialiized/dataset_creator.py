@@ -1156,19 +1156,33 @@ def grep_dataset(sorted_name, out_name):
     # go through remeining
     # ...
 
-def finalize_dataset(settings, directory):
+def finalize_dataset(settings, directory, out_path):
     with open(settings) as f_in:
         lines = [line.strip() for line in f_in.readlines()]
 
     parsed = [json.loads(line) for line in lines]
+    count = 0
 
-    # hard coded filtering
-    others = []
-    for p in parsed:
-        groups = [c['group'] for c in p['contents']]
-        counter = collections.Counter(groups)
-        if counter['colors'] == 4:
-            others.extend([g for g in groups if g != 'colors'])
+    with open(out_path, 'w') as f_out:
+        for p in parsed:
+            filename = p['filename']
+            contents = p['contents']
+
+            with open(os.path.join(directory, filename)) as f_in:
+                lines_in = [line for line in f_in.readlines()]
+                parsed_in = [json.loads(line) for line in lines_in]
+
+            for content in contents:
+                group = content['goup']
+                w1 = content['w1']
+                w2 = content['w2']
+
+                for i, parsed_in in enumerate(parsed_in):
+                    if parsed_in['category'] == group and parsed_in['replaced1'] == w1 and parsed_in['replaced2'] == w2:
+                        f_out.write(lines_in[i])
+                        count += 1
+                        break
+    print('Done:', count)
         
 
     print(collections.Counter(others).most_common())
@@ -1189,7 +1203,7 @@ def main():
         dataset_creator.py datasort <dataset_name> <out_name>
         dataset_creator.py summary_sorted <sorted_name>
         dataset_creator.py grep_dataset <sorted_name> <out_name>
-        dataset_creator.py finalize_dataset <setting_path> <src_dir>
+        dataset_creator.py finalize_dataset <setting_path> <src_dir> <out_path>
     """)
 
 
@@ -1198,7 +1212,7 @@ def main():
     elif args['grep_dataset']:
         grep_dataset(args['<sorted_name>'], args['<out_name>'])
     elif args['finalize_dataset']:
-        finalize_dataset(args['<setting_path>'], args['<src_dir>'])
+        finalize_dataset(args['<setting_path>'], args['<src_dir>'], args['<out_path>'])
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary_sorted']:
