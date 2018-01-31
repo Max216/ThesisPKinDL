@@ -824,7 +824,7 @@ def sort_data(dataset_name, out_path):
                     print('original:]]', premise)
                     print('generated:]]', hypothesis)
                     print()
-                    premise_dict[premise].append(hypothesis, name, w1, w2, lbl)
+                    premise_dict[premise].append((hypothesis, name, w1, w2, lbl))
 
     # filter out duplicates
     print('Filter out duplicates ...')
