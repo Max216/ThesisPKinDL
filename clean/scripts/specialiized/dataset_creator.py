@@ -810,20 +810,18 @@ def sort_data(dataset_name, out_path):
         category_dir = os.path.join(dataset_dir, name)
         parsed = _parse_all_summary(os.path.join(category_dir, 'SUMMARY.sjson'))
         
+        print('# CATEGORY:', name)
 
         for w1, w2, amount, lbl, rel_path, swp, swh, real_samples, generation in parsed:
             wp_path = os.path.join(category_dir, rel_path)
             sentences, replaced_sent_idx = _parse_word_pair(wp_path)
-
+            print('## sort in:', w1, '--', w2)
             for i in range(len(sentences)):
                 premise, hypothesis = sentences[i]
                 replaced = replaced_sent_idx[i]
 
                 # only check for replaced premises
                 if replaced == 1:
-                    print('original:]]', premise)
-                    print('generated:]]', hypothesis)
-                    print()
                     premise_dict[premise].append((hypothesis, name, w1, w2, lbl))
 
     # filter out duplicates
