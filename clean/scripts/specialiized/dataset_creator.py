@@ -854,7 +854,7 @@ def sort_data(dataset_name, out_path):
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
-    contents = collections.defaultdict(lambda: [])
+    contents = []
     for i, (premise, all_hyps) in enumerate(premise_dict.items()):
         filename = str(i) + '_' + premise + '.jsonl'
         file_path = os.path.join(out_path, filename)
