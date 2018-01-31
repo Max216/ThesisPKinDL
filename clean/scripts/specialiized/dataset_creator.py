@@ -943,18 +943,22 @@ def summary(dataset_name):
 def grep_dataset(sorted_name, out_name):
     random.seed(9)
     MIN_HYP_AMOUNT = 5
+    stop_amount = 10000 // 18
+
 
     def filter_below(filter_data, min_amount):
         return [(file, contents) for file, contents in filter_data if len(contents) >= min_amount]
 
     def get_list_for(group, data):
 
-        # for sort according to relevance
+        # function helpers
         def count_cat(contents, group):
             size = len([cat for cat, any1, any2 in contents if cat == group])
             if size > MIN_HYP_AMOUNT:
                 size = MIN_HYP_AMOUNT
+            return size
 
+        # function code
         counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
         
@@ -964,7 +968,6 @@ def grep_dataset(sorted_name, out_name):
         return [(i, file, contents, count) for i, file, contents, count in relevant_data if count == max_count]
         
 
-    stop_amount = 10000 // 18
     
 
     priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
