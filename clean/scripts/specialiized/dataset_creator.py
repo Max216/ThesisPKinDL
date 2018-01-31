@@ -1033,7 +1033,7 @@ def grep_dataset(sorted_name, out_name):
                     # get all for group
                     all_samples = [(group, w1, w2, w_counter[w1] + w_counter[w2]) for group, w1, w2 in contents]
                     
-                    group_samples = [d for d in group_samples if d[0] == current_group]
+                    group_samples = [d for d in all_samples if d[0] == current_group]
 
                     group_keep_samples = []
                     least_word_penalty = -1
