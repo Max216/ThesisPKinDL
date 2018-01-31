@@ -1158,7 +1158,7 @@ def grep_dataset(sorted_name, out_name):
 
 def finalize_dataset(settings, directory):
     with open(settings) as f_in:
-        lines = [line.strip() for line in f_in.readline()]
+        lines = [line.strip() for line in f_in.readlines()]
 
     parsed = [json.loads(line) for line in lines]
 
