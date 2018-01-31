@@ -937,7 +937,7 @@ def main():
     if args['test']:
         test_out()
     elif args['datasort']:
-        sort_data(args['dataset_name'], args['<out_name>'])
+        sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary']:
         summary(args['<dataset_name>'])
     elif args['clean_filtered']:
