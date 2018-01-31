@@ -905,8 +905,6 @@ def summary_sorted(sorted_name):
         contents = item['contents']
         groups = collections.Counter([content_item['group'] for content_item in contents])
         for key, amount in groups.most_common():
-            if amount > 5:
-                amount = '5+'
             result_dict[key][amount] += 1
 
     # print out
