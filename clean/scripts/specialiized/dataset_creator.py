@@ -1021,7 +1021,9 @@ def grep_dataset(sorted_name, out_name):
 
                 # penalize already occuring sentences
                 groupdata = [(i, file, contents, count, used_files[file]) for i, file, contents, count in groupdata]
+                print('my nice group data', groupdata)
                 least_used_sents = min([d[-1] for d in groupdata])
+                print('my least used sent', least_used_sents)
                 groupdata = [d for d in groupdata if d == least_used_sents]
 
                 print('Only use those nice setnences', groupdata)
