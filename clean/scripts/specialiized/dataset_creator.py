@@ -1156,8 +1156,8 @@ def grep_dataset(sorted_name, out_name):
     # go through remeining
     # ...
 
-def finalize_dataset(settings, directory, out_path):
-    with open(settings) as f_in:
+def finalize_dataset(dataset, out_path):
+    with open(dataset) as f_in:
         lines = [line for line in f_in.readlines()]
 
     parsed = [json.loads(line.strip()) for line in lines]
@@ -1225,7 +1225,7 @@ def main():
         dataset_creator.py datasort <dataset_name> <out_name>
         dataset_creator.py summary_sorted <sorted_name>
         dataset_creator.py grep_dataset <sorted_name> <out_name>
-        dataset_creator.py finalize_dataset <setting_path> <src_dir> <out_path>
+        dataset_creator.py finalize_dataset <dataset_name> <out_path>
         dataset_creator.py sample <datset_path>
     """)
 
@@ -1237,7 +1237,7 @@ def main():
     elif args['sample']:
         sample_dataset(args['<datset_path>'])
     elif args['finalize_dataset']:
-        finalize_dataset(args['<setting_path>'], args['<src_dir>'], args['<out_path>'])
+        finalize_dataset(args['<dataset_name>'], args['<out_path>'])
     elif args['datasort']:
         sort_data(args['<dataset_name>'], args['<out_name>'])
     elif args['summary_sorted']:
