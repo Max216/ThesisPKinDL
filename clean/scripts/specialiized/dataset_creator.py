@@ -1174,7 +1174,6 @@ def finalize_dataset(dataset, out_path):
     with open(out_path, 'w') as f_out:
         for key in keys:
             current_set = sample_dict[key]
-            print(current_set)
             only_material_sand = True
             for i, p in current_set:
                 if p['replaced1'] != 'sand':
@@ -1185,6 +1184,7 @@ def finalize_dataset(dataset, out_path):
                     f_out.write(lines[i])
                 count_written += len(current_set)
             else:
+                print('leave out', current_set)
                 count += len(current_set)
 
             if count == 320:
