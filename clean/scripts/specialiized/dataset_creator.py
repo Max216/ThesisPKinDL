@@ -1183,9 +1183,9 @@ def finalize_dataset(dataset, out_path):
             if not only_material_sand:
                 for i, p in current_set:
                     f_out.write(lines[i])
-                    count_written += 1
+                count_written += len(current_set)
             else:
-                count += 5
+                count += len(current_set)
 
             if count == 320:
                 break
