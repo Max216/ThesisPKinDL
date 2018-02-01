@@ -1168,8 +1168,10 @@ def finalize_dataset(dataset, out_path):
         sample_dict[p['sentence1']].append((i, p))
 
     count = 0
+    keys = [key for key in sample_dict]
+    random.shuffle(keys)
     with open(out_path, 'w') as f_out:
-        for key in sample_dict:
+        for key in keys:
             current_set = sample_dict[key]
             
             only_material_sand = True
@@ -1182,6 +1184,9 @@ def finalize_dataset(dataset, out_path):
                     f_out.write(lines[i])
             else:
                 count += 5
+
+            if count == 320:
+                break
 
     print('Done. removed:', count)
     
