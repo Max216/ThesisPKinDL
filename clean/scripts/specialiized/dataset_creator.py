@@ -1158,34 +1158,33 @@ def grep_dataset(sorted_name, out_name):
 
 def finalize_dataset(settings, directory, out_path):
     with open(settings) as f_in:
-        lines = [line.strip() for line in f_in.readlines()]
+        lines = [line for line in f_in.readlines()]
 
-    parsed = [json.loads(line) for line in lines]
+    parsed = [json.loads(line.strip()) for line in lines]
+
+    sample_dict = collections.defaultdict(lambda: [])
+
+    for i, p in enumerate(parsed):
+        sample_dict[p['sentenc1']].apppend((i, p))
+
     count = 0
-
     with open(out_path, 'w') as f_out:
-        for p in parsed:
-            filename = p['filename']
-            contents = p['contents']
+        for key in sample_dict:
+            current_set = sample_dict[key]
+            
+            only_material_sand == True
+            for i, p in current_set:
+                if p['replaced1'] != 'sand':
+                    only_material_sand = False
+                    break
+            if not only_material_sand:
+                for i, p in current_set:
+                    f_out.write(lines[i])
+            else:
+                count += 5
 
-            with open(os.path.join(directory, filename)) as f_in:
-                lines_in = [line for line in f_in.readlines()]
-                parsed_in = [json.loads(line) for line in lines_in]
-
-            for content in contents:
-                group = content['group']
-                w1 = content['w1']
-                w2 = content['w2']
-
-                for i, p_in in enumerate(parsed_in):
-                    if p_in['category'] == group and p_in['replaced1'] == w1 and p_in['replaced2'] == w2:
-                        f_out.write(lines_in[i])
-                        count += 1
-                        break
-    print('Done:', count)
-        
-
-    print(collections.Counter(others).most_common())
+    print('Done. removed:', count)
+    
 
 
 def sample_dataset(dataset_path):
