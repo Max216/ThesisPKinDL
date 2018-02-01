@@ -1206,6 +1206,10 @@ def sample_dataset(dataset_path):
             print('[p]', prem)
             print('[h]', hyp)
             print()
+
+    print('# SUMMARY')
+    for key in sample_dict:
+        print(key, '-->', len(sample_dict[key]), 'samples')
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
