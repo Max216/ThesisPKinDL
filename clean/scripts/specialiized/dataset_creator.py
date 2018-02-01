@@ -1186,6 +1186,7 @@ def finalize_dataset(dataset, out_path):
             else:
                 print('leave out', current_set)
                 count += len(current_set)
+                print('add', len(current_set))
                 print('current count', count)
 
             if count == 320:
