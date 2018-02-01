@@ -1188,6 +1188,24 @@ def finalize_dataset(settings, directory, out_path):
     print(collections.Counter(others).most_common())
 
 
+def sample_dataset(dataset_path):
+    with open(dataset_path) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    sample_dict = collections.defaultdict(lambda: [])
+    for p in parsed:
+        sample_dict[p['category']].append((p['sentence1'], p['sentence2'], p['gold_label'], p['replaced1'], p['replaced2']))
+
+    AMOUNT = 20
+
+    for key in sample_dict:
+        print('#', key)
+        choice = random.sample(sample_dict[key], AMOUNT)
+        for prem, hyp, lbl, w1, w2 in choice:
+            print(w1, '--', w2, '--', lbl)
+            print('[p]', prem)
+            print('[h]', hyp)
+            print()
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -1204,6 +1222,7 @@ def main():
         dataset_creator.py summary_sorted <sorted_name>
         dataset_creator.py grep_dataset <sorted_name> <out_name>
         dataset_creator.py finalize_dataset <setting_path> <src_dir> <out_path>
+        dataset_creator.py sample <datset_path>
     """)
 
 
@@ -1211,6 +1230,8 @@ def main():
         test_out()
     elif args['grep_dataset']:
         grep_dataset(args['<sorted_name>'], args['<out_name>'])
+    elif args['sample']:
+        sample_dataset(args['<datset_path>'])
     elif args['finalize_dataset']:
         finalize_dataset(args['<setting_path>'], args['<src_dir>'], args['<out_path>'])
     elif args['datasort']:
