@@ -1170,6 +1170,7 @@ def finalize_dataset(dataset, out_path):
     count = 0
     keys = [key for key in sample_dict]
     random.shuffle(keys)
+    count_written = 0
     with open(out_path, 'w') as f_out:
         for key in keys:
             current_set = sample_dict[key]
@@ -1182,6 +1183,7 @@ def finalize_dataset(dataset, out_path):
             if not only_material_sand:
                 for i, p in current_set:
                     f_out.write(lines[i])
+                    count_written += 1
             else:
                 count += 5
 
@@ -1189,6 +1191,7 @@ def finalize_dataset(dataset, out_path):
                 break
 
     print('Done. removed:', count)
+    print('written:', count_written)
     
 
 
