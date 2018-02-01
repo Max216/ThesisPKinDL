@@ -1207,9 +1207,12 @@ def sample_dataset(dataset_path):
             print()
 
     print('# SUMMARY')
+    total= 0
     summary = sorted([(key, len(sample_dict[key])) for key in sample_dict], key=lambda x: -x[-1])
     for key, amount in summary:
+        total += amount
         print(key, '-->', amount, 'samples')
+    print('total:', total)
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
