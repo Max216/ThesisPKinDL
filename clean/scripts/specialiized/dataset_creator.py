@@ -1165,7 +1165,7 @@ def finalize_dataset(dataset, out_path):
     sample_dict = collections.defaultdict(lambda: [])
 
     for i, p in enumerate(parsed):
-        sample_dict[p['sentenc1']].apppend((i, p))
+        sample_dict[p['sentence1']].append((i, p))
 
     count = 0
     with open(out_path, 'w') as f_out:
