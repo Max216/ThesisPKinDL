@@ -1208,7 +1208,7 @@ def sample_dataset(dataset_path):
             print()
 
     print('# SUMMARY')
-    summary = sorted([(key), len(sample_dict[key]) for key in sample_dict], key=lambda x: -x[-1])
+    summary = sorted([(key, len(sample_dict[key])) for key in sample_dict], key=lambda x: -x[-1])
     for key, amount in summary:
         print(key, '-->', amount, 'samples')
 def main():
