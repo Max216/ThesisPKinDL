@@ -1172,7 +1172,7 @@ def finalize_dataset(dataset, out_path):
         for key in sample_dict:
             current_set = sample_dict[key]
             
-            only_material_sand == True
+            only_material_sand = True
             for i, p in current_set:
                 if p['replaced1'] != 'sand':
                     only_material_sand = False
