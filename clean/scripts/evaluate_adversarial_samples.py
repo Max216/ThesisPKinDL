@@ -35,7 +35,7 @@ def main():
     categories = dataholder.get_categories()
     for category in categories:
         dataset = dataholder.get_dataset_for_category(embedding_holder, category)
-        accuracy = evaluate.eval(classifier, dataset, 32, embedding_holder.padding()):
+        accuracy = evaluate.eval(classifier, dataset, 32, embedding_holder.padding())
         print('Accuracy on', category, '->', accuracy)
 
     print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 8, embedding_holder.padding()))
