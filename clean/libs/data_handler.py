@@ -57,12 +57,29 @@ class Datahandler:
                 self.samples = data_tools._load_snli(f_in.readlines())
             elif data_format == 'snli_nltk':
                 self.samples = data_tools._load_snli_nltk(f_in.readlines())
+            elif data_format == 'snli_adversarial':
+                self.samples = data_tools._load_snli_adversarial(f_in.readlines())
             else:
                 print('Unknown data format:', data_format)
                 1/0
 
+    def get_dataset_for_category(self, embedding_holder, category):
+        curent_samples = [(p, h, lbl) for p, h, lbl, cat in self.samples if cat == category]
+        return SentEncoderDataset(curent_samples, embedding_holder, self.tag_to_idx)
+
+    def get_categories(self):
+        if len(self.samples[0]) != 4:
+            print('No categories')
+            1/0
+
+        return list(set([s[-1] for s in self.samples]))
+
     def get_dataset(self, embedding_holder):
-        return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx)
+        if len(self.samples[0]) != 3:
+            current_samples = [(p, h, lbl) for p, h, lbl, cat in self.samples]
+        else:
+            current_samples = self.samples
+        return SentEncoderDataset(current_samples, embedding_holder, self.tag_to_idx)
 
     def get_samples(self, indizes):
         '''

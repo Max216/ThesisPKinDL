@@ -30,13 +30,23 @@ def main():
 
     embedding_holder = embeddingholder.create_embeddingholder()
 
-    def prediction_fn(samples, wp_path):
-        dataholder = data_handler.Datahandler(wp_path)
-        return evaluate.predict_outcomes(classifier, dataholder.get_dataset(embedding_holder), 32, embedding_holder.padding())
-        #return [evaluate.predict_untokenized(classifier, embedding_holder, p, h) for p,h in samples]
+    dataholder = data_handler.Datahandler(wp_path, data_format='snli_adversarial')
+
+    categories = dataholder.get_categories()
+    for category in categories:
+        dataset = dataholder.get_dataset_for_category(embedding_holder, category)
+        accuracy = evaluate.eval(classifier, dataset, 32, embedding_holder.padding()):
+        print('Accuracy on', category, '->', accuracy)
+
+    print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 2, embedding_holder.padding()))
+
+    #def prediction_fn(samples, wp_path):
+    #    dataholder = data_handler.Datahandler(wp_path)
+    #    return evaluate.predict_outcomes(classifier, dataholder.get_dataset(embedding_holder), 32, embedding_holder.padding())
+    #    #return [evaluate.predict_untokenized(classifier, embedding_holder, p, h) for p,h in samples]
 
 
-    adv_dataset.evaluate(prediction_fn, dataset_path, output_path,print_samples=5)
+    #adv_dataset.evaluate(prediction_fn, dataset_path, output_path,print_samples=5)
 
 
 if __name__ == '__main__':

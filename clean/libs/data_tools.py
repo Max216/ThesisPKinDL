@@ -66,6 +66,11 @@ def _load_snli(lines, valid_labels=DEFAULT_VALID_LABELS, tokenize=True):
     else:
         return [(p, h, lbl) for (p, h, lbl) in samples if lbl in valid_labels]
 
+def _load_snli_adversarial(lines, valid_labels=DEFAULT_VALID_LABELS):
+    parsed_data = [json.loads(line) for line in lines]
+    return [(_tokenize(pd['sentence1']), _tokenize(pd['sentence2']), pd['gold_label'], pd['category']) for pd in parsed_data]
+    
+
 def _load_snli_nltk(lines, valid_labels=DEFAULT_VALID_LABELS):
     def extract_snli_line(line):
         parsed_data = json.loads(line)
