@@ -67,6 +67,9 @@ class Datahandler:
         curent_samples = [(p, h, lbl) for p, h, lbl, cat in self.samples if cat == category]
         return SentEncoderDataset(curent_samples, embedding_holder, self.tag_to_idx)
 
+    def get_samples_for_category(self, category):
+        return [(p, h, lbl) for p, h, lbl, cat in self.samples if cat == category]
+
     def get_categories(self):
         if len(self.samples[0]) != 4:
             print('No categories')
