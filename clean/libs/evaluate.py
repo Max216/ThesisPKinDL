@@ -41,8 +41,7 @@ def predict_tokenized(classifier, embedding_holder, p, h, index_to_tag=data_tool
     scores = classifier(
         m.cuda_wrap(autograd.Variable(p_batch)), 
         m.cuda_wrap(autograd.Variable(h_batch)), 
-        output_sent_info=False,
-        twister=twister)
+        output_sent_info=False)
 
     _, predicted_idx = torch.max(scores, dim=1)
     return index_to_tag[predicted_idx.data[0]]
