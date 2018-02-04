@@ -47,7 +47,7 @@ def main():
         with open(output_path, 'w') as f_out:
             for category in dataholder.get_categories():
                 data = dataholder.get_samples_for_category(category)
-                f_out.write('\n# ' + category  ' incorrect:\n')
+                f_out.write('\n# ' + category + ' incorrect:\n')
                 category_total = 0
                 category_correct = 0
                 for p,h,lbl in data:
