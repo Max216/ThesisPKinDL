@@ -30,7 +30,7 @@ def main():
 
     embedding_holder = embeddingholder.create_embeddingholder()
 
-    dataholder = data_handler.Datahandler(wp_path, data_format='snli_adversarial')
+    dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
 
     categories = dataholder.get_categories()
     for category in categories:
