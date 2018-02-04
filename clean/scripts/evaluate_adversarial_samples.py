@@ -53,8 +53,8 @@ def main():
                 for p,h,lbl in data:
                     prediction = evaluate.predict_tokenized(classifier, embedding_holder, p, h)
                     if prediction != lbl:
-                        f_out.write('[p] ' + p + '\n')
-                        f_out.write('[h] ' + h + '\n')
+                        f_out.write('[p] ' + ' '.join(p) + '\n')
+                        f_out.write('[h] ' + ' '.join(h) + '\n')
                         f_out.write('assumed: ' +  lbl + '; predicted: ' + prediction + '\n\n')
                     else:
                         if category not in not_count_categories:
