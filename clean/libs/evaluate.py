@@ -31,7 +31,7 @@ def predict_untokenized(classifier, embedding_holder, p_sentence, h_sentence, tw
     _, predicted_idx = torch.max(scores, dim=1)
     return index_to_tag[predicted_idx.data[0]]
 
-def predict_tokenized(classifier, embedding_holder, p_sent, h_sent, index_to_tag=data_tools.DEFAULT_VALID_LABELS):
+def predict_tokenized(classifier, embedding_holder, p, h, index_to_tag=data_tools.DEFAULT_VALID_LABELS):
     p_batch = torch.LongTensor(len(p), 1)
     h_batch = torch.LongTensor(len(h), 1)
 
