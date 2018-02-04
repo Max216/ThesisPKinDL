@@ -53,9 +53,9 @@ def main():
                 for p,h,lbl in data:
                     prediction = evaluate.predict_tokenized(classifier, embedding_holder, p, h)
                     if prediction != lbl:
-                        f_out.write('[p]',p,'\n')
-                        f_out.write('[h]',h, '\n')
-                        f_out.write('assumed:', lbl, '; predicted:', prediction, '\n\n')
+                        f_out.write('[p] ' + p + '\n')
+                        f_out.write('[h] ' + h + '\n')
+                        f_out.write('assumed: ' +  lbl + '; predicted: ' + prediction + '\n\n')
                     else:
                         if category not in not_count_categories:
                             total_correct += 1
@@ -66,8 +66,8 @@ def main():
 
                 print('Acuracy on', category, category_correct / category_total)
 
-            print('Accuracy without:', ','.join(not_count_categories),':')
-            print('amount samples:', total_amount, ' ; accuracy:', total_correct / total_amount)
+            print('Accuracy without: ' +  ','.join(not_count_categories) + ':')
+            print('amount samples: ' + total_amount + '; accuracy: ' + total_correct / total_amount)
 
     #def prediction_fn(samples, wp_path):
     #    dataholder = data_handler.Datahandler(wp_path)
