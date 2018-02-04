@@ -38,7 +38,7 @@ def main():
         accuracy = evaluate.eval(classifier, dataset, 32, embedding_holder.padding()):
         print('Accuracy on', category, '->', accuracy)
 
-    print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 2, embedding_holder.padding()))
+    print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 8, embedding_holder.padding()))
 
     #def prediction_fn(samples, wp_path):
     #    dataholder = data_handler.Datahandler(wp_path)
