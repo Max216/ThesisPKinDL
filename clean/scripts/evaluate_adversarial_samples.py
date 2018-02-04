@@ -67,7 +67,7 @@ def main():
                 print('Acuracy on', category, category_correct / category_total)
 
             print('Accuracy without: ' +  ','.join(not_count_categories) + ':')
-            print('amount samples: ' + total_amount + '; accuracy: ' + total_correct / total_amount)
+            print('amount samples: ' + str(total_amount) + '; accuracy: ' + str(total_correct / total_amount))
 
     #def prediction_fn(samples, wp_path):
     #    dataholder = data_handler.Datahandler(wp_path)
