@@ -14,7 +14,7 @@ def csv(in_path, out_path):
         premise_dict[p['sentence1']].append(p)
 
     with codecs.open(out_path, 'w', 'utf-8') as f_out:
-        f_out.write('premise,hypothesis1,hypothesis2,hypothesis3,hypothesis4,hypothesis5\n')
+        f_out.write('premise,hypothesis1,hypothesis2,hypothesis3,hypothesis4,hypothesis5,id1,id2,id3,id4,id5\n')
         for premise in premise_dict:
             current = premise_dict[premise]
 
@@ -23,6 +23,7 @@ def csv(in_path, out_path):
 
             for chunk in chunks:
                 current_hit = []
+                ids = []
                 premise = None
                 for i, sample in enumerate(chunk):
                     premise = sample['sentence1']
@@ -31,6 +32,7 @@ def csv(in_path, out_path):
                     category = sample['category']
                     replaced1 = sample['replaced1']
                     replaced2 = sample['replaced2']
+                    _id = sample['id']
 
                     rep2_regexp = re.compile('\\b' + replaced2 + '\\b')
                     split_hyp = re.split(rep2_regexp, hypothesis)
@@ -38,11 +40,11 @@ def csv(in_path, out_path):
 
                     new_hyp = ("<span class='highlight'>" + replaced2 + '</span>').join(split_hyp)
                     current_hit.append(new_hyp.replace(',', '&#44;').replace('\"', '&quot;'))
-
+                    ids.append(str(_id))
 
                 out = [premise.replace(',', '&#44;').replace('\"', '&quot;')]
                 for sample in chunk:
-                    new_out = out + current_hit
+                    new_out = out + current_hit + ids
                     f_out.write(u','.join(new_out) + os.linesep)
 
 
