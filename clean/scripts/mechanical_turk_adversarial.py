@@ -42,11 +42,22 @@ def csv(in_path, out_path):
 
                 out = [premise.replace(',', '&#44;').replace('\"', '&quot;')]
                 for sample in chunk:
-                    out.extend(current_hit)
-                    f_out.write(u','.join(out) + os.linesep)
+                    new_out = out + current_hit
+                    f_out.write(u','.join(new_out) + os.linesep)
 
 
+def id(in_path, out_path):
+    with open(in_path) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+    
+    id_samples = []
+    for i, p in enumerate(parsed):
+        p['id'] = i
+        id_samples.append(p)
 
+    with open(out_path, 'w') as f_out:
+        for p in id_samples:
+            f_out.write(json.dumps(p) + '\n')
 
 
 def main():
@@ -54,10 +65,14 @@ def main():
 
     Usage:
         mechanical_turk_adversarial.py csv <file_in> <file_out>
+        mechanical_turk_adversarial.py id <file_in> <file_out>
+
     """)
 
     if args['csv']:
         csv(args['<file_in>'], args['<file_out>'])
+    elif args['id']:
+        id(args['<file_in>'], args['<file_out>'])
 
 if __name__ == '__main__':
     main()
