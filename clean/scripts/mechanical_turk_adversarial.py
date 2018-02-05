@@ -42,9 +42,8 @@ def csv(in_path, out_path):
 
                 out = [premise.replace(',', '&#44;').replace('\"', '&quot;')]
                 for sample in chunk:
-
-                out.extend(current_hit)
-                f_out.write(u','.join(out) + os.linesep)
+                    out.extend(current_hit)
+                    f_out.write(u','.join(out) + os.linesep)
 
 
 
