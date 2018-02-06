@@ -1306,7 +1306,7 @@ def sample_dataset(dataset_path):
     for p in parsed:
         sample_dict[p['category']].append((p['sentence1'], p['sentence2'], p['gold_label'], p['replaced1'], p['replaced2']))
 
-    AMOUNT = 20
+    AMOUNT = 50
 
     for key in sample_dict:
         print('#', key)
