@@ -266,6 +266,28 @@ def vegetables():
     
     return ('vegetables', replace_first, replace_second, replace_any)
 
+def vegetables_extended():
+    singular = 'zucchini,tomato,potato,shallot,soy,squash,yam,thyme,spinach,watercress,turnip,rosemary,onion,rhubarb,sage,rutabaga,celeriac,radicchio,cilantro,pepper,kohlrabi,parsnip,lemon grass,parsley,oregano,marjoram,lettuce,lavender,chamomile,chard,ginger,kale,garlic,corn,fennel,dill,daikon,eggplant,cucumber,celery,carrot,avocado,alfalfa,anise,azuki,basil,beetroot,cabbage,caraway,cauliflower,'.split(',')
+    plural = 'chickpeas,chives,tomatoes,potatoes,onions,eggplants,peas,cucumbers,carrots,avocados,mushrooms,lentils'.split(',')
+    dont_replace_singular = ['pumpkin']
+    dont_replace_plural = ['pumpkins']
+
+    exclude=[set(['peas', 'chickpeas'])]
+
+    replace_any = all_incompatible(singular)
+    replace_any.extend(all_incompatible(plural, exclude_words=exclude))
+
+    replace_first = incompatible_to_first(singular, dont_replace_singular, symmetric=False)
+    replace_first.extend(incompatible_to_first(plural, dont_replace_plural, symmetric=False))
+
+    replace_second = incompatible_to_first(dont_replace_singular, singular, symmetric=False)
+    replace_second.extend(incompatible_to_first(dont_replace_plural, plural, symmetric=False))
+
+    replace_first.extend(compatible_to_first(singular, ['vegetable'], symmetric=False))
+    replace_first.extend(compatible_to_first(plural, ['vegetables'], symmetric=False))
+    
+    return ('vegetables_extended', replace_first, replace_second, replace_any)
+
 def drinks():
     alcohol = 'beer,champagne,whisky,wine,gin,vodka,tequila,cider'.split(',')
     plural = ['beers', 'wines']
@@ -1299,7 +1321,8 @@ def main():
             #instruments
             #test
             #fix
-            wordnet_antonyms
+            #wordnet_antonyms
+            vegetables_extended
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
