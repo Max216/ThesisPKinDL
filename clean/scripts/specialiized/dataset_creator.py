@@ -1362,7 +1362,7 @@ def main():
     elif args['clean_filtered']:
         clean_filtered(args['<dataset_name>'])
     elif args['create']:
-        create(args['<list>'], args['<directory>'], args['<directory>'])
+        create(args['<list>'], args['<directory>'], args['<out>'])
     elif args['show']:
         max_amount = int(args['<amount>'])
         words = args['<words>']
