@@ -1028,7 +1028,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
                 
             other_group_contents.extend(keep_antonyms)
             count += len(antonym_wn_contents) - len(keep_antonyms)
-            data.append(file, other_group_contents)
+            data.append((file, other_group_contents))
 
         print('removed of wn:', count)
         return data
