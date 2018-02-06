@@ -1355,9 +1355,9 @@ def main():
             #instruments
             #test
             #fix
-            #wordnet_antonyms
+            wordnet_antonyms
             #vegetables_extended
-            ordinal_numbers
+            #ordinal_numbers
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
