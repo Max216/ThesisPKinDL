@@ -282,7 +282,7 @@ def drinks():
     return ('drinks', replace_first, replace_second, replace_any)
 
 def wordnet_antonyms():
-    FILE_PATH = '/home/max/Downloads/antonyms_for_snli.txt'
+    FILE_PATH = '/home/nlp/max/data/res/antonyms_for_snli.txt'
     with open(FILE_PATH) as f_in:
         lines = [line.strip().split() for line in f_in.readlines()]
 
