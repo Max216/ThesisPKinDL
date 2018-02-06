@@ -1,6 +1,8 @@
 import sys, os, json, re, random
 sys.path.append('./../')
 
+TMP_PATH_ANTONYMS = '/home/nlp/max/data/res/antonyms_snli_2_500.txt'
+
 from docopt import docopt
 
 from libs import data_manipulator
@@ -337,8 +339,7 @@ def drinks():
     return ('drinks', replace_first, replace_second, replace_any)
 
 def wordnet_antonyms():
-    FILE_PATH = '/home/nlp/max/data/res/antonyms_for_snli_first500.txt'
-    with open(FILE_PATH) as f_in:
+    with open(TMP_PATH_ANTONYMS) as f_in:
         lines = [line.strip().split() for line in f_in.readlines()]
 
     antonyms = [(words[0], words[1]) for words in lines]
