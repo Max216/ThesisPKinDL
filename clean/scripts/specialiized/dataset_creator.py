@@ -1006,19 +1006,32 @@ def summary(dataset_name):
         print('#', name, 'total pairs:', category_count_pairs, ', total samples:', category_count_samples)
 
 
-def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path=None):
+def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
 
-    def clean_wn_antonyms(filter_data, wn_antonym_whitelist=None):
+    def clean_wn_antonyms(filter_data, wn_antonym_whitelist):
         data = []
+        count = 0
         for file, contents in filter_data:
             other_group_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat != 'antonyms_wn']
-            antonym_wn_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat == 'antonyms_wn']
+            antonym_wn_contents = [(cat, w1, w2) for cat, any1, any2 in contents if cat == 'antonyms_wn']
 
             keep_antonyms = []
-            for cat, any1, any2 in contents:
-                print('cat', cat, 'any1', any1, 'any2', any2)
-            1/0
-            #for ant in antonym_wn_contents
+            for cat, w1, w2 in contents:
+                if w1 != w2:
+                    for item1, item2 in wn_antonym_whitelist:
+                        if w1 == item1 and w2 == item2:
+                            keep_antonyms.append((cat,w1,w2))
+                            break
+                        elif w1 == item2 and w2 == item1:
+                            keep_antonyms.append((cat,w1,w2))
+                            break
+                
+            other_group_contents.extend(keep_antonyms)
+            count += len(antonym_wn_contents) - len(keep_antonyms)
+            data.append(file, other_group_contents)
+
+        print('removed of wn:', count)
+        return data
 
 
     def remove_unwanted_categories(filter_data, unwanted):
@@ -1057,7 +1070,9 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path=None):
         # first consider max count the most
         return (max_count, [(i, file, contents, count) for i, file, contents, count in relevant_data if count == max_count])
         
-
+    with open(wn_antonym_whitelist_path) as whitelist_in:
+        whitelist = [line.strip().split() for line in whitelist_in.readlines()]
+        whitelist = [(item[0], item[1]) for item in whitelist]
     
     # removed: ['fruits', 'fastfood', 'at-verbs'] add 'antonyms_wn'
     #priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
@@ -1092,7 +1107,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path=None):
 
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
-    data = clean_wn_antonyms(data)
+    data = clean_wn_antonyms(data, whitelist)
     data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))
     #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
@@ -1352,7 +1367,7 @@ def main():
         dataset_creator.py summary <dataset_name>
         dataset_creator.py datasort <dataset_name> <out_name>
         dataset_creator.py summary_sorted <sorted_name>
-        dataset_creator.py grep_dataset <sorted_name> <out_name>
+        dataset_creator.py grep_dataset <sorted_name> <out_name> <whitelist_wn>
         dataset_creator.py finalize_dataset <dataset_name> <out_path>
         dataset_creator.py sample <datset_path>
         dataset_creator.py create <list> <directory> <out>
@@ -1362,7 +1377,7 @@ def main():
     if args['test']:
         test_out()
     elif args['grep_dataset']:
-        grep_dataset(args['<sorted_name>'], args['<out_name>'])
+        grep_dataset(args['<sorted_name>'], args['<out_name>'], args['<whitelist_wn>'])
     elif args['sample']:
         sample_dataset(args['<datset_path>'])
     elif args['finalize_dataset']:
