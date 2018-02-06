@@ -1359,7 +1359,10 @@ def sample_dataset(dataset_path):
 
     for key in sample_dict:
         print('#', key)
-        choice = random.sample(sample_dict[key], AMOUNT)
+        if len(sample_dict[key]) < AMOUNT:
+            choice = sample_dict[key]
+        else:
+            choice = random.sample(sample_dict[key], AMOUNT)
         for prem, hyp, lbl, w1, w2 in choice:
             print(w1, '--', w2, '--', lbl)
             print('[p]', prem)

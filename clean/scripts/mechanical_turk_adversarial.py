@@ -23,31 +23,32 @@ def csv(in_path, out_path):
             chunks = [current[x:x+5] for x in range(0, len(current), 5)]
             print('chunks', len(chunks))
             for chunk in chunks:
-                print('in chunk', len(chunk))
-                current_hit = []
-                ids = []
-                premise = None
-                for i, sample in enumerate(chunk):
-                    premise = sample['sentence1']
-                    hypothesis = sample['sentence2']
-                    label = sample['gold_label']
-                    category = sample['category']
-                    replaced1 = sample['replaced1']
-                    replaced2 = sample['replaced2']
-                    _id = sample['id']
+                if len(chunk) == 5:
+                    print('in chunk', len(chunk))
+                    current_hit = []
+                    ids = []
+                    premise = None
+                    for i, sample in enumerate(chunk):
+                        premise = sample['sentence1']
+                        hypothesis = sample['sentence2']
+                        label = sample['gold_label']
+                        category = sample['category']
+                        replaced1 = sample['replaced1']
+                        replaced2 = sample['replaced2']
+                        _id = sample['id']
 
-                    rep2_regexp = re.compile('\\b' + replaced2 + '\\b')
-                    split_hyp = re.split(rep2_regexp, hypothesis)
-                    split_prem = re.split(rep2_regexp, premise)
+                        rep2_regexp = re.compile('\\b' + replaced2 + '\\b')
+                        split_hyp = re.split(rep2_regexp, hypothesis)
+                        split_prem = re.split(rep2_regexp, premise)
 
-                    new_hyp = ("<span class='highlight'>" + replaced2 + '</span>').join(split_hyp)
-                    current_hit.append(new_hyp.replace(',', '&#44;').replace('\"', '&quot;'))
-                    ids.append(str(_id))
+                        new_hyp = ("<span class='highlight'>" + replaced2 + '</span>').join(split_hyp)
+                        current_hit.append(new_hyp.replace(',', '&#44;').replace('\"', '&quot;'))
+                        ids.append(str(_id))
 
-                out = [premise.replace(',', '&#44;').replace('\"', '&quot;')] 
-                #for sample in chunk:
-                new_out = out + current_hit + ids
-                f_out.write(u','.join(new_out) + os.linesep)
+                    out = [premise.replace(',', '&#44;').replace('\"', '&quot;')] 
+                    #for sample in chunk:
+                    new_out = out + current_hit + ids
+                    f_out.write(u','.join(new_out) + os.linesep)
     print(len(premise_dict.keys()))
 
 
