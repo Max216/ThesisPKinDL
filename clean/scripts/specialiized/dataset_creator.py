@@ -1342,7 +1342,7 @@ def shuffle_dataset(path_in, path_out):
         if len(test[k]) > 1:
             print(test[k])
             cnt += len(test[k])
-
+    print(cnt)
     random.shuffle(lines)
     with open(path_out, 'w') as f_out:
         for line in lines:
