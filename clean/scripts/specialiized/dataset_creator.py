@@ -1008,23 +1008,25 @@ def summary(dataset_name):
 
 def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path=None):
 
-    def clean_wn_antonyms(filter_data, wn_antonym_whitelist):
+    def clean_wn_antonyms(filter_data, wn_antonym_whitelist=None):
         data = []
         for file, contents in filter_data:
             other_group_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat != 'antonyms_wn']
             antonym_wn_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat == 'antonyms_wn']
 
             keep_antonyms = []
-            for ant in antonym_wn_contents
+            for cat, any1, any2 in contents:
+                print('cat', cat, 'any1', any1, 'any2', any2)
+            1/0
+            #for ant in antonym_wn_contents
 
 
-    def remove_unwanted_categories(filter_data, unwanted=None):
+    def remove_unwanted_categories(filter_data, unwanted):
         data = []
         for file, contents in filter_data:
             new_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat not in unwanted]
             data.append((file, new_contents))
-            print('cat', cat, 'any1', any1, 'any2', any2)
-            1/0
+            
 
         return data
 
@@ -1090,7 +1092,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path=None):
 
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
-    data = remove_unwanted_categories(data)
+    data = clean_wn_antonyms(data)
     data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))
     #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
