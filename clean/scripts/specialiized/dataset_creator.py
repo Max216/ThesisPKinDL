@@ -1337,9 +1337,11 @@ def shuffle_dataset(path_in, path_out):
         key = p['sentence1'] + '#' + p['sentence2']
         test[key].append(p)
     
+    cnt = 0
     for k in test:
         if len(test[k]) > 1:
             print(test[k])
+            cnt += len(test[k])
 
     random.shuffle(lines)
     with open(path_out, 'w') as f_out:
