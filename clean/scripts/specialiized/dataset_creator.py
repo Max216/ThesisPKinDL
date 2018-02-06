@@ -1325,6 +1325,23 @@ def finalize_dataset(dataset, out_path):
     print('Done. removed:', count)
     print('written:', count_written)
     
+def shuffle_dataset(path_in, path_out):
+    check_set = set()
+    with open(path_in) as f_in:
+        lines = [line for line in f_in.readlines()]
+
+    parsed = [json.loads(line.strip()) for line in lines]
+    for p in parsed:
+        key = p['sentence1'] + '#' + p['sentence2']
+        if key not check_set:
+            check_set.add(key)
+        else:
+            1/0
+
+    random.shuffle(lines)
+    with open(path_out, 'w') as f_out:
+        for line in lines:
+            f_out.write(line)
 
 
 def sample_dataset(dataset_path):
@@ -1371,11 +1388,14 @@ def main():
         dataset_creator.py finalize_dataset <dataset_name> <out_path>
         dataset_creator.py sample <datset_path>
         dataset_creator.py create <list> <directory> <out>
+        dataset_creator.py shuffle <data> <out>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['shuffle']:
+        shuffle_dataset(args['<data>'], args['<out>'])
     elif args['grep_dataset']:
         grep_dataset(args['<sorted_name>'], args['<out_name>'], args['<whitelist_wn>'])
     elif args['sample']:
