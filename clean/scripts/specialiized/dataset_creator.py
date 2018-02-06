@@ -1009,6 +1009,13 @@ def summary(dataset_name):
 def grep_dataset(sorted_name, out_name):
     
 
+    def remove_unwanted_categories(filter_data, unwanted):
+        data = []
+        for file, contents in filter_data:
+            new_contents = [cat for cat, any1, any2 in contents if cat not in unwanted]
+            data.append((file, new_contents))
+
+        return data
 
     def filter_below(filter_data, min_amount):
         return [(file, contents) for file, contents in filter_data if len(contents) >= min_amount]
@@ -1039,7 +1046,7 @@ def grep_dataset(sorted_name, out_name):
         
 
     
-    # removed: ['fruits', 'fastfood', 'at-verbs']
+    # removed: ['fruits', 'fastfood', 'at-verbs'] add 'antonyms_wn'
     #priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
     #priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
     #priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
@@ -1072,6 +1079,8 @@ def grep_dataset(sorted_name, out_name):
 
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
+    data = remove_unwanted_categories(filter_data, set(['fruits', 'fastfood', 'at-verbs']))
+    #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
     print('keep:', len(data))
 
