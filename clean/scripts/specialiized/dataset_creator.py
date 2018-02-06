@@ -1333,7 +1333,7 @@ def shuffle_dataset(path_in, path_out):
     parsed = [json.loads(line.strip()) for line in lines]
     for p in parsed:
         key = p['sentence1'] + '#' + p['sentence2']
-        if key not check_set:
+        if key not in check_set:
             check_set.add(key)
         else:
             1/0
