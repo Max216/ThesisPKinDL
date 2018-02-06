@@ -302,7 +302,7 @@ def vegetables():
     return ('vegetables', replace_first, replace_second, replace_any)
 
 def vegetables_extended():
-    singular = 'zucchini,tomato,potato,shallot,soy,squash,yam,thyme,spinach,watercress,turnip,rosemary,onion,rhubarb,sage,rutabaga,celeriac,radicchio,cilantro,pepper,kohlrabi,parsnip,lemon grass,parsley,oregano,marjoram,lettuce,lavender,chamomile,chard,ginger,kale,garlic,corn,fennel,dill,daikon,eggplant,cucumber,celery,carrot,avocado,alfalfa,anise,azuki,basil,beetroot,cabbage,caraway,cauliflower,'.split(',')
+    singular = 'zucchini,tomato,potato,shallot,soy,squash,yam,thyme,spinach,watercress,turnip,rosemary,onion,rhubarb,sage,rutabaga,celeriac,radicchio,cilantro,pepper,kohlrabi,parsnip,lemon grass,parsley,oregano,marjoram,lettuce,lavender,chamomile,chard,ginger,kale,garlic,corn,fennel,dill,daikon,eggplant,cucumber,celery,carrot,avocado,alfalfa,anise,azuki,basil,beetroot,cabbage,caraway,cauliflower'.split(',')
     plural = 'chickpeas,chives,tomatoes,potatoes,onions,eggplants,peas,cucumbers,carrots,avocados,mushrooms,lentils'.split(',')
     dont_replace_singular = ['pumpkin']
     dont_replace_plural = ['pumpkins']
@@ -866,7 +866,9 @@ def sort_data(dataset_name, out_path):
     with open(dataset_name) as f_in:
         lines = [line.strip().split(' ') for line in f_in.readlines()]
 
+    ignore_categories = set(['fruits', 'fastfood', 'at-verbs'])
     categories = [(line[0], line[3]) for line in lines]
+    categories = [cat, path for cat, in categories if cat not in ignore_categories]
 
     premise_dict = collections.defaultdict(lambda:  [])
 
@@ -1005,9 +1007,7 @@ def summary(dataset_name):
 
 
 def grep_dataset(sorted_name, out_name):
-    random.seed(9)
-    MIN_HYP_AMOUNT = 5
-    stop_amount = 10000 // 18
+    
 
 
     def filter_below(filter_data, min_amount):
@@ -1039,21 +1039,33 @@ def grep_dataset(sorted_name, out_name):
         
 
     
+    # removed: ['fruits', 'fastfood', 'at-verbs']
+    #priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
+    #priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
+    #priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
 
-    priority1 = ['antonyms_nn_vb', 'antonyms_other', 'movements', 'fastfood']
-    priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
-    priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
+    priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other'), (1,'movements')]
+    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables'), (1,'drinks'), (1, 'antonyms_wn')]
+    priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
+
+    random.seed(9)
+    MIN_HYP_AMOUNT = 5
+    categories_size = len(priority1) + len(priority2) + len(priority3)
+    all_groups = priority1 + priority2 + priority3
+    total_group_weight = sum([w for w,c in all_groups])
+    stop_amount = 10000 // total_group_weight
+    
     w_counter = collections.Counter()
     grp_counter = collections.Counter()
     used_files = collections.Counter()
 
     grp_penalize_factor = dict()
-    for g in priority1:
-        grp_penalize_factor[g] = 1
-    for g in priority2:
-        grp_penalize_factor[g] = 500
-    for g in priority3:
-        grp_penalize_factor[g] = 100000
+    for w,g in priority1:
+        grp_penalize_factor[g] = 1 * (1/w)
+    for w,g in priority2:
+        grp_penalize_factor[g] = 500 * (1/w)
+    for w,g in priority3:
+        grp_penalize_factor[g] = 100000 * (1/w)
 
     with open(sorted_name) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
@@ -1066,9 +1078,10 @@ def grep_dataset(sorted_name, out_name):
     # go through all priorities in order
     final_dataset = []
     used_groups = []
+    used_group_weight = 0
     for name, priority in [('1', priority1), ('2', priority2), ('3', priority3)]:
         print('# priority', name)
-        for current_group in priority:
+        for group_weight, current_group in priority:
             # for each, until reached stop amount (or all used)
             group_end = False
             used_groups.append(current_group)
@@ -1079,7 +1092,7 @@ def grep_dataset(sorted_name, out_name):
                 # get top samples for group
                 max_count, groupdata = get_list_for(current_group, data)
                 #print('sublist:', len(groupdata), 'different premise, having', max_count, 'beautiful samples for the group.')
-                if grp_counter[current_group] >= stop_amount:
+                if grp_counter[current_group] >= stop_amount * group_weight:
                     group_end = True
                     break
                 elif len(groupdata) == 0:
@@ -1189,10 +1202,11 @@ def grep_dataset(sorted_name, out_name):
             print('Finished with', current_group, grp_counter[current_group])
             total_samples = sum(grp_counter.values())
             total_finished = sum([grp_counter[g] for g in used_groups])
+            used_group_weight += group_weight
             print('currently having:', total_samples,'/ 10000', 'samples')
             missing = 10000 - total_finished
 
-            missing_group_amount = 18 - len(used_groups)
+            missing_group_amount = total_group_weight - used_group_weight
             if missing_group_amount > 0:
                 stop_amount = missing / missing_group_amount
             print(grp_counter.most_common())
