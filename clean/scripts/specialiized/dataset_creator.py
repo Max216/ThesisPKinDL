@@ -1331,22 +1331,20 @@ def shuffle_dataset(path_in, path_out):
         lines = [line for line in f_in.readlines()]
 
     parsed = [json.loads(line.strip()) for line in lines]
-    test = collections.defaultdict(lambda: [])
 
-    for p in parsed:
+    keep = []
+    for i,p in enumerate(parsed):
         key = p['sentence1'] + '#' + p['sentence2']
-        test[key].append(p)
-    
-    cnt = 0
-    for k in test:
-        if len(test[k]) > 1:
-            print(test[k])
-            cnt += len(test[k])
-    print(cnt)
-    random.shuffle(lines)
+        if key not in check_set:
+            check_set.add(key)
+            keep.append(lines[i])
+
+    random.shuffle(keep)
     with open(path_out, 'w') as f_out:
-        for line in lines:
+        for line in keep:
             f_out.write(line)
+
+    print(len(keep), len(lines))
 
 
 def sample_dataset(dataset_path):
