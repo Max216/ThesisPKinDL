@@ -1243,6 +1243,22 @@ def grep_dataset(sorted_name, out_name):
     # go through remeining
     # ...
 
+def create(result, directory, out):
+    with open(result) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    with open(out, 'w') as f_out:
+        for p in parsed:
+            with open(os.pth.join(directory, p['filename'])) as f_in:
+                parsed_in = [json.loads(line.strip()) for line in f_in.readlines()]
+                for content in p['contents']:
+                    for p_in in parsed_in:
+                        if p_in['replaced1'] == content['w1'] and p_in['replaced2'] == content['w2'] and p_in['category'] == content['group']:
+                            f_out.write(json.dumps(p_in) + '\n')
+                            break
+
+
+
 def finalize_dataset(dataset, out_path):
     with open(dataset) as f_in:
         lines = [line for line in f_in.readlines()]
@@ -1325,6 +1341,7 @@ def main():
         dataset_creator.py grep_dataset <sorted_name> <out_name>
         dataset_creator.py finalize_dataset <dataset_name> <out_path>
         dataset_creator.py sample <datset_path>
+        dataset_creator.py create <list> <directory> <out>
     """)
 
 
@@ -1344,6 +1361,8 @@ def main():
         summary(args['<dataset_name>'])
     elif args['clean_filtered']:
         clean_filtered(args['<dataset_name>'])
+    elif args['create']:
+        create(args['<list>'], args['<directory>'], args['<directory>'])
     elif args['show']:
         max_amount = int(args['<amount>'])
         words = args['<words>']
