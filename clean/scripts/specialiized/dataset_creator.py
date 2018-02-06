@@ -1012,7 +1012,7 @@ def grep_dataset(sorted_name, out_name):
     def remove_unwanted_categories(filter_data, unwanted):
         data = []
         for file, contents in filter_data:
-            new_contents = [cat for cat, any1, any2 in contents if cat not in unwanted]
+            new_contents = [(cat, any1, any2) for cat, any1, any2 in contents if cat not in unwanted]
             data.append((file, new_contents))
 
         return data
