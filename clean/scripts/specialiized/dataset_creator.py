@@ -1249,7 +1249,7 @@ def create(result, directory, out):
 
     with open(out, 'w') as f_out:
         for p in parsed:
-            with open(os.pth.join(directory, p['filename'])) as f_in:
+            with open(os.path.join(directory, p['filename'])) as f_in:
                 parsed_in = [json.loads(line.strip()) for line in f_in.readlines()]
                 for content in p['contents']:
                     for p_in in parsed_in:
