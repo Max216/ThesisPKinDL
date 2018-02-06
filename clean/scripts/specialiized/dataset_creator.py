@@ -229,6 +229,39 @@ def numbers():
 
     return ('numbers', replace_first, replace_second, replace_any)
 
+def numbers_extended():
+    numbers_written = 'two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen,twenty,thirty,forty,fifty,sixty,seventy,eighty,ninety,hundred,thousand'.split(',')
+    numbers_digits = '2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,1000'.split(',')
+
+    exclude_pairs = [set([numbers_written[i], numbers_digits[i]]) for i in range(len(numbers_written))]
+
+    incompatible_written_numbers = all_incompatible(numbers_written)
+    incompatible_digits = all_incompatible(numbers_digits)
+    incompatible_written_premise = incompatible_to_first(numbers_written, numbers_digits, exclude_pairs, False)
+    incompable_digits_premise = incompatible_to_first(numbers_digits, numbers_written, exclude_pairs, False)
+
+    synonym_numbers = synonym_from_two_lists(numbers_written, numbers_digits)
+    synonym_numbers_reversed = synonym_from_two_lists(numbers_digits, numbers_written)
+
+    replace_first = synonym_numbers + incompatible_written_premise
+    replace_second = synonym_numbers_reversed + incompable_digits_premise
+    replace_any = incompatible_written_numbers + incompatible_digits
+
+
+    return ('numbers', replace_first, replace_second, replace_any)
+
+def ordinal_numbers():
+    written = 'first,second,third,fourth,fifth,sixth,seventh,eighth,ninth,tenth,eleventh,twelfth,thirteenth,fourteenth,fifteenth,sixteenth,seventeenth,eighteenth,nineteenth,twentieth,thirtieth,fortieth,fiftieth,sixtieth,seventieth,eightieth,ninetieth,hundredth,thousandth'.split(',')
+    digits = '1st,2nd,3rd,4th,5th,6th,7th,8th,9th,10th,11th,12th,13th,14th,15th,16th,17th,18th,19th,20th,30th,40th,50th,60th,70th,80th,90th,100th,1000th'.split(',')
+    exclude_pairs = [set([written[i], digits[i]]) for i in range(len(written))]
+
+    incompatible = all_incompatible(written + digits, exclude_words=exclude_pairs)
+    synonyms = synonym_from_two_lists(digits, written)
+    synonyms.extend(synonym_from_two_lists(written, digits))
+
+    replace_any = incompatible + synonyms
+
+    return ('ordinals', [], [], replace_any)
 
 def fruits():
     singular = 'watermelon,strawberry,raspberry,pineapple,pear,apple,banana,blueberry,cherry,coconut,fig,grape,lemon,mango'.split(',')
@@ -1322,7 +1355,8 @@ def main():
             #test
             #fix
             #wordnet_antonyms
-            vegetables_extended
+            #vegetables_extended
+            ordinal_numbers
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
