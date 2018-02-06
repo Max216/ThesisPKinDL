@@ -1,6 +1,7 @@
 from docopt import docopt
 
 import json, re, collections, codecs, os
+import csv as csv_lib
 
 
 def csv(in_path, out_path):
@@ -98,7 +99,34 @@ def filter_common(in_path, out_path):
         for sample in keep_samples:
             f_out.write(json.dumps(sample) + '\n')
 
+def clean_results(file_in, file_out):
+    with open(file_in) as f_in:
+        csv_reader = csv_lib.reader(f_in)
+        content = [row for row in csv_reader]
 
+    header = content[0]
+    contents = content[1:]
+
+    id_headers = ["Input.id1", "Input.id2","Input.id3","Input.id4","Input.id5"]
+    question_1_headers = ["Answer.label1_hyp1","Answer.label1_hyp2", "Answer.label1_hyp3","Answer.label1_hyp4","Answer.label1_hyp5"]
+    question_2_headers = ["Answer.label2_hyp1", "Answer.label2_hyp2", "Answer.label2_hyp3", "Answer.label2_hyp4", "Answer.label2_hyp5"]
+    question_3_headers = ["Answer.nonsense_hyp1","Answer.nonsense_hyp2","Answer.nonsense_hyp3","Answer.nonsense_hyp4","Answer.nonsense_hyp5"]
+
+    sample_id_indizes = [header.index(s_id) for s_id in id_headers]
+    sample_q1_indizes = [header.index(q1) if q1 in header else -1 for q1 in question_1_headers]
+    sample_q2_indizes = [header.index(q2) if q2 in header else -1 for q2 in question_2_headers]
+    sample_q3_indizes = [header.index(q3) if q3 in header else -1 for q3 in question_3_headers]
+
+   
+    print(sample_id_indizes)
+    print(sample_q1_indizes)
+    print(sample_q2_indizes)
+    print(sample_q3_indizes)
+
+    with open(file_out, 'w') as f_out:
+        pass
+        1/0
+        # TODO
 
 def main():
     args = docopt("""Deal with data for mechanical turk.
@@ -107,6 +135,7 @@ def main():
         mechanical_turk_adversarial.py csv <file_in> <file_out>
         mechanical_turk_adversarial.py id <file_in> <file_out>
         mechanical_turk_adversarial.py filter_common <file_in> <file_out>
+        mechanical_turk_adversarial.py clean_results <file_in> <file_out>
 
     """)
 
@@ -116,6 +145,8 @@ def main():
         id(args['<file_in>'], args['<file_out>'])
     elif args['filter_common']:
         filter_common(args['<file_in>'], args['<file_out>'])
+    elif args['clean_results']:
+        clean_results(args['<file_in>'], args['<file_out>'])
 
 if __name__ == '__main__':
     main()

@@ -281,6 +281,14 @@ def drinks():
 
     return ('drinks', replace_first, replace_second, replace_any)
 
+def wordnet_antonyms():
+    FILE_PATH = '/home/max/Downloads/antonyms_for_snli.txt'
+    with open(FILE_PATH) as f_in:
+        lines = [line.strip().split() for line in f_in.readlines()]
+
+    antonyms = [(words[0], words[1]) for words in lines]
+    replace_any = incompatible_pairs(antonyms)
+    return ('antonyms_wn', [], [], replace_any)
 
 def fastfoods():
     singular = 'kebab,hamburger,cheeseburger,sandwich,taco,pizza'.split(',')
@@ -1290,7 +1298,8 @@ def main():
             #rooms,
             #instruments
             #test
-            fix
+            #fix
+            wordnet_antonyms
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
