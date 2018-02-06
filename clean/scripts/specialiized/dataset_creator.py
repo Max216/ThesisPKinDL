@@ -868,7 +868,7 @@ def sort_data(dataset_name, out_path):
 
     ignore_categories = set(['fruits', 'fastfood', 'at-verbs'])
     categories = [(line[0], line[3]) for line in lines]
-    categories = [cat, path for cat, in categories if cat not in ignore_categories]
+    categories = [cat, path for cat,path in categories if cat not in ignore_categories]
 
     premise_dict = collections.defaultdict(lambda:  [])
 
