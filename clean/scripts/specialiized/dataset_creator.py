@@ -1079,7 +1079,7 @@ def grep_dataset(sorted_name, out_name):
 
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
-    data = remove_unwanted_categories(filter_data, set(['fruits', 'fastfood', 'at-verbs']))
+    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))
     #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
     print('keep:', len(data))
