@@ -957,6 +957,24 @@ def sort_data(dataset_name, out_path):
             }) + '\n')
 
 
+def validate_sorted(content_file):
+    dirname = os.path.dirname(content_file)
+    with open(content_file) as f_in:
+        filenames = [os.path.join(dirname, json.loads(line.strip())['filename']) for line in f_in.readlines()]
+
+    have_pairs = set()
+    for file in filenames:
+        with open(file) as f_in:
+            parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+            for p in parsed:
+                key = p['sentence1'] + '#' + p['sentence2']
+                if key not in have_pairs:
+                    have_pairs.add(key)
+                else:
+                    print('found duplicate here!')
+                    1/0
+
+
 
 
 def summary_sorted(sorted_name):
@@ -1108,7 +1126,9 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
     data = clean_wn_antonyms(data, whitelist)
-    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))
+    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))    
+
+
     #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
     print('keep:', len(data))
@@ -1395,11 +1415,14 @@ def main():
         dataset_creator.py sample <datset_path>
         dataset_creator.py create <list> <directory> <out>
         dataset_creator.py shuffle <data> <out>
+        dataset_creator.py val_sorted <contents>
     """)
 
 
     if args['test']:
         test_out()
+    elif args['val_sorted']:
+        validate_sorted(args['<contents>'])
     elif args['shuffle']:
         shuffle_dataset(args['<data>'], args['<out>'])
     elif args['grep_dataset']:
