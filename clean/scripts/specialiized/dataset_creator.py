@@ -1101,7 +1101,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
             if len_before > len_after:
                 print('removed:', len_before - len_after)
 
-            return content
+            return new_content
         # function code
         unused_data = [(file, remove_used(contents, file)) for file, contents in data]
         counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(unused_data)]
