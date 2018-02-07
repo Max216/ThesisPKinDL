@@ -1097,8 +1097,8 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     #priority2 = ['synonyms', 'planets', 'antonyms_adj_adv', 'vegetables', 'at-verbs', 'drinks']
     #priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
 
-    priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other'), (1,'movements')]
-    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables'), (1,'drinks'), (1, 'antonyms_wn')]
+    priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
+    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_expanded'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
 
     random.seed(9)
@@ -1110,6 +1110,22 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     
     w_counter = collections.Counter()
     grp_counter = collections.Counter()
+    grp_counter['antonyms_nn_vb'] = 52
+    grp_counter['antonyms_other'] = 16
+    grp_counter['synonyms'] = 78
+    grp_counter['planets'] = 8
+    grp_counter['antonyms_adj_adv'] = 17
+    grp_counter['vegetables_expanded'] = 20
+    grp_counter['drinks'] = 95
+    grp_counter['antonyms_wn'] = 135
+    grp_counter['ordinals'] = 0
+    grp_counter['numbers'] = 67
+    grp_counter['rooms'] = 75
+    grp_counter['materials'] = 103 + 17
+    grp_counter['instruments'] = 65
+    grp_counter['nationalities'] = 105 + 6
+    grp_counter['countries'] = 65 + 6
+    grp_counter['colors'] = 70
     used_files = collections.Counter()
 
     grp_penalize_factor = dict()
@@ -1126,8 +1142,10 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
     data = clean_wn_antonyms(data, whitelist)
-    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs']))    
+    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs', 'movements']))    
 
+    total_finished = sum([grp_counter[g] for g in used_groups])
+    print('already finished:', total_finished)
 
     #print('After removing unwanted:', len(data))
     data = filter_below(data, MIN_HYP_AMOUNT)
