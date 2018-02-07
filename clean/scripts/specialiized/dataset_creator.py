@@ -1433,6 +1433,9 @@ def remove_from_sorted(sorted_content, rm_dataset):
                 for line in lines:
                     f_out.write(line)
 
+        if len(remove_samples) == 0:
+            break
+
     print('removed:', rm_cnt)
 
 
