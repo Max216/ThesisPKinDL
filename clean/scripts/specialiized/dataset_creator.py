@@ -1420,7 +1420,7 @@ def remove_from_sorted(sorted_content, rm_dataset):
             for j, (sent1, sent2) in enumerate(remove_samples):
                 if sent1 == p_in['sentence1'] and sent2 == p_in['sentence2']:
                     # remove
-                    rm.append(i)
+                    rm_lines.append(i)
                     rm_samples.append(j)
 
         if len(rm_lines) > 0:
