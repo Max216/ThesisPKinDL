@@ -1495,6 +1495,95 @@ def remove_from_sorted(sorted_content, rm_dataset):
 
     print('removed:', rm_cnt)
 
+def make_valid(data_path, out_path, exclude_path):
+    random.seed(1)
+    with open(exclude_path) as f_in:
+        parsed_rm = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    with open(data_path) as f_in:
+        parsed_new = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    print('rm dataset', len(parsed_rm))
+    print('dataset', len(parsed_new))
+    cnt_remove_have_already = 0
+    keep_new = []
+    for p_new in parsed_new:
+        add = True
+        for p_rm in parsed_rm:
+            if p_new['sentence1'] == p_rm['sentence1'] and p_new['sentence2'] == p_rm['sentence2']:
+                cnt_remove_have_already += 1
+                print('Found one', cnt_remove_have_already)
+                add = False
+                break
+
+        if add:
+            keep_new.append(p_new)
+
+    print('remove:', cnt_remove_have_already)
+    print('dataset', len(keep_new))
+
+    premise_dict = collections.defaultdict(lambda: [])
+    for p_new  in keep_new:
+        premise_dict[p_new['sentence1']].append(p_new)
+
+    keep_new = []
+    cnt = 0
+    for p in premise_dict:
+        samples = premise_dict[p]
+        if len(samples) == 5:
+            keep_new.extend(samples)
+        elif len(samples) == 10:
+            keep_new.extend(samples)
+        elif len(samples) > 5 and len(samples) < 20:
+            keep_new.extend(samples[:5])
+
+    print('Filtered down to', len(keep_new))
+
+    AMOUNT = 9000
+    premise_dict = collections.defaultdict(lambda: [])
+    for p_new  in keep_new:
+        premise_dict[p_new['sentence1']].append(p_new)
+
+    # validate
+    for p in premise_dict:
+        if len(premise_dict[p]) == 5 or len(premise_dict[p]) == 10:
+            pass
+        else:
+            1/0
+    print('passed')
+
+    want_groups = []
+    wanted_groups = set(['antonyms_adj_adv', 'planets', 'vegetables_extended', 'antonyms_other'])
+    remaining_groups = []
+    for p in premise_dict:
+        important = False
+        for sample in premise_dict[p]:
+            if sample['category'] in wanted_groups:
+                important = True
+                break
+
+        if important:
+            want_groups.extend(premise_dict[p])
+        else:
+            remaining_groups.append(premise_dict[p])
+
+    print('want groups:', len(want_groups))
+
+    # remaining:
+    remaining = AMOUNT - len(want_groups)
+
+    random.shuffle(remaining_groups)
+    add_samples = []
+    while remaining > 0:
+        for g in remaining_groups:
+            if remaining - len(g) >= 0:
+                add_samples.extend(g)
+                remaining = remaining - len(g)
+    
+    keep_new = want_groups + add_samples
+    with open(out_path, 'w') as f_out:
+        for p in keep_new:
+            f_out.write(json.dumps(p) + '\n')
 
 
 def main():
@@ -1518,6 +1607,7 @@ def main():
         dataset_creator.py shuffle <data> <out>
         dataset_creator.py val_sorted <contents>
         dataset_creator.py rm_from_sorted <sorted> <rm_dataset>
+        dataset_creator.py make_valid <data> <out> <exclude>
     """)
 
 
@@ -1545,6 +1635,8 @@ def main():
         clean_filtered(args['<dataset_name>'])
     elif args['create']:
         create(args['<list>'], args['<directory>'], args['<out>'])
+    elif args['make_valid']:
+        make_valid(args['<data>'], args['<out>'], args['<exclude>'])
     elif args['show']:
         max_amount = int(args['<amount>'])
         words = args['<words>']
