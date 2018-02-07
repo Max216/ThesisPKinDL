@@ -1026,6 +1026,9 @@ def summary(dataset_name):
 
 def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
 
+
+    used_sample_dict = collections.defaultdict(lambda: set())
+
     def clean_wn_antonyms(filter_data, wn_antonym_whitelist):
         data = []
         count = 0
@@ -1090,9 +1093,20 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
                 size = MIN_HYP_AMOUNT
             return size
 
+        def remove_used(content, file):
+            len_before = len(content)
+            new_content = [(cat, w1, w2) for cat, w1, w2 in content if w1 + '#' + w2 not in used_sample_dict[file]]
+            len_after = len(new_content)
+
+            if len_before > len_after:
+                print('removed:', len_before - len_after)
+
+            return content
         # function code
-        counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
+        unused_data = [(file, remove_used(contents, file)) for file, contents in data]
+        counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(unused_data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
+
         
         # refilter
         relevant_data = [(i, file, contents, count) for i, file, contents, count in relevant_data if len(contents) >= MIN_HYP_AMOUNT]
@@ -1271,6 +1285,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
                     w_counter[w1] += 1
                     w_counter[w2] += 1
                     grp_counter[group] += 1
+                    used_sample_dict[file].add(w1 + '#' + w2)
                 used_files[file] += 1
 
                 # update data and repeat
