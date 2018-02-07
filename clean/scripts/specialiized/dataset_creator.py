@@ -1144,7 +1144,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     data = clean_wn_antonyms(data, whitelist)
     data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs', 'movements']))    
 
-    total_finished = sum([grp_counter[g] for g in used_groups])
+    total_finished = sum([grp_counter[g] for g in grp_counter])
     print('already finished:', total_finished)
 
     #print('After removing unwanted:', len(data))
