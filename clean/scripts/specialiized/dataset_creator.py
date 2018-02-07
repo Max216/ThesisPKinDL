@@ -1098,7 +1098,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     #priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
 
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
-    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_expanded'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
+    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
 
     random.seed(9)
@@ -1115,7 +1115,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     grp_counter['synonyms'] = 78
     grp_counter['planets'] = 8
     grp_counter['antonyms_adj_adv'] = 17
-    grp_counter['vegetables_expanded'] = 20
+    grp_counter['vegetables_extended'] = 20
     grp_counter['drinks'] = 95
     grp_counter['antonyms_wn'] = 135
     grp_counter['ordinals'] = 0
