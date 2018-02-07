@@ -1371,6 +1371,7 @@ def shuffle_dataset(path_in, path_out):
     parsed = [json.loads(line.strip()) for line in lines]
 
     keep = []
+    cnt = 0
     for i,p in enumerate(parsed):
         key = p['sentence1'] + '#' + p['sentence2']
         if key not in check_set:
@@ -1378,8 +1379,10 @@ def shuffle_dataset(path_in, path_out):
             keep.append(lines[i])
         else:
             print('oh no')
-            1/0
+            cnt +=1
 
+    print('duplicates', cnt)
+    1/0
     random.shuffle(keep)
     with open(path_out, 'w') as f_out:
         for line in keep:
