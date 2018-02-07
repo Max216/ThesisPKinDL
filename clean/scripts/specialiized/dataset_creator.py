@@ -1103,8 +1103,8 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
 
             return new_content
         # function code
-        unused_data = [(file, remove_used(contents, file)) for file, contents in data]
-        counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(unused_data)]
+        #unused_data = [(file, remove_used(contents, file)) for file, contents in data]
+        counted_data = [(i, file, contents, count_cat(contents, group))for i, (file, contents) in enumerate(data)]
         relevant_data = [(i, file, contents, count) for i, file, contents, count in counted_data if count > 0]
 
         
@@ -1131,7 +1131,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
     priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
-    FINAL_AMOUNT = 10000
+    FINAL_AMOUNT = 20000
     random.seed(9)
     MIN_HYP_AMOUNT = 5
     categories_size = len(priority1) + len(priority2) + len(priority3)
