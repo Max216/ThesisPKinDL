@@ -1376,6 +1376,9 @@ def shuffle_dataset(path_in, path_out):
         if key not in check_set:
             check_set.add(key)
             keep.append(lines[i])
+        else:
+            print('oh no')
+            1/0
 
     random.shuffle(keep)
     with open(path_out, 'w') as f_out:
