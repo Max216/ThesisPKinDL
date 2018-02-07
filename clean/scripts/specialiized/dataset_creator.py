@@ -1415,7 +1415,7 @@ def shuffle_dataset(path_in, path_out):
             cnt +=1
 
     print('duplicates', cnt)
-    1/0
+
     random.shuffle(keep)
     with open(path_out, 'w') as f_out:
         for line in keep:
