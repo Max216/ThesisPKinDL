@@ -58,7 +58,7 @@ def id(in_path, out_path):
     
     id_samples = []
     for i, p in enumerate(parsed):
-        p['id'] = i
+        p['id'] = i + 5000
         id_samples.append(p)
 
     with open(out_path, 'w') as f_out:
