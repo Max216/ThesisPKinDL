@@ -1100,13 +1100,13 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
     priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
-
+    FINAL_AMOUNT = 15000
     random.seed(9)
     MIN_HYP_AMOUNT = 5
     categories_size = len(priority1) + len(priority2) + len(priority3)
     all_groups = priority1 + priority2 + priority3
     total_group_weight = sum([w for w,c in all_groups])
-    stop_amount = 10000 // total_group_weight
+    stop_amount = FINAL_AMOUNT // total_group_weight
     
     w_counter = collections.Counter()
     grp_counter = collections.Counter()
@@ -1279,8 +1279,8 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
             total_samples = sum(grp_counter.values())
             total_finished = sum([grp_counter[g] for g in used_groups])
             used_group_weight += group_weight
-            print('currently having:', total_samples,'/ 10000', 'samples')
-            missing = 10000 - total_finished
+            print('currently having:', total_samples,'/', FINAL_AMOUNT, 'samples')
+            missing = FINAL_AMOUNT - total_finished
 
             missing_group_amount = total_group_weight - used_group_weight
             if missing_group_amount > 0:
