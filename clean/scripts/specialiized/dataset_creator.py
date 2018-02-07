@@ -1051,6 +1051,23 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
         print('removed of wn:', count)
         return data
 
+    def filter_duplictes(filter_data):
+        cnt_removed = 0
+        data = []
+        added = set()
+        for file, contents in filter_data:
+            new_contents = []
+            for cat,w1,w2 in contents:
+                key = w1 + '#' + w2
+                if key not in added:
+                    added.add(key)
+                    new_contents.append((cat,w1,w2))
+            data.append((file, new_contents))
+
+        print('filtered duplicates:', cnt_removed)
+        return data
+
+
 
     def remove_unwanted_categories(filter_data, unwanted):
         data = []
@@ -1100,7 +1117,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
     priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
-    FINAL_AMOUNT = 15000
+    FINAL_AMOUNT = 10000
     random.seed(9)
     MIN_HYP_AMOUNT = 5
     categories_size = len(priority1) + len(priority2) + len(priority3)
@@ -1142,7 +1159,8 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     print('# sorted samples loaded:', len(parsed))
     data = [(item['filename'], [(content_item['group'], content_item['w1'], content_item['w2']) for content_item in item['contents']]) for item in parsed]
     data = clean_wn_antonyms(data, whitelist)
-    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs', 'movements']))    
+    data = remove_unwanted_categories(data, set(['fruits', 'fastfood', 'at-verbs', 'movements']))
+    data = filter_duplictes(data)
 
     total_finished = sum([grp_counter[g] for g in grp_counter])
     print('already finished:', total_finished)
