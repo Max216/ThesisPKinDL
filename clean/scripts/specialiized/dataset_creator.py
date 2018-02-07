@@ -1396,6 +1396,47 @@ def sample_dataset(dataset_path):
         total += amount
         print(key, '-->', amount, 'samples')
     print('total:', total)
+
+
+def remove_from_sorted(sorted_content, rm_dataset):
+    with open(rm_dataset) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    remove_samples = [(p['sentence1'], p['sentence2']) for p in parsed]
+
+    directory = os.path.dirname(sorted_content)
+    rm_cnt = 0
+    with open(sorted_content) as f_in:
+        files = [os.path.join(directory, json.loads(line.strip())['filename']) for line in f_in.readlines()]
+
+    for file in files:
+        print('open', file, 'remaining', len(remove_samples))
+        with open(file) as f_in:
+            parsed_in = [json.loads(line.strip()) for line in f_in.readlines()]
+
+        rm_lines = []
+        rm_samples = []
+        for i, p_in in enumerate(parsed_in):
+            for j, (sent1, sent2) in enumerate(remove_samples):
+                if sent1 == p_in['sentence1'] and sent2 == p_in['sentence2']:
+                    # remove
+                    rm.append(i)
+                    rm_samples.append(j)
+
+        if len(rm_lines) > 0:
+            rm_cnt += len(rm_lines)
+            remove_samples = [remove_samples[i] for i in range(len(remove_samples)) if i not in rm_samples]
+            with open(file) as f_in:
+                lines = [line for line in f_in.readlines()]
+                lines = [lines[i] for i in range(len(lines)) if i not in rm_lines]
+            with open(file, 'w') as f_out:
+                for line in lines:
+                    f_out.write(line)
+
+    print('removed:', rm_cnt)
+
+
+
 def main():
     args = docopt("""Create a new dataset based on the given type.
 
@@ -1416,6 +1457,7 @@ def main():
         dataset_creator.py create <list> <directory> <out>
         dataset_creator.py shuffle <data> <out>
         dataset_creator.py val_sorted <contents>
+        dataset_creator.py rm_from_sorted <sorted> <rm_dataset>
     """)
 
 
@@ -1423,6 +1465,8 @@ def main():
         test_out()
     elif args['val_sorted']:
         validate_sorted(args['<contents>'])
+    elif args['rm_from_sorted']:
+        remove_from_sorted(args['<sorted>'], args['<rm_dataset>'])
     elif args['shuffle']:
         shuffle_dataset(args['<data>'], args['<out>'])
     elif args['grep_dataset']:
