@@ -111,6 +111,31 @@ def countries():
 
     return ('countries', [], [], all_incompatible(countries, exclude_words=exclude_words))
 
+def countries2():
+    group1 = "Canada,England,Australia,Ireland,New Zealand".split(',')
+    group2 = 'China,India,Japan,Singapore,Malaysia,Vietnam,North Korea,Thailand'.split(',')
+    group3 = 'Russia,Ukraine,Poland,Hungary'.split(',')
+    group4 = 'Germany,Holland,Sweden,Switzerland,Norway,Belgium'.split(',')
+    group5 = 'Spain,Brazil,Mexico,Argentina,Peru,Venezuela'.split(',')
+    group6 = 'Turkey,Israel,Egypt,Syria,Greece'.split(',')
+    group7 = "Afghanistan,Iran,Iraq,Pakistan,Saudi Arabia".split(',')
+    group8 = "Cuba,Haiti,Jamaica".split(',')
+    group9 = "Kenya,Libya,Nigeria,South Africa".split(',')
+    group10 = 'France,Spain,Italy,Greece,Portugal'.split(',')
+
+    replace_any = all_incompatible(group1)
+    replace_any.extend(all_incompatible(group2))
+    replace_any.extend(all_incompatible(group3))
+    replace_any.extend(all_incompatible(group4))
+    replace_any.extend(all_incompatible(group5))
+    replace_any.extend(all_incompatible(group6))
+    replace_any.extend(all_incompatible(group7))
+    replace_any.extend(all_incompatible(group8))
+    replace_any.extend(all_incompatible(group9))
+    replace_any.extend(all_incompatible(group10))
+
+    return ('countries_grouped', [], [], replace_any)
+
 def nationalities():
     exclude_words = []
 
@@ -129,6 +154,51 @@ def nationalities():
     replace_second.extend(incompatible_to_first(nationalities_same_singular_plural, nationalities_different_plural_plural, symmetric=False))
 
     return ('nationalities', replace_first, replace_second, replace_any)
+
+def nationalities2():
+    # singular
+    group1 = "English,Canadian,Irish,Australian".split(',')
+    group2 = "Indonesian,North Korean,South Korean,Thai,Chinese,Japanese,Vietnamese,Indian".split(',')
+    group3 = "Russian,Ukrainian,Polish,Hungarian".split(',')
+    group4 = "Belgian,Danish,Dutch,Swedish,German,Norwegian".split(',')
+    group5 = "Argentinian,Chilean,Peruvian,Spanish,Mexican,Brazilian".split(',')
+    group6 = "Palestinian,Syrian,Turkish,Greek,Egyptian,Israeli".split(',')
+    group7 = "Afghan,Iraqi,Pakistani".split(',')
+    group8 = "Jamaican,Cuban".split(',')
+    group9 = "Kenyan,Nigerian,South African".split(',')
+    group10 = 'French,Spanish,Italian,Greek,Portuguese'.split(',')
+
+    replace_any = all_incompatible(group1)
+    replace_any.extend(all_incompatible(group2))
+    replace_any.extend(all_incompatible(group3))
+    replace_any.extend(all_incompatible(group4))
+    replace_any.extend(all_incompatible(group5))
+    replace_any.extend(all_incompatible(group6))
+    replace_any.extend(all_incompatible(group7))
+    replace_any.extend(all_incompatible(group8))
+    replace_any.extend(all_incompatible(group9))
+    replace_any.extend(all_incompatible(group10))
+
+    # plural
+    group1_p = "English,Canadians,Irish,Australians".split(',')
+    group2_p = "Indonesians,Chinese,Japanese,Vietnamese,Indians".split(',')
+    group3_p = "Russians,Ukrainians,Polish".split(',')
+    group4_p = "Danish,Dutch,Swedish,Germans,Norwegians".split(',')
+    group5_p = "Chileans,Spanish,Mexicans".split(',')
+    group6_p = "Palestinians,Turkish,Greeks".split(',')
+    group10_p = "French,Italians,Spanish,Greeks".split(',')
+
+    replace_any.extend(all_incompatible(group1_p))
+    replace_any.extend(all_incompatible(group2_p))
+    replace_any.extend(all_incompatible(group3_p))
+    replace_any.extend(all_incompatible(group4_p))
+    replace_any.extend(all_incompatible(group5_p))
+    replace_any.extend(all_incompatible(group6_p))
+    replace_any.extend(all_incompatible(group10_p))
+
+    return ('nationalities_grouped', [], [], replace_any)
+
+
 
 def colors():
     colors = 'red,blue,yellow,purple,green,brown,grey,black,white,turquoise,violet,beige,silver,pink'.split(',')
@@ -1131,7 +1201,7 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
     priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
     priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
-    FINAL_AMOUNT = 20000
+    FINAL_AMOUNT = 10000
     random.seed(9)
     MIN_HYP_AMOUNT = 5
     categories_size = len(priority1) + len(priority2) + len(priority3)
@@ -1671,9 +1741,11 @@ def main():
             #instruments
             #test
             #fix
-            wordnet_antonyms
+            #wordnet_antonyms
             #vegetables_extended
             #ordinal_numbers
+            countries2,
+            nationalities2
         ]
 
         datahandler = data_manipulator.DataManipulator().load()
