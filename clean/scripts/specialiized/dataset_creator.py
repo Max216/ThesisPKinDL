@@ -1622,7 +1622,7 @@ def make_valid(data_path, out_path, exclude_path):
 
     # validate
     for p in premise_dict:
-        if len(premise_dict[p]) == 5 or len(premise_dict[p]) == 10:
+        if len(premise_dict[p]) == 5 or len(premise_dict[p]) == 10 or len(premise_dict[p]) == 15 or len(premise_dict[p]) == 20:
             pass
         else:
             1/0
