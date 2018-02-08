@@ -1660,7 +1660,7 @@ def main():
     args = docopt("""Create a new dataset based on the given type.
 
     Usage:
-        dataset_creator.py create <out_name>
+        dataset_creator.py create1 <out_name>
         dataset_creator.py test 
         dataset_creator.py show -a <amount> (-w <words>)...
         dataset_creator.py clean_simple <dataset_name>
