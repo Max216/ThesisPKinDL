@@ -1223,9 +1223,9 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     grp_counter['numbers'] = 67
     grp_counter['rooms'] = 75
     grp_counter['materials'] = 103 + 17
-    grp_counter['instruments'] = 65
-    grp_counter['nationalities'] = 105 + 6
-    grp_counter['countries'] = 65 + 6
+    grp_counter['instruments'] = 65 + 12
+    grp_counter['nationalities_grouped'] = 105 
+    grp_counter['countries_grouped'] = 65 
     grp_counter['colors'] = 70
     used_files = collections.Counter()
 
@@ -1604,8 +1604,14 @@ def make_valid(data_path, out_path, exclude_path):
             keep_new.extend(samples)
         elif len(samples) == 10:
             keep_new.extend(samples)
-        elif len(samples) > 5 and len(samples) < 20:
+        elif len(samples) > 5 and len(samples) < 10:
             keep_new.extend(samples[:5])
+        elif len(samples) > 5 and len(samples) < 15:
+            keep_new.extend(samples[:10])
+        elif len(samples) > 5 and len(samples) < 20:
+            keep_new.extend(samples[:15])
+        elif len(samples) > 5 and len(samples) < 25:
+            keep_new.extend(samples[:20])
 
     print('Filtered down to', len(keep_new))
 
@@ -1623,7 +1629,7 @@ def make_valid(data_path, out_path, exclude_path):
     print('passed')
 
     want_groups = []
-    wanted_groups = set(['antonyms_adj_adv', 'planets', 'vegetables_extended', 'antonyms_other'])
+    wanted_groups = set(['antonyms_adj_adv', 'planets', 'vegetables', 'antonyms_other'])
     remaining_groups = []
     for p in premise_dict:
         important = False
