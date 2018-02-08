@@ -1199,9 +1199,9 @@ def grep_dataset(sorted_name, out_name, wn_antonym_whitelist_path):
     #priority3 = ['fruits', 'rooms', 'materials','instruments', 'nationalities', 'countries', 'numbers', 'colors']
 
     priority1 = [(1, 'antonyms_nn_vb'), (1, 'antonyms_other')]
-    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables_extended'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals')]
-    priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'),(1,'instruments'), (1,'nationalities'), (1,'countries'), (1,'colors')]
-    FINAL_AMOUNT = 10000
+    priority2 = [(1,'synonyms'), (1,'planets'), (1,'antonyms_adj_adv'), (1,'vegetables'), (1,'drinks'), (1, 'antonyms_wn'), (1, 'ordinals'), (1,'nationalities_grouped'), (1,'countries_grouped')]
+    priority3 = [ (1,'numbers'), (1,'rooms'), (1,'materials'), (1,'colors')]
+    FINAL_AMOUNT = 20000
     random.seed(9)
     MIN_HYP_AMOUNT = 5
     categories_size = len(priority1) + len(priority2) + len(priority3)
