@@ -1,6 +1,6 @@
 from docopt import docopt
-import nltk
-from nltk import word_tokenize
+#import nltk
+#from nltk import word_tokenize
 import torch
 import torch.autograd as autograd
 
@@ -32,6 +32,7 @@ def req_embeddings(args):
     embedding_path = args['<embeddings>']
     data_train_path = args['<data_train>']
     data_dev_path = args['<data_dev>']
+    data_test_path = args['<data_test>']
     name_out = args['<name_out>']
 
     # Vocabulary
@@ -40,7 +41,11 @@ def req_embeddings(args):
     voc_dev = extract_vocab(data_dev_path)
     print('vocab dev', len(voc_dev))
 
+    voc_test = extract_vocab(data_test_path)
+    print('vocab test', len(voc_test))
+
     voc = voc_train | voc_dev
+    voc = voc | voc_test
 
     print('Total vocabulary in data:', len(voc))
 
@@ -227,7 +232,7 @@ def main():
     args = docopt("""Work with data.
 
     Usage:
-        data_tools.py req_embeddings <embeddings> <data_train> <data_dev> <name_out>
+        data_tools.py req_embeddings <embeddings> <data_train> <data_dev> <data_test> <name_out>
         data_tools.py unique_sents <model_path> <data> <amount> <name_out>
         data_tools.py pos_unique_sents <path>
 
