@@ -25,7 +25,7 @@ def main():
 
 def load_dataset(path):
     with open(path) as f_in:
-        parsed = [json.loads(line.strip() for line in f_in.readlines())]
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
 
 def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
