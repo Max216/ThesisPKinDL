@@ -29,6 +29,9 @@ def load_dataset(path):
     return parsed
 
 def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
+    
+    dic = ['entailment','neutral','contradiction']
+
     dataset = load_dataset(dataset_file)
     original_dataset = load_dataset(original_dataset_file)
     original_dict = dict([(pd['id'], pd) for pd in original_dataset])
@@ -42,8 +45,8 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
     for pr in plain_results:
         premise = pr[0]
         hyp = pr[1]
-        gold = pr[2]
-        predicted = pr[3]
+        gold = dic[int(pr[2])]
+        predicted = dic[int(pr[3])]
 
 
         plain_results_dict[premise][hyp] = (predicted, gold)
