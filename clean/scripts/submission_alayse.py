@@ -56,6 +56,10 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
         predicted, gold = plain_results_dict[premise][hypothesis]
         if gold != pd['gold_label']:
             print('Somthing is wrong...')
+            print(premise)
+            print(hypothesis)
+            print('gold:', gold)
+            print('predicted:', predicted)
             1/0
         pd['predicted_label'] = predicted
 
