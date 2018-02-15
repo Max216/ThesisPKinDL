@@ -45,12 +45,12 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
         predicted = pr[2]
         gold = pr[3]
 
-        plain_results_dict[' '.join(premise)][' '.join(hyp)] = (predicted, gold)
+        plain_results_dict[premise][hyp] = (predicted, gold)
 
     out_set = []
     for pd in dataset:
-        premise = data_tools._tokenize(pd['sentence1'])
-        hypothesis = data_tools._tokenize(pd['sentence2'])
+        premise = ' '.join(data_tools._tokenize(pd['sentence1']))
+        hypothesis = ' '.join(data_tools._tokenize(pd['sentence2']))
 
         predicted, gold = plain_results_dict[premise][hypothesis]
         if gold != pd['gold_label']:
