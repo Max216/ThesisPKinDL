@@ -42,8 +42,9 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
     for pr in plain_results:
         premise = pr[0]
         hyp = pr[1]
-        predicted = pr[2]
-        gold = pr[3]
+        gold = pr[2]
+        predicted = pr[3]
+
 
         plain_results_dict[premise][hyp] = (predicted, gold)
 
