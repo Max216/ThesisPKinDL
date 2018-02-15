@@ -29,12 +29,13 @@ def create_counts(dataset, out):
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
 
     for pd in parsed:
-        tokenized_premise = data_tools._tokenize(pd['sentence1'])
-        tokenized_hyp = data_tools._tokenize(pd['sentence2'])
+        if pd['gold_label'] != '-':
+            tokenized_premise = data_tools._tokenize(pd['sentence1'])
+            tokenized_hyp = data_tools._tokenize(pd['sentence2'])
 
-        for sentence in [tokenized_hyp, tokenized_premise]:
-            for word in sentence:
-                word_count[word] += 1
+            for sentence in [tokenized_hyp, tokenized_premise]:
+                for word in sentence:
+                    word_count[word] += 1
 
     torch.save(word_count, out)
 
