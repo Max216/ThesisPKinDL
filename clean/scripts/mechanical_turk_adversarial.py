@@ -1,8 +1,10 @@
 from docopt import docopt
 
-import json, re, collections, codecs, os
+import json, re, collections, codecs, os, random
 import csv as csv_lib
 import numpy as np
+from sklearn.metrics import cohen_kappa_score
+import math
 
 
 def csv(in_path, out_path):
@@ -33,9 +35,14 @@ def csv(in_path, out_path):
                         premise = sample['sentence1']
                         hypothesis = sample['sentence2']
                         label = sample['gold_label']
-                        category = sample['category']
-                        replaced1 = sample['replaced1']
-                        replaced2 = sample['replaced2']
+                        category = 'synonyms' #sample['category']
+                        #replaced1 = sample['replaced1']
+                        #replaced2 = sample['replaced2']
+
+                        replacement =sample["replacement"].split(',')
+                        replaced1 = replacement[0]
+                        replaced2 = replacement[1]
+
                         _id = sample['id']
 
                         rep2_regexp = re.compile('\\b' + replaced2 + '\\b')
@@ -59,7 +66,7 @@ def id(in_path, out_path):
     
     id_samples = []
     for i, p in enumerate(parsed):
-        p['id'] = i + 10000
+        p['id'] = i + 20000
         id_samples.append(p)
 
     with open(out_path, 'w') as f_out:
@@ -427,7 +434,85 @@ def fleiss_kappa(M):
 
     return kappa
 
-def kappa_from_samples(samples, num_categories = 4):
+
+def computeKappa(mat):
+
+    def softmax(x):
+        """Compute softmax values for each sets of scores in x."""
+        e_x = np.exp(x - np.max(x))
+        return e_x / e_x.sum(axis=0)
+
+    DEBUG = True
+    """ Computes the Kappa value
+        @param n Number of rating per subjects (number of human raters)
+        @param mat Matrix[subjects][categories]
+        @return The Kappa value """
+    n = checkEachLineCount(mat)   # PRE : every line count must be equal to n
+    N = len(mat)
+    k = len(mat[0])
+    
+    if DEBUG:
+        print(n, "raters.")
+        print(N, "subjects.")
+        print(k, "categories.")
+    
+    # Computing p[]
+    p = [0.0] * k
+    for j in range(k):
+        p[j] = 0.0
+        for i in range(N):
+            p[j] += mat[i][j]
+        p[j] /= N*n
+    if DEBUG: print("p =", p)
+    
+    # Computing P[]    
+    P = [0.0] * N
+    for i in range(N):
+        P[i] = 0.0
+        for j in range(k):
+            P[i] += mat[i][j] * mat[i][j]
+        P[i] = (P[i] - n) / (n * (n - 1))
+    #if DEBUG: print("P =", P)
+    
+    # Computing Pbar
+    Pbar = sum(P) / N
+    #if DEBUG: print("Pbar =", Pbar)
+    
+    # Computing PbarE
+    PbarE = 0.0
+    
+    # not important, I tried something
+    #label_counts = np.sum(mat, axis=0)
+    #max_cnt, min_cnt = np.max(label_counts), np.min(label_counts)
+    #normalied_counts = softmax(label_counts)
+
+    for i,pj in enumerate(p):
+        #if normalize:
+        #    factor = normalied_counts[i]
+        #else:
+        #    factor = 1
+        PbarE +=  (pj * pj) #### * factor
+    #if DEBUG: print("PbarE =", PbarE)
+    
+    kappa = (Pbar - PbarE) / (1 - PbarE)
+    #if DEBUG: print("kappa =", kappa)
+    
+    return kappa
+
+def checkEachLineCount(mat):
+    """ Assert that each line has a constant number of ratings
+        @param mat The matrix checked
+        @return The number of ratings
+        @throws AssertionError If lines contain different number of ratings """
+    n = sum(mat[0])
+    
+    assert all(sum(line) == n for line in mat[1:]), "Line count != %d (n value)." % n
+    return n
+
+
+
+def calc_kappa(samples, num_categories = 4):
+    print('Calc kappa based on', num_categories, 'categories')
     label_dict = dict([('entailment', 0), ('contradiction', 1), ('neutral', 2), ('incorrect', 3)])
     num_items = len(samples)
     matrix = np.zeros((num_items, num_categories))
@@ -435,73 +520,15 @@ def kappa_from_samples(samples, num_categories = 4):
     for i,s in enumerate(samples):
         for annotator_label in s['annotator_labels']:
             matrix[i, label_dict[annotator_label]] += 1
-
-    return fleiss_kappa(matrix)
-
-def kappa(results_path, data_path):
-    num_categories = 4
+    print(matrix)
 
 
-    with open(data_path) as f_in:
-        parsed_data = [json.loads(line.strip()) for line in f_in.readlines()]
-    cat_dict = dict([(str(p['id']), p['category']) for p in parsed_data])
-
-    with open(results_path) as f_in:
-        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
-        annotations = [p['labels'] for p in parsed]
-        annotation_dict = dict([(str(p['id']), p['labels']) for p in parsed])
-
-    label_dict = dict([('entailment', 0), ('contradiction', 1), ('neutral', 2), ('incorrect', 3)])
-
-    num_items = 10000
-
-    assert len(annotations) == num_items
-
-    matrix = np.zeros((num_items, num_categories))
-    for i, labels in enumerate(annotations):
-        for lbl in labels:
-            matrix[i, label_dict[lbl]] += 1
-
-    assert np.sum(matrix) == 10000 * 3
-
-    print('Fleiss Kappa all:', fleiss_kappa(matrix))
-
-    all_categories = list(set([cat for k, cat in cat_dict.items()]))
+    
+    return computeKappa(matrix)
+    #return fleiss_kappa(matrix)
 
 
-    total_cnt_1_label = 0
-    total_cnt_2_label = 0
-    total_cnt_3_label = 0
-    for cat in all_categories:
-        cnt_1_label = 0
-        cnt_2_label = 0
-        cnt_3_label = 0
-        for k, lbls in annotation_dict.items():
-            if cat_dict[k] == cat:
-                num_annotations = len(set(lbls))
-                if num_annotations == 1:
-                    cnt_1_label += 1
-                elif num_annotations == 2:
-                    cnt_2_label += 1
-                else:
-                    cnt_3_label += 1
-
-        print('In', cat, ':')
-        print('All same label:', cnt_1_label)
-        print('Two different labels:', cnt_2_label)
-        print('Three different labels:', cnt_3_label)
-        print()
-        total_cnt_1_label += cnt_1_label
-        total_cnt_2_label += cnt_2_label
-        total_cnt_3_label += cnt_3_label
-
-    print('In total:')
-    print('All same label:', total_cnt_1_label)
-    print('Two different labels:', total_cnt_2_label)
-    print('Three different labels:', total_cnt_3_label)
-
-
-def analyse_full_json(path_json):
+def kappa(path_json, num_labels):
     with open(path_json) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
 
@@ -513,12 +540,59 @@ def analyse_full_json(path_json):
     parsed_valid = [p for p in parsed if p['gold_label'] != '-' and p['gold_label'] != 'incorrect']
     print('Valid samples:', len(parsed_valid))
 
-    print('# Categories')
-    print(collections.Counter([p['category'] for p in parsed_valid]).most_common())
+    #print('# Categories')
+    #print(collections.Counter([p['category'] for p in parsed_valid]).most_common())
 
     print('# Fleiss')
-    print('Over all data with used categories: size =',len(parsed),': ', kappa_from_samples(parsed))
-   
+    print('size =',len(parsed_valid),'; kappa =', calc_kappa(parsed_valid, num_labels))
+    contradiction_samples = [pd for pd in parsed_valid if pd['gold_label'] == 'contradiction']
+    entailment_samples = [pd for pd in parsed_valid if pd['gold_label'] == 'entailment']
+    neutral_samples = [pd for pd in parsed_valid if pd['gold_label'] == 'neutral']
+
+    print()
+    for name, samples in [('contradiction', contradiction_samples), ('entailment',entailment_samples), ('neutral',neutral_samples)]:
+        print(name, len(samples))
+        print('kappa:', calc_kappa(samples, num_labels))
+        print()
+
+    three_agreement = collections.defaultdict(int)
+    two_agreement = collections.defaultdict(int)
+    any_other_agreement = collections.defaultdict(int)
+
+    for s in parsed_valid:
+        if len(list(set(s['annotator_labels']))) == 1:
+            three_agreement[s['gold_label']] += 1
+        elif len(list(set(s['annotator_labels']))) == 2:
+            two_agreement[s['gold_label']] += 1
+        else:
+            any_other_agreement[s['gold_label']] += 1
+
+
+    for k in list(set(three_agreement.keys()) | set(two_agreement.keys() | set(any_other_agreement.keys()))):
+        total_count = three_agreement[k] + two_agreement[k] + any_other_agreement[k]
+        print('Gold label:', k, '; samples:', total_count, 'percentage full agreement:', three_agreement[k] / total_count)
+    print('verify if more than two distinct labels are possible. cnt:', sum([any_other_agreement[k] for k in any_other_agreement]))
+    print('verify:', sum([three_agreement[k] for k in three_agreement]) + sum([two_agreement[k] for k in two_agreement]) + sum([any_other_agreement[k] for k in any_other_agreement]), '==', len(parsed_valid))
+    all_label_dict = collections.defaultdict(lambda: collections.defaultdict(int))
+    
+    cnt_annotations = 0
+    for s in parsed_valid:
+        gold = s['gold_label']
+        for annotated in s['annotator_labels']:
+            all_label_dict[gold][annotated] += 1
+            cnt_annotations += 1
+    print('annotations total:', cnt_annotations, '->', cnt_annotations/5)
+
+    for gold in all_label_dict:
+        cnt_total_annotations = 0
+        print('gold label:', gold)
+        for annotated in all_label_dict[gold]:
+            cnt_total_annotations += all_label_dict[gold][annotated]
+        #print('annotations total:', cnt_total_annotations, '->', cnt_total_annotations/5)
+        print('verify:', cnt_total_annotations/len(parsed_valid[0]['annotator_labels']), '==', three_agreement[gold] + two_agreement[gold] + any_other_agreement[gold])
+        for annotated in all_label_dict[gold]:
+            print('labeled as', annotated, ':', all_label_dict[gold][annotated] / cnt_total_annotations)
+
 
 
 def create_sets(json_path, out_path):
@@ -556,6 +630,363 @@ def create_sets(json_path, out_path):
     print('Done.')
 
 
+def include_annotator_ids(data_path, csv_path, out_path):
+    with open(data_path) as f_in:
+        parsed_data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    with open(csv_path) as f_in:
+        csv_reader = csv_lib.reader(f_in)
+        content = [row for row in csv_reader]
+
+    header = content[0]
+    print('header', header)
+    content = [c for i,c in enumerate(content) if i != 0]
+
+    print(len(content))
+
+    question_1_headers = ["Answer.label1_hyp1","Answer.label1_hyp2", "Answer.label1_hyp3","Answer.label1_hyp4","Answer.label1_hyp5"]
+    question_2_headers = ["Answer.label2_hyp1", "Answer.label2_hyp2", "Answer.label2_hyp3", "Answer.label2_hyp4", "Answer.label2_hyp5"]
+    question_3_headers = ["Answer.nonsense_hyp1","Answer.nonsense_hyp2","Answer.nonsense_hyp3","Answer.nonsense_hyp4","Answer.nonsense_hyp5"]
+    id_headers = ["Input.id1","Input.id2","Input.id3","Input.id4","Input.id5"]
+    print(header)
+    sample_id_indizes = [header.index(s_id) for s_id in id_headers]
+    sample_q1_indizes = [header.index(q1) if q1 in header else -1 for q1 in question_1_headers]
+    sample_q2_indizes = [header.index(q2) if q2 in header else -1 for q2 in question_2_headers]
+    sample_q3_indizes = [header.index(q3) if q3 in header else -1 for q3 in question_3_headers]
+    annotator_id = header.index('WorkerId')
+    hit_id = header.index('HITId')
+
+    processed_data = []
+    for pd in parsed_data:
+        pd['annotator_labels'] = []
+        pd['annotator_ids'] = []
+
+    print('Load annotations ...')
+    cnt = 0
+    for pd in parsed_data:
+        print('For', cnt)
+        cnt += 1
+        sample_id = str(pd['id'])
+        for i in range(len(content)):
+            for id_idx in range(len(sample_id_indizes)):
+                id_field = sample_id_indizes[id_idx]
+                if str(content[i][id_field]) == sample_id:
+                    pd['annotator_ids'].append(content[i][annotator_id])
+                    pd['hit_id'] = content[i][hit_id]
+
+                    q1_field = sample_q1_indizes[id_idx]
+                    q2_field = sample_q2_indizes[id_idx]
+                    q3_field = sample_q3_indizes[id_idx]
+                    q1_answer = content[i][q1_field]
+                    q2_answer = content[i][q2_field]
+                    q3_answer = content[i][q3_field]
+
+                    label = None
+                    if q1_answer == 'no':
+                        label = 'contradiction'
+                    elif q1_answer == 'yes':
+                        if q2_answer == '':
+                            label = 'entailment'
+                        elif q2_answer == 'add_info':
+                            label = 'neutral'
+                        else:
+                            print('unknown q2 answer:', q2_answer)
+                            1/0
+                    elif q3_answer == 'incorrect':
+                        pass
+                    else:
+                        print('unknown answer:', q1_answer, ';', q2_answer, ';', q3_answer)
+                        1/0
+
+                    pd['annotator_labels'].append(label)
+    print('Done')
+    print('Verify')
+    for pd in parsed_data:
+        if len(pd['annotator_labels']) != 3:
+            print('not enought annotator labels')
+            1/0
+        if len(pd['annotator_ids']) != 3:
+            print('not enough annotator ids')
+            1/0
+        lbl, amount = collections.Counter(pd['annotator_labels']).most_common()[0]
+        if lbl != pd['gold_label']:
+            print('different gold labels')
+            1/0
+    print('Valid!')
+    print('Save')
+    with open(out_path, 'w') as f_out:
+        for pd in parsed_data:
+            f_out.write(json.dumps(pd) + '\n')
+
+    print('Done')
+
+
+def cohens_kappa(results, workers):
+    """
+    Compute Cohen's Kappa on all workers that answered at least 5 HITs
+    :param results:
+    :return:
+    """
+    answers_per_worker = { worker_id : { key : results[key][worker_id] for key in results.keys()
+                                         if worker_id in results[key] }
+                           for worker_id in workers }
+    answers_per_worker = { worker_id : answers for worker_id, answers in answers_per_worker.items()
+                           if len(answers) >= 5 }
+    curr_workers = answers_per_worker.keys()
+    worker_pairs = [(worker1, worker2) for worker1 in curr_workers for worker2 in curr_workers if worker1 != worker2]
+
+    label_index = { 'contradiction' : 1, 'entailment' : 0 , 'neutral': 2}
+    pairwise_kappa = { worker_id : { } for worker_id in answers_per_worker.keys() }
+
+    # Compute pairwise Kappa
+    for (worker1, worker2) in worker_pairs:
+
+        mutual_hits = set(answers_per_worker[worker1].keys()).intersection(set(answers_per_worker[worker2].keys()))
+        mutual_hits = set([hit for hit in mutual_hits]) # REMOVED:  if not pandas.isnull(hit)
+
+        if len(mutual_hits) >= 5:
+
+            worker1_labels = np.array([label_index[answers_per_worker[worker1][key][0]] for key in mutual_hits])
+            worker2_labels = np.array([label_index[answers_per_worker[worker2][key][0]] for key in mutual_hits])
+            curr_kappa = cohen_kappa_score(worker1_labels, worker2_labels)
+
+            if not math.isnan(curr_kappa):
+                pairwise_kappa[worker1][worker2] = curr_kappa
+                pairwise_kappa[worker2][worker1] = curr_kappa
+
+    # Remove worker answers with low agreement to others
+    workers_to_remove = set()
+
+    for worker, kappas in pairwise_kappa.items():
+        if np.mean(list(kappas.values())) < 0.15:
+            print('Removing', worker)
+            workers_to_remove.add(worker)
+
+    kappa = np.mean([k for worker1 in pairwise_kappa.keys() for worker2, k in pairwise_kappa[worker1].items()
+                     if not worker1 in workers_to_remove and not worker2 in workers_to_remove])
+
+    # Return the average
+    return kappa, workers_to_remove
+
+def eval_annotators(data_path):
+
+    MIN_AMOUNT_SAME_HITS = 5
+    MIN_AMOUNT_CO_WORKERS = 3
+
+    not_enough_coworkers = []
+
+    with open(data_path) as f_in:
+        parsed_data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    # create comparisons per annotator
+    # => dict per annotator: ... only really use annotator id => HIT ids
+    annotator_dict = collections.defaultdict(lambda: [])
+    for pd in parsed_data:
+        for i, annotator_id in enumerate(pd['annotator_ids']):
+            annotator_dict[annotator_id].append((pd['annotator_labels'][i], pd))
+
+
+    print('num annotators:', len(annotator_dict))
+
+    hit_dict = collections.defaultdict(lambda: [])
+    for pd in parsed_data:
+        hit_dict[pd['hit_id']].append(pd)
+
+    # find relevant matches:
+    annotator_matches = []
+    annotator_keys = sorted(list(annotator_dict.keys()))
+    use_hits = []
+    for i, annotator in enumerate(annotator_keys):
+        annotator_hits = set([sample['hit_id'] for labeled, sample in annotator_dict[annotator]])
+
+        # remember coworkers (annotator_id, hits)
+        coworkers = []
+
+        for j, other_annotator in enumerate(annotator_keys):
+
+            if i != j:
+                other_annotator_hits = set([sample['hit_id'] for labeled, sample in annotator_dict[other_annotator]])
+
+                # find same HITs and check if enough
+                same_hits = annotator_hits & other_annotator_hits
+                if len(same_hits) >= MIN_AMOUNT_SAME_HITS:
+                    coworkers.append((other_annotator, same_hits))
+
+        # Only consider if enough workers
+        if len(coworkers) >= MIN_AMOUNT_CO_WORKERS:
+            annotator_matches.append((annotator, annotator_hits, coworkers))
+            for _, same_hits in coworkers:
+                use_hits.extend(list(same_hits))
+        else:
+            not_enough_coworkers.append(annotator)
+
+    for annotator, annotator_hits, coworkers in annotator_matches:
+        num_coworkers = len(coworkers)
+        num_compare_amount_hits = sum([len(hits) for c, hits in coworkers])
+        amount_annotator_hits = len(annotator_hits)
+
+        print(annotator,':', 'num hits:', amount_annotator_hits, '; num coworkers:', num_coworkers, 'num compare hits:', num_compare_amount_hits)
+
+    print('not comparing:', len(not_enough_coworkers), 'annotators due to not enough relevant coworkers')
+
+    workers = set([annotator for annotator, annotator_hits, coworkers in annotator_matches])
+    relevant_hits = set(use_hits)
+    results = {}
+    for pd in parsed_data:
+        sample_id = pd['id']
+        sample_annotators = pd['annotator_ids']
+        sample_annotations = pd['annotator_labels']
+        hit_id = pd['hit_id']
+
+        if hit_id in relevant_hits:
+            if sample_id not in results:
+                results[sample_id] = {}
+
+            for i in range(len(sample_annotations)):
+                results[sample_id][sample_annotators[i]] = (sample_annotations[i], '')
+
+
+    kappa, workers_to_remove = cohens_kappa(results, workers)
+    print('kappa', workers_to_remove)
+    print(kappa)
+
+def postprocess(file_in, file_out):
+    with open(file_in) as f_in:
+        parsed_data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    removed = 0
+    used = 0
+    renamed_category = 0
+    translate_dict = dict([
+        ('antonyms_wn', 'antonyms_wordnet'),
+        ('numbers', 'cardinals'),
+        ('nationalities_grouped', 'nationalities'),
+        ('antonyms_other', 'antonyms'),
+        ('countries_grouped', 'countries'),
+        ('antonyms_adj_adv', 'antonyms'),
+        ('antonyms_nn_vb', 'antonyms')
+    ])
+
+    def is_remove_sample(w1, w2):
+        rm_set1 = set(['small', 'old'])
+        rm_set2 = set(['little', 'old'])
+        rm_set3 = set(['important', 'little'])
+
+        if w1 in rm_set1 and w2 in rm_set1:
+            return True
+        if w1 in rm_set2 and w2 in rm_set2:
+            return True
+        if w1 in rm_set3 and w2 in rm_set3:
+            return True
+        if w1 == 'sand' and w2 != 'glass':
+            return True
+        return False
+
+    with open(file_out, 'w') as f_out:
+        for pd in parsed_data:
+            new_json = {
+                'category': pd['category'],
+                'gold_label': pd['gold_label'],
+                'annotator_labels': pd['annotator_labels'],
+                'sentence1': pd['sentence1'],
+                'sentence2': pd['sentence2'],
+                'pairID': pd['id']
+            }
+            category = new_json['category']
+            if category in translate_dict:
+                new_json['category'] = translate_dict[category]
+                renamed_category += 1
+            if is_remove_sample(pd['replaced1'], pd['replaced2']):
+                removed += 1
+            else:
+                used += 1
+                f_out.write(json.dumps(new_json) + '\n')
+
+    print('Done.')
+    print('size:', used, ', removed:', removed, ', renamed:', renamed_category)
+
+        
+def subset(from_data, to_data, amount):
+    prem_dict = collections.defaultdict(lambda: [])
+
+    with open(from_data) as f_in:
+        parsed_data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    for pd in parsed_data:
+        prem_dict[pd['sentence1']].append(pd)
+
+    keep_samples = collections.defaultdict(lambda: [])
+
+    cnt = 0
+    for prem in prem_dict:
+        if len(prem_dict[prem]) >= 5 and len(prem_dict[prem]) < 10:
+            keep_samples[prem] = random.sample(prem_dict[prem], 5)
+            cnt += 5
+        elif len(prem_dict[prem]) >= 10 and len(prem_dict[prem]) < 15:
+            keep_samples[prem] = random.sample(prem_dict[prem], 10)
+            cnt += 10
+        elif len(prem_dict[prem]) >= 15 and len(prem_dict[prem]) < 20:
+            keep_samples[prem] = random.sample(prem_dict[prem], 15)
+            cnt += 15
+        elif len(prem_dict[prem]) >= 20 and len(prem_dict[prem]) < 25:
+            keep_samples[prem] = random.sample(prem_dict[prem], 20)
+            cnt += 20
+        elif len(prem_dict[prem]) >= 25 and len(prem_dict[prem]) < 30:
+            keep_samples[prem] = random.sample(prem_dict[prem], 25)
+            cnt += 25
+        elif len(prem_dict[prem]) >= 30 and len(prem_dict[prem]) < 35:
+            keep_samples[prem] = random.sample(prem_dict[prem], 30)
+            cnt += 30
+        elif len(prem_dict[prem]) >= 35:
+            print(len(prem_dict[prem]))
+
+    print('total:', cnt)
+    
+    cnt = 0
+
+    with open(to_data, 'w') as f_out:
+        for p in keep_samples.keys():
+            for pair in keep_samples[p]:
+                f_out.write(json.dumps(pair) + '\n')
+                cnt +=1
+
+    print('Done:', cnt)
+
+def recategorize(file_in, file_out):
+    with open(file_in) as f_in:
+        parsed = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    adapted = collections.defaultdict(int)
+    neutral  = 0
+
+    new_list = []
+    samples = []
+    for pd in parsed:
+        if pd['category'] == 'synonyms' and pd['gold_label'] == 'neutral':
+            neutral +=1
+
+        if pd['gold_label'] == 'entailment':
+            adapted[pd['category']] += 1
+            if pd['category'] != 'synonyms':
+                samples.append(pd)
+            pd['category'] = 'entailing'
+
+
+        new_list.append(pd)
+
+    print(adapted.items())
+    print(samples)
+    print('neutral synonyms:', neutral)
+
+    with open(file_out, 'w') as f_out:
+        for pd in new_list:
+            f_out.write(json.dumps(pd) + '\n')
+
+
+
+
+
+
 def main():
     args = docopt("""Deal with data for mechanical turk.
 
@@ -571,20 +1002,31 @@ def main():
         mechanical_turk_adversarial.py stats <new_dataset> <old_dataset>
         mechanical_turk_adversarial.py rm_incorrect <file_in> <file_out_correct> <file_out_incorrect>
         mechanical_turk_adversarial.py analyse <csv> <data> <result>
-        mechanical_turk_adversarial.py kappa <results> <data>
-        mechanical_turk_adversarial.py anl <fulljson>
+        mechanical_turk_adversarial.py kappa <dataset> <num_labels>
         mechanical_turk_adversarial.py create_sets <fulljson> <out>
-
+        mechanical_turk_adversarial.py include_annotators <fulljson> <csv> <fout>
+        mechanical_turk_adversarial.py eval_annotators <datapath>
+        mechanical_turk_adversarial.py postprocess <file_in> <file_out>
+        mechanical_turk_adversarial.py subset <file_in> <file_out> <amount>
+        mechanical_turk_adversarial.py recategorize <file_in> <file_out>
     """)
 
     if args['csv']:
         csv(args['<file_in>'], args['<file_out>'])
+    elif args['recategorize']:
+        recategorize(args['<file_in>'], args['<file_out>'])
+    if args['subset']:
+        subset(args['<file_in>'], args['<file_out>'], int(args['<amount>']))
+    elif args['postprocess']:
+        postprocess(args['<file_in>'], args['<file_out>'])
+    elif args['eval_annotators']:
+        eval_annotators(args['<datapath>'])
+    elif args['include_annotators']:
+        include_annotator_ids(args['<fulljson>'], args['<csv>'], args['<fout>'])
     elif args['create_sets']:
         create_sets(args['<fulljson>'], args['<out>'])
-    elif args['anl']:
-        analyse_full_json(args['<fulljson>'])
     elif args['kappa']:
-        kappa(args['<results>'], args['<data>'])
+        kappa(args['<dataset>'], int(args['<num_labels>']))
     elif args['finalize_wa']:
         finalize_with_annotations(args['<results>'],args['<src>'], args['<out>'])
     elif args['analyse']:

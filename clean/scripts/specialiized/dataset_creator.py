@@ -1500,21 +1500,29 @@ def sample_dataset(dataset_path):
 
     sample_dict = collections.defaultdict(lambda: [])
     for p in parsed:
-        sample_dict[p['category']].append((p['sentence1'], p['sentence2'], p['gold_label'], p['replaced1'], p['replaced2']))
-
+        #sample_dict[p['category']].append((p['sentence1'], p['sentence2'], p['gold_label'], p['replaced1'], p['replaced2']))
+        sample_dict[p['category']].append((p['sentence1'], p['sentence2'], p['gold_label']))
     AMOUNT = 50
+
+
 
     for key in sample_dict:
         print('#', key)
         if len(sample_dict[key]) < AMOUNT:
             choice = sample_dict[key]
+            random.shuffle(choice)
         else:
             choice = random.sample(sample_dict[key], AMOUNT)
-        for prem, hyp, lbl, w1, w2 in choice:
-            print(w1, '--', w2, '--', lbl)
+        words = set(['important', 'little'])
+        #for prem, hyp, lbl, w1, w2 in choice:
+        for prem, hyp, lbl in choice:
+            #print(w1, '--', w2, '--', lbl)
+            print(lbl)
             print('[p]', prem)
             print('[h]', hyp)
             print()
+            
+
 
     print('# SUMMARY')
     total= 0
