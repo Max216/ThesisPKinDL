@@ -253,7 +253,7 @@ def evaluate(result_path):
         prediction_dict = collections.defaultdict(lambda: collections.defaultdict(int))
         for sample in cat_dict[cat]:
             prediction_dict[sample['gold_label']][sample['predicted_label']] += 1
-            print(sample['gold_label'], '--', sample['predicted_label'])
+            #print(sample['gold_label'], '--', sample['predicted_label'])
 
         # accuracy
         print('accuracy:', acc_predictiondict(prediction_dict))
@@ -264,11 +264,11 @@ def evaluate(result_path):
 
         # precision contradiction
         c_rec, c_prec = recall_precision_prediction_dict(prediction_dict, 'contradiction')
-        print('entailment: prec =', c_prec, ', recall =', c_rec)
+        print('contradiction: prec =', c_prec, ', recall =', c_rec)
 
         # precision neutral
         n_rec, n_prec = recall_precision_prediction_dict(prediction_dict, 'neutral')
-        print('entailment: prec =', n_prec, ', recall =', n_rec)
+        print('neutral: prec =', n_prec, ', recall =', n_rec)
 
 def plot_cos(cos_file, bin_size = 0.05):
 
