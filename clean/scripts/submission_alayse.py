@@ -87,7 +87,7 @@ def load_embeddings(embedding_path):
         lines = [line.strip() for line in f_in.readlines()]
 
     lines = [line.split(' ', 1) for line in lines]
-    return dict([line[0], np.asarray([float(v) for v in line[1].split()])])
+    return dict([(line[0], np.asarray([float(v) for v in line[1].split()])) for line in lines])
 
 def get_embedding(embeddings, words):
     splitted = word.split()
