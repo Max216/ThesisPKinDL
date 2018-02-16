@@ -136,7 +136,7 @@ def create_cosine_similarity(result_path, embeddings_path, path_out):
 
     with open(path_out, 'w') as f_out:
         for w1, w2, gold_lbl, predicted_lbl, category, similarity in final_values:
-            f_out.write('\t'.join([w1,w2,gold_lbl,predicted_label,category,str(similarity)]) + '\n')
+            f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,category,str(similarity)]) + '\n')
 
 
 def print_stats(result_path):
