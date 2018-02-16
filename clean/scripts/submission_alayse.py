@@ -12,6 +12,7 @@ from docopt import docopt
 import numpy as np
 from numpy import dot
 from numpy.linalg import norm
+from scipy import spatial
 
 import matplotlib.pyplot as plt
 
@@ -116,7 +117,8 @@ def cnt_word_or_phrase(word_dict, w):
         return min([word_dict[w] for w in splitted])
 
 def cos_sim(a, b):
-    return dot(a, b)/(norm(a)*norm(b))
+    return 1 - spatial.distance.cosine(a, b)
+    #return dot(a, b)/(norm(a)*norm(b))
 
 def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
