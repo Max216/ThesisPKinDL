@@ -56,7 +56,7 @@ def main():
         submission_alayse.py create_res_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py stats <results>
-        submission_alayse.py plot_cos <results> <embeddings>
+        submission_alayse.py create_cos <results> <embeddings> <path_out>
     """)
 
 
@@ -74,8 +74,8 @@ def main():
         create_decomposition_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['stats']:
         print_stats(args['<results>'])
-    elif args['plot_cos']:
-        plot_cosine_similarity(args['<results>'], args['<embeddings>'])
+    elif args['create_cos']:
+        create_cosine_similarity(args['<results>'], args['<embeddings>'], args['path_out>'])
 
 def load_dataset(path):
     with open(path) as f_in:
@@ -116,7 +116,7 @@ def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
     print(word, wc[word])
 
-def plot_cosine_similarity(result_path, embeddings_path):
+def create_cosine_similarity(result_path, embeddings_path, path_out):
     results = load_dataset(result_path)
     embeddings = load_embeddings(embeddings_path)
     results = [r for r in results if r['gold_label'] == 'contradiction']
@@ -133,6 +133,10 @@ def plot_cosine_similarity(result_path, embeddings_path):
 
     all_similarities = sorted([fv[-1] for fv in final_values])
     print(all_similarities)
+
+    with open(path_out, 'w') as f_out:
+        for w1, w2, gold_lbl, predicted_lbl, category, similarity in final_values:
+            f_out.write('\t'.join([w1,w2,gold_lbl,predicted_label,category,str(similarity)]) + '\n')
 
 
 def print_stats(result_path):
