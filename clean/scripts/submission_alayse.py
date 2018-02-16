@@ -15,6 +15,7 @@ def main():
     Usage:
         submission_alayse.py create_counts <data_in> <file_out>
         submission_alayse.py create_counts_lower <data_in> <file_out>
+        submission_alayse.py wc <wordcount> <word>
         submission_alayse.py create_esim_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_res_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
@@ -24,6 +25,8 @@ def main():
 
     if args['create_counts']:
         create_counts(args['<data_in>'], args['<file_out>'])
+    elif args['wc']:
+        word_count(args['<wordcount>'], args['<word>'])
     elif args['create_counts_lower']:
         create_counts_lower(args['<data_in>'], args['<file_out>'])
     elif args['create_esim_anl']:
@@ -37,6 +40,10 @@ def load_dataset(path):
     with open(path) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
+
+def word_count(wordcount_file, word):
+    wc = torch.load(wordcount_file)
+    print(word, wc[word])
 
 
 def print_stats(result_path):
