@@ -62,6 +62,7 @@ def main():
         submission_alayse.py stats <results>
         submission_alayse.py create_cos <results> <embeddings> <path_out>
         submission_alayse.py plot_cos <cosfile>
+        submission_alayse.py eval <results>
     """)
 
 
@@ -83,6 +84,8 @@ def main():
         create_cosine_similarity(args['<results>'], args['<embeddings>'], args['<path_out>'])
     elif args['plot_cos']:
         plot_cos(args['<cosfile>'])
+    elif args['eval']:
+        evaluate(args['<results>'])
 
 def load_dataset(path):
     with open(path) as f_in:
@@ -147,20 +150,19 @@ def create_cosine_similarity(result_path, embeddings_path, path_out):
             f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)]) + '\n')
 
 
-def plot_cos(cos_file, bin_size = 0.05):
+def plt_file_acc(samples):
+    correct = 0
+    for sample in samples:
+        gold = sample[2]
+        predicted = sample[3]
 
-    with open(cos_file) as f_in:
-        content = [line.strip().split('\t') for line in f_in.readlines()]
+        if gold == predicted:
+            correct += 1
 
-    for i in range(len(content)):
-        content[i][-1] = float(content[i][-1])
-        content[i][4] = int(content[i][4])
-        content[i][5] = int(content[i][5])
+    return correct / len(samples)
 
-    sorted_content = sorted(content, key=lambda x: x[-1])
-    print(sorted_content)
-
-    #count1 = [c[]]
+def create_bins(samples, bin_size=0.05):
+    sorted_content = sorted(samples, key=lambda x: x[-1])
 
     # verify
     for c in sorted_content:
@@ -170,7 +172,7 @@ def plot_cos(cos_file, bin_size = 0.05):
     bins = []
     max_bound =  bin_size
     while(len(sorted_content)) > 0:
-        print('find bin with max bound:', max_bound, len(sorted_content))
+        #print('find bin with max bound:', max_bound, len(sorted_content))
         for i in range(len(sorted_content)):
             if sorted_content[i][-1] > max_bound:
                 bins.append(sorted_content[:i])
@@ -189,11 +191,139 @@ def plot_cos(cos_file, bin_size = 0.05):
     for b in bins:
         print('max_bound:', max_bound, '; samples:', len(b))
         if len(b) == 0:
-            print('skip!')
+            #print('skip!')
+            pass
         else:
             correct = len([sample for sample in b if sample[3] == 'contradiction'])
             print('acc', correct / len(b))
         max_bound += bin_size
+
+    return bins
+
+def acc_predictiondict(pd):
+    correct = 0
+    incorrect = 0
+    for gold in pd:
+        for pred in pd[gold]:
+            if pred == gold:
+                correct += pd[gold][pred]
+            else:
+                incorrect += pd[gold][predicted]
+
+    return correct / (correct + incorrect)
+
+def recall_precision_prediction_dict(prediction_dict, label):
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
+    ZERO = 0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+
+    for gold_label in prediction_dict:
+        for predicted_label in prediction_dict[gold_label]:
+            if gold_label == predicted_label:
+                if gold_label == label:
+                    tp += prediction_dict[gold_label][predicted_label]
+                else:
+                    tn += prediction_dict[gold_label][predicted_label]
+            else:
+                if predicted_label == label:
+                    fp += prediction_dict[gold_label][predicted_label]
+                elif gold_label == label:
+                    fn += prediction_dict[gold_label][predicted_label]
+
+    recall = tp / (tp + fn + ZERO)
+    precision = tp / (tp + fp+ ZERO)
+    return (recall, precision)
+
+def evaluate(result_path):
+    data = load_dataset(result_path)
+
+    cat_dict = collections.defaultdict(list)
+    for d in data:
+        cat_dict[d['category']].append(d)
+
+    for cat in cat_dict:
+        print('# category:', cat)
+        n_entailment = len(d for d in cat_dict[cat] if d['gold_label'] == 'entailment')
+        n_neutral = len(d for d in cat_dict[cat] if d['gold_label'] == 'neutral')
+        n_contradiction = len(d for d in cat_dict[cat] if d['gold_label'] == 'contradiction')
+        print('size:', len(cat_dict[cat]), ', entailment:', n_entailment, ', neutral:', n_neutral, ', contradiction:', n_contradiction)
+
+        prediction_dict = collections.defaultdict(lambda: collections.defaultdict(int))
+        for sample in cat_dict[cat]:
+            prediction_dict[sample['gold_label']][sample['predicted_label']] += 1
+
+        # accuracy
+        print('accuracy:', acc_predictiondict(prediction_dict))
+
+        # precision entailment
+        e_rec, e_prec = recall_precision_prediction_dict(pd, 'entailment')
+        print('entailment: prec =', e_prec, ', recall =', e_rec)
+
+        # precision contradiction
+        c_rec, c_prec = recall_precision_prediction_dict(pd, 'entailment')
+        print('entailment: prec =', c_prec, ', recall =', c_rec)
+
+        # precision neutral
+        n_rec, n_prec = recall_precision_prediction_dict(pd, 'entailment')
+        print('entailment: prec =', n_prec, ', recall =', n_rec)
+
+def plot_cos(cos_file, bin_size = 0.05):
+
+    with open(cos_file) as f_in:
+        content = [line.strip().split('\t') for line in f_in.readlines()]
+
+    for i in range(len(content)):
+        content[i][-1] = float(content[i][-1])
+        content[i][4] = int(content[i][4])
+        content[i][5] = int(content[i][5])
+
+    SPLIT1 = 400
+    SPLIT2 = 1500
+
+    content_rare = []
+    content_semi_rare = []
+    content_semi_often = []
+    content_often = []
+
+
+    for c in content:
+        count1 = c[4]
+        count2 = c[5]
+
+        if count1 <= SPLIT1 and count2 <= SPLIT1:
+            content_rare.append(c)
+        elif count1 <= SPLIT2 and count2 <= SPLIT1:
+            content_semi_rare.append(c)
+        elif count1 <= SPLIT1 and count2 <= SPLIT2:
+            content_semi_rare.append(c)
+        elif count1 <= SPLIT2 or count2 <= SPLIT2:
+            content_semi_often.append(c)
+        else:
+            content_often.append(c)
+
+    print('content_rare', len(content_rare), plt_file_acc(content_rare))
+    print('content_semi_rare', len(content_semi_rare), plt_file_acc(content_semi_rare))
+    print('content_semi_often', len(content_semi_often), plt_file_acc(content_semi_often))
+    print('content_often', len(content_often), plt_file_acc(content_often))
+
+
+
+    print('content_rare')
+    create_bins(content_rare, bin_size=0.2)
+
+    print('content_semi_rare')
+    create_bins(content_semi_rare, bin_size=0.2)
+
+    print('content_semi_often')
+    create_bins(content_semi_often, bin_size=0.2)
+
+    print('content_often')
+    create_bins(content_often, bin_size=0.2)
+
+    print('all')
+    create_bins(content, bin_size=0.05)
 
 
     #x_labels = [x for x,y in data]
