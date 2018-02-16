@@ -239,6 +239,8 @@ def recall_precision_prediction_dict(prediction_dict, label):
 def evaluate(result_path):
     data = load_dataset(result_path)
 
+    correct = len([d for d in data if d['gold_label'] == d['predicted_label']])
+
     cat_dict = collections.defaultdict(list)
     for d in data:
         cat_dict[d['category']].append(d)
@@ -309,8 +311,6 @@ def plot_cos(cos_file, bin_size = 0.05):
     print('content_semi_often', len(content_semi_often), plt_file_acc(content_semi_often))
     print('content_often', len(content_often), plt_file_acc(content_often))
 
-
-
     print('content_rare')
     create_bins(content_rare, bin_size=0.2)
 
@@ -325,6 +325,39 @@ def plot_cos(cos_file, bin_size = 0.05):
 
     print('all')
     create_bins(content, bin_size=0.05)
+
+    ##
+    print('#### test2')
+    max_vals = [500,1500,4500,10000,50000]
+
+    content1 = []
+    content2 = []
+    content3 = []
+    content4 = []
+    content5 = []
+    content6 = []
+    for c in content:
+        max_freq = max([c[4], c[5]])
+        if max_freq <= 500:
+            content1.append(c)
+        elif max_freq <= 1500:
+            content2.append(c)
+        elif max_freq <= 4500:
+            content3.append(c)
+        elif max_freq <= 10000:
+            content4.append(c)
+        elif max_freq <= 50000:
+            content5.append(c)
+        else:
+            content6.append(c)
+
+    print('max-freq 500', len(content1), plt_file_acc(content1))
+    print('max-freq 1500', len(content2), plt_file_acc(content2))
+    print('max-freq 4500', len(content3), plt_file_acc(content3))
+    print('max-freq 10000', len(content4), plt_file_acc(content4))
+    print('max-freq 50000', len(content5), plt_file_acc(content5))
+    print('min-freq 50000+', len(content6), plt_file_acc(content6))
+
 
 
     #x_labels = [x for x,y in data]
