@@ -14,22 +14,56 @@ def main():
 
     Usage:
         submission_alayse.py create_counts <data_in> <file_out>
+        submission_alayse.py create_counts_lower <data_in> <file_out>
         submission_alayse.py create_esim_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_res_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
+        submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
+        submission_alayse.py stats <results>
     """)
 
 
     if args['create_counts']:
         create_counts(args['<data_in>'], args['<file_out>'])
+    elif args['create_counts_lower']:
+        create_counts_lower(args['<data_in>'], args['<file_out>'])
     elif args['create_esim_anl']:
         create_esim_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['create_res_anl']:
         create_residual_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
+    elif args['stats']:
+        print_stats(args['<results>'])
 
 def load_dataset(path):
     with open(path) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
+
+
+def print_stats(result_path):
+    results = load_dataset(result_path)
+    set_phrases = set()
+
+    cnt_samples = 0
+    cnt_samples_contradiction = 0
+    for pd in results:
+        added  = False
+        if len(pd['replaced1'].split()) > 1:
+            set_phrases.add(pd['replaced1'])
+            added = True
+        if len(pd['replaced2'].split()) > 1:
+            set_phrases.add(pd['replaced2'])
+            added = True
+
+        if added:
+            cnt_samples +=1 
+            if pd['gold_label'] == 'contradiction':
+                cnt_samples_contradiction += 1
+
+    print('phrases:', set_phrases)
+    print('Affected samples:', cnt_samples)
+    print('Affected contradiction:', cnt_samples_contradiction)
+
+
 
 def create_residual_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
     with open(result_file) as f_in:
@@ -130,6 +164,26 @@ def create_counts(dataset, out):
             for sentence in [tokenized_hyp, tokenized_premise]:
                 for word in sentence:
                     word_count[word] += 1
+
+    torch.save(word_count, out)
+
+    # test
+    loaded = torch.load(out)
+    print(loaded['a'])
+
+
+def create_counts_lower(dataset_path, out_path):
+    word_count = collections.defaultdict(int)
+    dataset = load_dataset(dataset_path)
+
+    for pd in parsed:
+        if pd['gold_label'] != '-':
+            tokenized_premise = data_tools._tokenize(pd['sentence1'])
+            tokenized_hyp = data_tools._tokenize(pd['sentence2'])
+
+            for sentence in [tokenized_hyp, tokenized_premise]:
+                for word in sentence:
+                    word_count[word.lower()] += 1
 
     torch.save(word_count, out)
 
