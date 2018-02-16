@@ -9,6 +9,28 @@ from libs import data_tools
 
 from docopt import docopt
 
+import numpy as np
+from numpy import dot
+from numpy.linalg import norm
+
+
+def create_word_mapping():
+    keep = ['New Zealand','dining room', 'prison cell','acoustic guitar','North Korean','South Korean','common room','can not','hot chocolate', 'North Korea', 'living room', 'no one', 'Saudi Arabia', 'electric guitar', 'french horn']
+    adapt = [('in a bathroom', ['bathroom']),('in a garage', ['garage']), ('in a kitchen', ['kitchen']),('plenty of', ['plenty']),('in a building', ['building']),('far from', ['far']), ('far away from', ['far', 'away']),('at night', ['night']),('close to', ['close']), ('a lot of', ['lot'])('in a hallway', ['hallway']), ('in a room', ['room']), ('during the day', ['during', 'day']), ('in front of', ['front'])]
+
+    result_dict = dict()
+    for wp in keep:
+        result_dict[wp] = wp.split()
+        result_dict[wp.lower()] = [w.lower() for w in wp.split()]
+
+    for wp_from, wp_to in adapt:
+        result_dict[wp_from] = wp_to
+        result_dict[wp_from.lower()] = [w.lower() for w in wp_to]
+
+    return result_dict
+
+word_mapper = create_word_mapping()
+
 def main():
     args = docopt("""For submission
 
@@ -20,6 +42,7 @@ def main():
         submission_alayse.py create_res_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py stats <results>
+        submission_alayse.py plot_cos <results> <embeddings>
     """)
 
 
@@ -37,11 +60,30 @@ def main():
         create_decomposition_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['stats']:
         print_stats(args['<results>'])
+    elif args['plot_cos']:
+        plot_cosine_similarity(args['<results>'], args['<embeddings>'])
 
 def load_dataset(path):
     with open(path) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
+
+def load_embeddings(embedding_path):
+    with open(embedding_path) as f_in:
+        lines = [line.strip() for line in f_in.readlines()]
+
+    lines = [line.split(' ', 1) for line in lines]
+    return dict([line[0], np.asarray([float(v) for v in line[1].split()])])
+
+def get_embedding(embeddings, words):
+    splitted = word.split()
+    if len(splitted) == 1:
+        return embeddings[word]
+    else:
+        mapped_words = word_mapper[words]
+        all_vecs = np.array([embeddings[w] for w in mapped_words])
+        return np.mean(all_vecs, axis=0)
+
 
 def cnt_word_or_phrase(word_dict, w):
     splitted = w.split()
@@ -50,9 +92,30 @@ def cnt_word_or_phrase(word_dict, w):
     else:
         return min([word_dict[w] for w in splitted])
 
+def cos_sim(a, b):
+    return dot(a, b)/(norm(a)*norm(b))
+
 def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
     print(word, wc[word])
+
+def plot_cosine_similarity(results_path, embeddings_path):
+    results = load_dataset(result_path)
+    embeddings = load_embeddings(embeddings_path)
+    results = [r for r in results if r['gold_label'] == 'contradiction']
+    
+    final_values = []
+    for sample in results:
+        embd1 = get_embedding(embeddings, sample['replaced1'])
+        embd2 = get_embedding(embeddings, sample['replaced2'])
+        if len(embd2) != 300:
+            print('oh no!', len(embd2))
+            1/0
+        similarity = cos_sim(embd1, embd2)
+        final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['category'], similarity))
+
+    all_similarities = sorted([fv[-1] for fv in final_values])
+    print(all_similarities)
 
 
 def print_stats(result_path):
