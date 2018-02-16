@@ -240,6 +240,7 @@ def evaluate(result_path):
     data = load_dataset(result_path)
 
     correct = len([d for d in data if d['gold_label'] == d['predicted_label']])
+    print('###', correct / len(data))
 
     cat_dict = collections.defaultdict(list)
     for d in data:
