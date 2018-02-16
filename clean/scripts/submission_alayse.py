@@ -39,13 +39,13 @@ def create_residual_analyse_file(result_file, dataset_file, original_dataset_fil
 
     dataset = load_dataset(dataset_file)
     original_dataset = load_dataset(original_dataset_file)
-    original_dict = dict([(pd['id'], pd) for pd in original_dataset])
-    dataset_dict = dict([(pd['pairID'], pd) for pd in dataset])
+    original_dict = dict([(str(pd['id']), pd) for pd in original_dataset])
+    dataset_dict = dict([(str(pd['pairID']), pd) for pd in dataset])
     wordcount = torch.load(wordcount_file)
 
     results = []
     for _id, predicted, category in plain_results:
-        _id = _id[1:]
+        _id = str(_id[1:])
         orig_sample = original_dict[_id]
         data_sample = dataset_dict[_id]
         if orig_sample['category'] != category:
