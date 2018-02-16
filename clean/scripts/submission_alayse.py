@@ -35,7 +35,7 @@ def main():
         create_residual_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['create_decomp_anl']:
         create_decomposition_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
-    elif args['stats']
+    elif args['stats']:
         print_stats(args['<results>'])
 
 def load_dataset(path):
