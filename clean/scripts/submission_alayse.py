@@ -33,13 +33,21 @@ def main():
         create_esim_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['create_res_anl']:
         create_residual_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
-    elif args['stats']:
+    elif args['create_decomp_anl']:
+        create_decomposition_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
         print_stats(args['<results>'])
 
 def load_dataset(path):
     with open(path) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
+
+def cnt_word_or_phrase(word_dict, w):
+    splitted = w.split()
+    if len(splitted) == 1:
+        return word_dict[w]
+    else:
+        return min([word_dict[w] for w in splitted])
 
 def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
@@ -95,8 +103,8 @@ def create_residual_analyse_file(result_file, dataset_file, original_dataset_fil
         data_sample['predicted_label'] = predicted
         data_sample['replaced1'] = orig_sample['replaced1']
         data_sample['replaced2'] = orig_sample['replaced2']
-        data_sample['count1'] = wordcount[orig_sample['replaced1']]
-        data_sample['count2'] = wordcount[orig_sample['replaced2']]
+        data_sample['count1'] = cnt_word_or_phrase(wordcount, orig_sample['replaced1'])
+        data_sample['count2'] = cnt_word_or_phrase(wordcount, orig_sample['replaced2'])
 
         results.append(data_sample)
 
@@ -147,8 +155,8 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
         orgininal_sample = original_dict[pd['pairID']]
         pd['replaced1'] = orgininal_sample['replaced1']
         pd['replaced2'] = orgininal_sample['replaced2']
-        pd['count1'] = wordcount[orgininal_sample['replaced1']]
-        pd['count2'] = wordcount[orgininal_sample['replaced2']]
+        pd['count1'] = cnt_word_or_phrase(wordcount, orig_sample['replaced1'])
+        pd['count2'] = cnt_word_or_phrase(wordcount, orig_sample['replaced2'])
         out_set.append(pd)
 
     print('write out', len(out_set), 'samples')
@@ -156,6 +164,54 @@ def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, w
         for pd in out_set:
             f_out.write(json.dumps(pd) + '\n')
 
+
+
+def create_decomposition_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
+    dataset = load_dataset(dataset_file)
+    original_dataset = load_dataset(original_dataset_file)
+    original_dict = dict([(pd['id'], pd) for pd in original_dataset])
+    wordcount = torch.load(wordcount_file)
+
+    results = []
+    with open(result_file) as f_in:
+        plain_results = [line.strip().split('\t') for line in f_in.readlines()]
+
+    plain_results_dict = collections.defaultdict(lambda: dict())
+    for pr in plain_results:
+        premise = pr[0]
+        hyp = pr[1]
+        gold = dic[int(pr[2])]
+        predicted = dic[int(pr[3])]
+
+
+        plain_results_dict[premise][hyp] = (predicted, gold)
+
+    out_set = []
+    for pd in dataset:
+        premise = pd['sentence1']
+        hypothesis = pd['sentence2']
+
+        predicted, gold = plain_results_dict[premise][hypothesis]
+        if gold != pd['gold_label']:
+            print('Somthing is wrong...')
+            print(premise)
+            print(hypothesis)
+            print('gold:', gold)
+            print('predicted:', predicted)
+            1/0
+        pd['predicted_label'] = predicted
+
+        orgininal_sample = original_dict[pd['pairID']]
+        pd['replaced1'] = orgininal_sample['replaced1']
+        pd['replaced2'] = orgininal_sample['replaced2']
+        pd['count1'] = cnt_word_or_phrase(wordcount, orig_sample['replaced1'].lower())
+        pd['count2'] = cnt_word_or_phrase(wordcount, orig_sample['replaced2'].lower())
+        out_set.append(pd)
+
+    print('write out', len(out_set), 'samples')
+    with open(out_file, 'w') as f_out:
+        for pd in out_set:
+            f_out.write(json.dumps(pd) + '\n')
 
 def create_counts(dataset, out):
     word_count = collections.defaultdict(int)
