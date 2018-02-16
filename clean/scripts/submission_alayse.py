@@ -137,13 +137,14 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
     
     final_values = []
     for sample in results:
-        embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
-        embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
-        if len(embd2) != 300:
-            print('oh no!', len(embd2))
-            1/0
-        similarity = cos_sim(embd1, embd2)
-        final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['count1'], sample['count2'],  sample['category'], similarity))
+        if len(sample['replaced1'].split()) == 1 and len(sample['replaced2'].split()) == 1:
+            embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
+            embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
+            if len(embd2) != 300:
+                print('oh no!', len(embd2))
+                1/0
+            similarity = cos_sim(embd1, embd2)
+            final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['count1'], sample['count2'],  sample['category'], similarity))
 
     all_similarities = sorted([fv[-1] for fv in final_values])
     print(all_similarities)
