@@ -176,7 +176,7 @@ def create_counts_lower(dataset_path, out_path):
     word_count = collections.defaultdict(int)
     dataset = load_dataset(dataset_path)
 
-    for pd in parsed:
+    for pd in dataset:
         if pd['gold_label'] != '-':
             tokenized_premise = data_tools._tokenize(pd['sentence1'])
             tokenized_hyp = data_tools._tokenize(pd['sentence2'])
