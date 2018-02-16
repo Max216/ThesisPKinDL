@@ -37,6 +37,15 @@ def create_residual_analyse_file(result_file, dataset_file, original_dataset_fil
 
     print(collections.Counter([v[-1] for v in plain_results]).most_common())
 
+    dataset = load_dataset(dataset_file)
+    original_dataset = load_dataset(original_dataset_file)
+    original_dict = dict([(pd['id'], pd) for pd in original_dataset])
+    wordcount = torch.load(wordcount_file)
+
+    for _id, predicted, category in plain_results:
+        _id = _id[1:]
+        orig_sample = None
+
 def create_esim_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
     
     dic = ['entailment','neutral','contradiction']
