@@ -92,9 +92,8 @@ def load_embeddings(embedding_path):
 def get_embedding(embeddings, words):
     splitted = words.split()
     if len(splitted) == 1:
-        if words not in embeddings:
-            print('unknown:', words)
-            return np.zeros(300)
+        if words == 'cannot':
+            return np.mean(np.array([embeddings['can'], embeddings['not']]), axis=0)
         else:
             return embeddings[words]
     else:
