@@ -123,8 +123,8 @@ def cnt_word_or_phrase(word_dict, w):
         return min([word_dict[w] for w in splitted])
 
 def cos_sim(a, b):
-    return 1 - spatial.distance.cosine(a, b)
-    #return dot(a, b)/(norm(a)*norm(b))
+    #return 1 - spatial.distance.cosine(a, b)
+    return dot(a, b)/(norm(a)*norm(b))
 
 def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
@@ -178,29 +178,15 @@ def create_bins(samples, bin_size=0.05):
         #print('find bin with max bound:', max_bound, len(sorted_content))
         for i in range(len(sorted_content)):
             if sorted_content[i][-1] > max_bound:
-                bins.append(sorted_content[:i])
+                bins.append((max_bound - bin_size, max_bound, sorted_content[:i]))
                 sorted_content = sorted_content[i:]
                 max_bound += bin_size
                 break
 
             # if reached here it is over
             if i == len(sorted_content) - 1:
-                bins.append(sorted_content)
+                bins.append((max_bound - bin_size, max_bound, sorted_content))
                 sorted_content = []
-
-
-    print('eval bins:')
-    max_bound = bin_size
-    for b in bins:
-        print('max_bound:', max_bound, '; samples:', len(b))
-        if len(b) == 0:
-            #print('skip!')
-            pass
-        else:
-            correct = len([sample for sample in b if sample[3] == 'contradiction'])
-            print('acc', correct / len(b))
-        max_bound += bin_size
-
     return bins
 
 def acc_predictiondict(pd):
@@ -276,7 +262,37 @@ def evaluate(result_path):
         n_rec, n_prec = recall_precision_prediction_dict(prediction_dict, 'neutral')
         print('neutral: prec =', n_prec, ', recall =', n_rec)
 
-def plot_cos(cos_file, bin_size = 0.05):
+def plot_cos(cos_file, bin_size= 0.2):
+    #([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)])
+    GOLD = 2
+    PRED = 3
+    CNT1 = 4
+    CNT2 = 5
+    with open(cos_file) as f_in:
+        content = [line.strip().split('\t') for line in f_in.readlines()]
+
+    # verify contradiction
+    for c in content:
+        if c[GOLD] != 'contradiction':
+            print('Not good data!')
+            1/0
+        c[CNT1] = int(c[CNT1])
+        c[CNT2] = int(c[CNT2])
+        c[-1] = float(c[-1])
+
+    print('Validated only contradiction.')
+    bins = create_bins(content, bin_size=bin_size)
+    for vstart, vend, samples in bins:
+        print(vstart, '-', vend, '->', len(samples))
+        correct = 0
+        for s in samples:
+            if s[GOLD] == s[PRED]:
+                correct += 1
+        print('Acc:', correct / len(samples))
+
+
+
+def plot_cos_evalshit(cos_file, bin_size = 0.05):
 
     with open(cos_file) as f_in:
         content = [line.strip().split('\t') for line in f_in.readlines()]
