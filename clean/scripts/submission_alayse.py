@@ -188,7 +188,7 @@ def create_counts_lower(dataset_path, out_path):
     torch.save(word_count, out)
 
     # test
-    loaded = torch.load(out)
+    loaded = torch.load(out_path)
     print(loaded['a'])
 
 
