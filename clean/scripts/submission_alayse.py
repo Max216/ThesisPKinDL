@@ -48,7 +48,7 @@ def create_residual_analyse_file(result_file, dataset_file, original_dataset_fil
         _id = str(_id[1:])
         orig_sample = original_dict[_id]
         data_sample = dataset_dict[_id]
-        if orig_sample['category'] != category:
+        if data_sample['category'] != category:
             print('Someethinhg is wrong!', orig_sample['category'], category, _id)
             1/0
         data_sample['predicted_label'] = predicted
