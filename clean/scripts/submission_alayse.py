@@ -113,7 +113,7 @@ def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
     print(word, wc[word])
 
-def plot_cosine_similarity(results_path, embeddings_path):
+def plot_cosine_similarity(result_path, embeddings_path):
     results = load_dataset(result_path)
     embeddings = load_embeddings(embeddings_path)
     results = [r for r in results if r['gold_label'] == 'contradiction']
