@@ -245,9 +245,9 @@ def evaluate(result_path):
 
     for cat in cat_dict:
         print('# category:', cat)
-        n_entailment = len(d for d in cat_dict[cat] if d['gold_label'] == 'entailment')
-        n_neutral = len(d for d in cat_dict[cat] if d['gold_label'] == 'neutral')
-        n_contradiction = len(d for d in cat_dict[cat] if d['gold_label'] == 'contradiction')
+        n_entailment = len([d for d in cat_dict[cat] if d['gold_label'] == 'entailment'])
+        n_neutral = len([d for d in cat_dict[cat] if d['gold_label'] == 'neutral'])
+        n_contradiction = len([d for d in cat_dict[cat] if d['gold_label'] == 'contradiction'])
         print('size:', len(cat_dict[cat]), ', entailment:', n_entailment, ', neutral:', n_neutral, ', contradiction:', n_contradiction)
 
         prediction_dict = collections.defaultdict(lambda: collections.defaultdict(int))
