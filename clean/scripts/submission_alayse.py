@@ -60,7 +60,7 @@ def main():
         submission_alayse.py create_res_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py stats <results>
-        submission_alayse.py create_cos <results> <embeddings> <path_out>
+        submission_alayse.py create_cos <results> <embeddings> <path_out> [<lower>]
         submission_alayse.py plot_cos <cosfile>
         submission_alayse.py eval <results>
     """)
@@ -81,7 +81,7 @@ def main():
     elif args['stats']:
         print_stats(args['<results>'])
     elif args['create_cos']:
-        create_cosine_similarity(args['<results>'], args['<embeddings>'], args['<path_out>'])
+        create_cosine_similarity(args['<results>'], args['<embeddings>'], args['<path_out>'], args['<lower>'])
     elif args['plot_cos']:
         plot_cos(args['<cosfile>'])
     elif args['eval']:
@@ -99,7 +99,10 @@ def load_embeddings(embedding_path):
     lines = [line.split(' ', 1) for line in lines]
     return dict([(line[0], np.asarray([float(v) for v in line[1].split()])) for line in lines])
 
-def get_embedding(embeddings, words):
+def get_embedding(embeddings, words, lower=False):
+    if lower == 'lower':
+        print('lowering!')
+        words = words.lower()
     splitted = words.split()
     if len(splitted) == 1:
         if words == 'cannot':
@@ -127,15 +130,15 @@ def word_count(wordcount_file, word):
     wc = torch.load(wordcount_file)
     print(word, wc[word])
 
-def create_cosine_similarity(result_path, embeddings_path, path_out):
+def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False):
     results = load_dataset(result_path)
     embeddings = load_embeddings(embeddings_path)
     results = [r for r in results if r['gold_label'] == 'contradiction']
     
     final_values = []
     for sample in results:
-        embd1 = get_embedding(embeddings, sample['replaced1'])
-        embd2 = get_embedding(embeddings, sample['replaced2'])
+        embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
+        embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
         if len(embd2) != 300:
             print('oh no!', len(embd2))
             1/0
