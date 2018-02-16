@@ -16,6 +16,9 @@ from scipy import spatial
 
 import matplotlib.pyplot as plt
 
+COLOR_DECOMPOSABLE = '#660000'
+COLOR_ESIM = '#000066'
+COLOR_RESIDUAL = '#006600'
 
 
 def create_word_mapping():
@@ -63,6 +66,7 @@ def main():
         submission_alayse.py create_cos <results> <embeddings> <path_out> [<lower>]
         submission_alayse.py plot_cos <cosfile>
         submission_alayse.py eval <results>
+        submission_alayse.py plot_freq_acc <esim> <residual> <decomp>
     """)
 
 
@@ -86,6 +90,8 @@ def main():
         plot_cos(args['<cosfile>'])
     elif args['eval']:
         evaluate(args['<results>'])
+    elif args['plot_freq_acc']:
+        plot_freq_acc(args['<esim>'], args['<residual>'], args['<decomp>'])
 
 def load_dataset(path):
     with open(path) as f_in:
@@ -103,7 +109,7 @@ def get_embedding(embeddings, words, lower=False):
     if lower == 'lower':
         print('lowering!')
         words = words.lower()
-    splitted = words.split(' ')
+    splitted = words.split()
     if len(splitted) == 1:
         if words == 'cannot':
             return np.mean(np.array([embeddings['can'], embeddings['not']]), axis=0)
@@ -137,14 +143,13 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
     
     final_values = []
     for sample in results:
-        if len(sample['replaced1'].split(' ')) == 1 and len(sample['replaced2'].split(' ')) == 1:
-            embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
-            embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
-            if len(embd2) != 300:
-                print('oh no!', len(embd2))
-                1/0
-            similarity = cos_sim(embd1, embd2)
-            final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['count1'], sample['count2'],  sample['category'], similarity))
+        embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
+        embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
+        if len(embd2) != 300:
+            print('oh no!', len(embd2))
+            1/0
+        similarity = cos_sim(embd1, embd2)
+        final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['count1'], sample['count2'],  sample['category'], similarity))
 
     all_similarities = sorted([fv[-1] for fv in final_values])
     print(all_similarities)
@@ -263,7 +268,7 @@ def evaluate(result_path):
         n_rec, n_prec = recall_precision_prediction_dict(prediction_dict, 'neutral')
         print('neutral: prec =', n_prec, ', recall =', n_rec)
 
-def plot_cos(cos_file, bin_size= 0.2):
+def plot_cos(cos_file, bin_size= 0.1):
     #([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)])
     GOLD = 2
     PRED = 3
@@ -282,6 +287,7 @@ def plot_cos(cos_file, bin_size= 0.2):
         c[-1] = float(c[-1])
 
     print('Validated only contradiction.')
+    accuracies = []
     bins = create_bins(content, bin_size=bin_size)
     for vstart, vend, samples in bins:
         print(vstart, '-', vend, '->', len(samples))
@@ -289,9 +295,85 @@ def plot_cos(cos_file, bin_size= 0.2):
         for s in samples:
             if s[GOLD] == s[PRED]:
                 correct += 1
-        print('Acc:', correct / len(samples))
+        accuracies.append(correct / len(samples))
 
 
+
+    y_vals = [round(x * 100,2) for x in accuracies]
+    half_bin = bin_size/2
+    x_vals = [half_bin + i*bin_size for i in range(len(y_vals))]
+    #y_vals = [y for x,y in data]
+    #x_indizes = np.arange(len(data))
+    width = 1/(len(y_vals) * 1.1)
+    color = COLOR_DECOMPOSABLE
+
+    plt.bar(x_vals, y_vals, width, color=color)
+    plt.ylabel('Accuracy (%)')
+    plt.xlabel('Cosine similarity')
+    #plt.xticks(x_indizes, x_labels)
+    #plt.title(title)
+
+    plt.show()
+
+
+def freq_bins(content, bins = [500,1500,5000,25000,50000]):
+    contents = [[] for i in range(len(bins))]
+    for c in content:
+        max_freq = max([c[4], c[5]])
+        for i in range(len(bins)):
+            if i < len(bins) - 1:
+                if max_freq < bins[i]:
+                    contents[i].append(c)
+                    break
+            else:
+                # last bin
+                contents[-1].append(c)
+
+    for i in range(len(bins)):
+        if i < len(bins) - 1:
+            print('max-freq', bins[i],'>>', len(contents[i]), plt_file_acc(contents[i]))
+        else:
+            print('min-freq', bins[i],'>>', len(contents[i]), plt_file_acc(contents[i]))
+
+    
+    #print('max-freq 1500', len(content2), plt_file_acc(content2))
+    #print('max-freq 4500', len(content3), plt_file_acc(content3))
+    #print('max-freq 10000', len(content4), plt_file_acc(content4))
+    #print('max-freq 50000', len(content5), plt_file_acc(content5))
+    #print('min-freq 50000+', len(content6), plt_file_acc(content6))
+
+def load_txt_result(path):
+    #([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)])
+    with open(path) as f_in:
+        content = [line.strip().split('\t') for line in f_in.readlines()]
+
+    for c in content:
+        c[4] = int(c[4])
+        c[5] = int(c[5])
+        c[-1] = float(c[-1])
+        if c[2] != 'contradiction':
+            print('###', c[2])
+            1/0
+
+    return content
+
+def plot_freq_acc(esim_file, residual_file, decomposable_file):
+    
+    esim_content = load_txt_result(esim_file)
+    residual_content = load_txt_result(residual_file)
+    decomposable_content = load_txt_result(decomposable_file)
+
+    print('# esim')
+    freq_bins(esim_content)
+    print()
+
+    print('# residual')
+    freq_bins(residual_content)
+    print()
+
+    print('# decomposable')
+    freq_bins(decomposable_content)
+    print()
 
 def plot_cos_evalshit(cos_file, bin_size = 0.05):
 
