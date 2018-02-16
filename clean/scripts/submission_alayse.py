@@ -13,6 +13,9 @@ import numpy as np
 from numpy import dot
 from numpy.linalg import norm
 
+import matplotlib.pyplot as plt
+
+
 
 def create_word_mapping():
     keep = ['New Zealand','dining room', 'prison cell','acoustic guitar','North Korean','South Korean','common room','can not','hot chocolate', 'North Korea', 'living room', 'no one', 'Saudi Arabia', 'electric guitar', 'french horn']
@@ -57,6 +60,7 @@ def main():
         submission_alayse.py create_decomp_anl <esim_results> <dataset> <original_dataset> <wordcount> <out>
         submission_alayse.py stats <results>
         submission_alayse.py create_cos <results> <embeddings> <path_out>
+        submission_alayse.py plot_cos <cosfile>
     """)
 
 
@@ -76,6 +80,8 @@ def main():
         print_stats(args['<results>'])
     elif args['create_cos']:
         create_cosine_similarity(args['<results>'], args['<embeddings>'], args['<path_out>'])
+    elif args['plot_cos']:
+        plot_cos(args['<cosfile>'])
 
 def load_dataset(path):
     with open(path) as f_in:
@@ -129,14 +135,78 @@ def create_cosine_similarity(result_path, embeddings_path, path_out):
             print('oh no!', len(embd2))
             1/0
         similarity = cos_sim(embd1, embd2)
-        final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['category'], similarity))
+        final_values.append((sample['replaced1'], sample['replaced2'], sample['gold_label'], sample['predicted_label'], sample['count1'], sample['count2'],  sample['category'], similarity))
 
     all_similarities = sorted([fv[-1] for fv in final_values])
     print(all_similarities)
 
     with open(path_out, 'w') as f_out:
-        for w1, w2, gold_lbl, predicted_lbl, category, similarity in final_values:
-            f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,category,str(similarity)]) + '\n')
+        for w1, w2, gold_lbl, predicted_lbl, cnt1, cnt2, category, similarity in final_values:
+            f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)]) + '\n')
+
+
+def plot_cos(cos_file, bin_size = 0.05):
+
+    with open(cos_file) as f_in:
+        content = [line.strip().split('\t') for line in f_in.readlines()]
+
+    for i in range(len(content)):
+        content[i][-1] = float(content[i][-1])
+        content[i][4] = int(content[i][4])
+        content[i][5] = int(content[i][5])
+
+    sorted_content = sorted(content, key=lambda x: x[-1])
+    print(sorted_content)
+
+    #count1 = [c[]]
+
+    # verify
+    for c in sorted_content:
+        if c[2] != 'contradiction':
+            print('something is wrong!! no contradiction:', c[2])
+
+    bins = []
+    max_bound =  bin_size
+    while(len(sorted_content)) > 0:
+        print('find bin with max bound:', max_bound, len(sorted_content))
+        for i in range(len(sorted_content)):
+            if sorted_content[i][-1] > max_bound:
+                bins.append(sorted_content[:i])
+                sorted_content = sorted_content[i:]
+                max_bound += bin_size
+                break
+
+            # if reached here it is over
+            if i == len(sorted_content) - 1:
+                bins.append(sorted_content)
+                sorted_content = []
+
+
+    print('eval bins:')
+    max_bound = bin_size
+    for b in bins:
+        print('max_bound:', max_bound, '; samples:', len(b))
+        if len(b) == 0:
+            print('skip!')
+        else:
+            correct = len([sample for sample in b if sample[3] == 'contradiction'])
+            print('acc', correct / len(b))
+        max_bound += bin_size
+
+
+    #x_labels = [x for x,y in data]
+    #y_vals = [y for x,y in data]
+    #x_indizes = np.arange(len(data))
+    #width = 0.35
+    #color = [color_palette[i] for i in range(len(data))]
+
+    #plt.bar(x_indizes, y_vals, width, color=color)
+    #plt.ylabel(y_axis_name)
+    #plt.xlabel(x_axis_name)
+    #plt.xticks(x_indizes, x_labels)
+    #plt.title(title)
+
+    #plt.show()
 
 
 def print_stats(result_path):
