@@ -16,7 +16,21 @@ from numpy.linalg import norm
 
 def create_word_mapping():
     keep = ['New Zealand','dining room', 'prison cell','acoustic guitar','North Korean','South Korean','common room','can not','hot chocolate', 'North Korea', 'living room', 'no one', 'Saudi Arabia', 'electric guitar', 'french horn']
-    adapt = [('in a bathroom', ['bathroom']),('in a garage', ['garage']), ('in a kitchen', ['kitchen']),('plenty of', ['plenty']),('in a building', ['building']),('far from', ['far']), ('far away from', ['far', 'away']),('at night', ['night']),('close to', ['close']), ('a lot of', ['lot'])('in a hallway', ['hallway']), ('in a room', ['room']), ('during the day', ['during', 'day']), ('in front of', ['front'])]
+    adapt = [
+    ('in a bathroom', ['bathroom']),
+    ('in a garage', ['garage']), 
+    ('in a kitchen', ['kitchen']),
+    ('plenty of', ['plenty']),
+    ('in a building', ['building']),
+    ('far from', ['far']), 
+    ('far away from', ['far', 'away']),
+    ('at night', ['night']),
+    ('close to', ['close']), 
+    ('a lot of', ['lot']),
+    ('in a hallway', ['hallway']), 
+    ('in a room', ['room']), 
+    ('during the day', ['during', 'day']),
+     ('in front of', ['front'])]
 
     result_dict = dict()
     for wp in keep:
