@@ -140,6 +140,7 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
     results = load_dataset(result_path)
     embeddings = load_embeddings(embeddings_path)
     results = [r for r in results if r['gold_label'] == 'contradiction']
+    print('Preselect', len(results), 'results')
     
     final_values = []
     for sample in results:
@@ -155,6 +156,7 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
     print(all_similarities)
 
     with open(path_out, 'w') as f_out:
+        print('Saving', len(final_values), 'values')
         for w1, w2, gold_lbl, predicted_lbl, cnt1, cnt2, category, similarity in final_values:
             f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)]) + '\n')
 
@@ -372,7 +374,7 @@ def plot_freq_acc(esim_file, residual_file, decomposable_file):
     print()
 
     print('# decomposable')
-    freq_bins(decomposable_content)
+    freq_bins(residual_content)
     print()
 
 def plot_cos_evalshit(cos_file, bin_size = 0.05):
