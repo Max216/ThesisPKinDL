@@ -208,7 +208,7 @@ def acc_predictiondict(pd):
             if pred == gold:
                 correct += pd[gold][pred]
             else:
-                incorrect += pd[gold][predicted]
+                incorrect += pd[gold][pred]
 
     return correct / (correct + incorrect)
 
