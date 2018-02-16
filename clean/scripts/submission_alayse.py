@@ -185,7 +185,7 @@ def create_counts_lower(dataset_path, out_path):
                 for word in sentence:
                     word_count[word.lower()] += 1
 
-    torch.save(word_count, out)
+    torch.save(word_count, out_path)
 
     # test
     loaded = torch.load(out_path)
