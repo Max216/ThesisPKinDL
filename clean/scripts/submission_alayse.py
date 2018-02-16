@@ -204,8 +204,8 @@ def create_decomposition_analyse_file(result_file, dataset_file, original_datase
         orgininal_sample = original_dict[pd['pairID']]
         pd['replaced1'] = orgininal_sample['replaced1']
         pd['replaced2'] = orgininal_sample['replaced2']
-        pd['count1'] = cnt_word_or_phrase(wordcount, orig_sample['replaced1'].lower())
-        pd['count2'] = cnt_word_or_phrase(wordcount, orig_sample['replaced2'].lower())
+        pd['count1'] = cnt_word_or_phrase(wordcount, orgininal_sample['replaced1'].lower())
+        pd['count2'] = cnt_word_or_phrase(wordcount, orgininal_sample['replaced2'].lower())
         out_set.append(pd)
 
     print('write out', len(out_set), 'samples')
