@@ -503,7 +503,7 @@ def create_decomposition_analyse_file(result_file, dataset_file, original_datase
         premise = pr[0]
         hyp = pr[1]
         gold = pr[2]
-        predicted = [3]
+        predicted = pr[3]
 
 
         plain_results_dict[premise][hyp] = (predicted, gold)
