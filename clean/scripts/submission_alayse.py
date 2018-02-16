@@ -75,7 +75,7 @@ def main():
     elif args['stats']:
         print_stats(args['<results>'])
     elif args['create_cos']:
-        create_cosine_similarity(args['<results>'], args['<embeddings>'], args['path_out>'])
+        create_cosine_similarity(args['<results>'], args['<embeddings>'], args['<path_out>'])
 
 def load_dataset(path):
     with open(path) as f_in:
