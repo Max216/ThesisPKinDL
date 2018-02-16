@@ -103,7 +103,7 @@ def get_embedding(embeddings, words, lower=False):
     if lower == 'lower':
         print('lowering!')
         words = words.lower()
-    splitted = words.split()
+    splitted = words.split(' ')
     if len(splitted) == 1:
         if words == 'cannot':
             return np.mean(np.array([embeddings['can'], embeddings['not']]), axis=0)
@@ -137,7 +137,7 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
     
     final_values = []
     for sample in results:
-        if len(sample['replaced1'].split()) == 1 and len(sample['replaced2'].split()) == 1:
+        if len(sample['replaced1'].split(' ')) == 1 and len(sample['replaced2'].split(' ')) == 1:
             embd1 = get_embedding(embeddings, sample['replaced1'], lower=lower)
             embd2 = get_embedding(embeddings, sample['replaced2'], lower=lower)
             if len(embd2) != 300:
