@@ -253,6 +253,7 @@ def evaluate(result_path):
         prediction_dict = collections.defaultdict(lambda: collections.defaultdict(int))
         for sample in cat_dict[cat]:
             prediction_dict[sample['gold_label']][sample['predicted_label']] += 1
+            print(sample['gold_label'], '--', sample['predicted_label'])
 
         # accuracy
         print('accuracy:', acc_predictiondict(prediction_dict))
