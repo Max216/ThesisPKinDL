@@ -90,9 +90,9 @@ def load_embeddings(embedding_path):
     return dict([(line[0], np.asarray([float(v) for v in line[1].split()])) for line in lines])
 
 def get_embedding(embeddings, words):
-    splitted = word.split()
+    splitted = words.split()
     if len(splitted) == 1:
-        return embeddings[word]
+        return embeddings[words]
     else:
         mapped_words = word_mapper[words]
         all_vecs = np.array([embeddings[w] for w in mapped_words])
