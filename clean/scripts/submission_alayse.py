@@ -24,14 +24,14 @@ def main():
     elif args['create_esim_anl']:
         create_esim_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
     elif args['create_res_anl']:
-        create_esim_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
+        create_residual_analyse_file(args['<esim_results>'], args['<dataset>'], args['<original_dataset>'], args['<wordcount>'], args['<out>'])
 
 def load_dataset(path):
     with open(path) as f_in:
         parsed = [json.loads(line.strip()) for line in f_in.readlines()]
     return parsed
 
-def create_res_anl(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
+def create_residual_analyse_file(result_file, dataset_file, original_dataset_file, wordcount_file, out_file):
     with open(result_file) as f_in:
         plain_results = [line.strip().split('\t') for line in f_in.readlines()]
 
