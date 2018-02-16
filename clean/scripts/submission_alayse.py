@@ -258,15 +258,15 @@ def evaluate(result_path):
         print('accuracy:', acc_predictiondict(prediction_dict))
 
         # precision entailment
-        e_rec, e_prec = recall_precision_prediction_dict(pd, 'entailment')
+        e_rec, e_prec = recall_precision_prediction_dict(prediction_dict, 'entailment')
         print('entailment: prec =', e_prec, ', recall =', e_rec)
 
         # precision contradiction
-        c_rec, c_prec = recall_precision_prediction_dict(pd, 'entailment')
+        c_rec, c_prec = recall_precision_prediction_dict(prediction_dict, 'contradiction')
         print('entailment: prec =', c_prec, ', recall =', c_rec)
 
         # precision neutral
-        n_rec, n_prec = recall_precision_prediction_dict(pd, 'entailment')
+        n_rec, n_prec = recall_precision_prediction_dict(prediction_dict, 'neutral')
         print('entailment: prec =', n_prec, ', recall =', n_rec)
 
 def plot_cos(cos_file, bin_size = 0.05):
