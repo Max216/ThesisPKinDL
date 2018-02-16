@@ -92,7 +92,11 @@ def load_embeddings(embedding_path):
 def get_embedding(embeddings, words):
     splitted = words.split()
     if len(splitted) == 1:
-        return embeddings[words]
+        if words not in embeddings:
+            print('unknown:', words)
+            return np.zeros(300)
+        else:
+            return embeddings[words]
     else:
         mapped_words = word_mapper[words]
         all_vecs = np.array([embeddings[w] for w in mapped_words])
