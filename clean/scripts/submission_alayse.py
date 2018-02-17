@@ -125,8 +125,22 @@ def label_stats(result_file):
     data = [d for d in data if d['gold_label'] == 'contradiction']
 
     contr_dict = collections.defaultdict(lambda: collections.defaultdict(int))
+    count_entailemt = 0
+    count_neutral = 0
+    count_contradiction = 0
     for d in data:
-        contr_dict[d['category']][d['predicted_label']] += 1
+        lbl = d['predicted_label']
+        contr_dict[d['category']][lbl] += 1
+
+        if lbl == 'contradiction':
+            count_contradiction += 1
+        elif lbl == 'neutral':
+            count_neutral += 1
+        elif lbl == 'entailment':
+            count_entailemt += 1
+        else:
+            1/0
+
 
     for cat in contr_dict:
         print('#', cat)
@@ -136,6 +150,12 @@ def label_stats(result_file):
             print(pred, '->', contr_dict[cat][pred])
         print('total:', cnt)
         print()
+
+    print('general:')
+    print('entailment:', count_entailemt)
+    print('contradiction:', count_contradiction)
+    print('neutral:', count_neutral)
+    print('verify:', count_entailemt + count_contradiction + count_neutral, '==', len(data))
 
 def get_embedding(embeddings, words, lower=False):
     if lower == 'lower':
@@ -201,7 +221,7 @@ def find_samples(testset_path, file, group):
         if sample['category'] == group and sample['gold_label'] == 'contradiction':
             group_words.add(sample['replaced1'])
             group_words.add(sample['replaced2'])
-
+    print('group words:', group_words)
     regexps = [(re.compile('\\b' + w + '\\b')) for w in list(group_words)]
     counter = 0
     for sample in dataset:
