@@ -1,7 +1,7 @@
 '''Evaluate a model'''
 
 
-import sys, os, collections, json
+import sys, os, collections, json, re
 import torch
 sys.path.append('./../')
 
@@ -67,6 +67,10 @@ def main():
         submission_alayse.py plot_cos <cosfile>
         submission_alayse.py eval <results>
         submission_alayse.py plot_freq_acc <esim> <residual> <decomp>
+        submission_alayse.py labelstats <results>
+        submission_alayse.py plot_file <file>
+        submission_alayse.py plot_freq_acc_file <file>
+        submission_alayse.py find_samples <testset> <file> <group>
     """)
 
 
@@ -92,6 +96,17 @@ def main():
         evaluate(args['<results>'])
     elif args['plot_freq_acc']:
         plot_freq_acc(args['<esim>'], args['<residual>'], args['<decomp>'])
+    elif args['plot_file']:
+        plot_file(args['<file>'])
+    elif args['plot_freq_acc_file']:
+        plot_freq_acc_file(args['<file>'])
+    elif args['labelstats']:
+        label_stats(args['<results>'])
+    elif args['<find_samples>']:
+        find_samples(args['<testset>'],args['<file>'], args['<group>'])
+
+
+
 
 def load_dataset(path):
     with open(path) as f_in:
@@ -104,6 +119,23 @@ def load_embeddings(embedding_path):
 
     lines = [line.split(' ', 1) for line in lines]
     return dict([(line[0], np.asarray([float(v) for v in line[1].split()])) for line in lines])
+
+def label_stats(result_file):
+    data = load_dataset(result_file)
+    data = [d for d in data if d['gold_label'] == 'contradiction']
+
+    contr_dict = collections.defaultdict(lambda: collections.defaultdict(int))
+    for d in data:
+        contr_dict[d['category']][d['predicted_label']] += 1
+
+    for cat in contr_dict:
+        print('#', cat)
+        cnt = 0
+        for pred in contr_dict[cat]:
+            cnt += contr_dict[cat][pred]
+            print(pred, '->', contr_dict[cat][pred])
+        print('total:', cnt)
+        print()
 
 def get_embedding(embeddings, words, lower=False):
     if lower == 'lower':
@@ -159,6 +191,38 @@ def create_cosine_similarity(result_path, embeddings_path, path_out, lower=False
         print('Saving', len(final_values), 'values')
         for w1, w2, gold_lbl, predicted_lbl, cnt1, cnt2, category, similarity in final_values:
             f_out.write('\t'.join([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)]) + '\n')
+
+def find_samples(testset_path, file, group):
+    dataset = load_dataset(file)
+    testset = load_dataset(testset_path)
+
+    group_words = set()
+    for sample in testset:
+        if sample['category'] == group and sample['gold_label'] == 'contradiction':
+            instrument_words.add(sample['replaced1'])
+            instrument_words.add(sample['replaced2'])
+
+    regexps = [(re.compile('\\b' + w + '\\b')) for w in list(group_words)]
+    counter = 0
+    for sample in dataset:
+        if sample['gold_label'] == 'contradiction':
+            for i in range(len(group_words)):
+                r1 = regexps[i]
+                if r1.search(sample['sentence1']):
+                    for j in range(len(regexps)):
+                        if i != j:
+                            r2 = regexps[j]
+                            if r2.search(sample['sentence2']):
+                                counter += 1
+                                print(sample['sentence1'])
+                                print(sample['sentence2'])
+                                print()
+                                break
+    print('total:', counter)
+
+
+
+
 
 
 def plt_file_acc(samples):
@@ -318,6 +382,32 @@ def plot_cos(cos_file, bin_size= 0.1):
     plt.show()
 
 
+
+def plot_file(file):
+    bin_size = 0.2
+    with open(file) as f_in:
+        content = [line.strip().split() for line in f_in.readlines()]
+
+    y_vals = [round(float(c[1]) * 100,2) for c in content]
+    half_bin = bin_size/2
+    x_labels = [c[0] for c in content]
+    #y_vals = [y for x,y in data]
+    #x_indizes = np.arange(len(data))
+    width = 0.8#1/(len(content))
+    color = COLOR_DECOMPOSABLE
+
+    index = np.arange(len(content))
+
+    plt.bar(index, y_vals, width, color=COLOR_DECOMPOSABLE)
+    plt.ylabel('Accuracy (%)')
+    plt.xlabel('Cosine similarity')
+    plt.xticks(index , x_labels, rotation=0)
+    #plt.xticks(x_indizes, x_labels)
+    #plt.title(title)
+
+    plt.show()
+
+
 def freq_bins(content, bins = [500,1500,5000,25000,50000]):
     contents = [[] for i in range(len(bins))]
     for c in content:
@@ -427,13 +517,94 @@ def plot_multi_bar_chart(data, legend_labels, colors, width=0.2, rotate=0, ncol=
     plt.xlabel('Occurences of most frequent word of word-pair')
     #plt.title(title)
     if ncol == 3:
-        plt.xticks(index + i* bar_width, x_labels, rotation=rotate)
+        plt.xticks(index + (i-1) * bar_width , x_labels, rotation=rotate)
     else:
         plt.xticks(index + i * bar_width/2, x_labels, rotation=rotate)
     plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
                 mode="expand", borderaxespad=0, ncol=ncol)
     plt.subplots_adjust(top=0.8)
 
+
+    plt.show()
+
+def plot_freq_acc_file(file_path):
+    LABEL = 0
+    SNLI_FREQ = 1
+    SNLI_ACC = 2
+    SNLI_MNLI_FREQ = 3
+    SNLI_MNLI_ACC = 4
+
+    with open(file_path) as f_in:
+        content = [line.strip().split() for line in f_in.readlines()][1:]
+
+    for i in range(len(content)):
+        content[i][SNLI_FREQ] = int(content[i][SNLI_FREQ])
+        content[i][SNLI_MNLI_FREQ] = int(content[i][SNLI_MNLI_FREQ])
+        content[i][SNLI_ACC] = float(content[i][SNLI_ACC]) * 100
+        content[i][SNLI_MNLI_ACC] = float(content[i][SNLI_MNLI_ACC]) * 100
+
+
+
+
+    x_labels = [c[LABEL] for c in content]
+    data = []
+    for i in range(len(x_labels)):
+        data.append([content[i][val_idx] for val_idx in [SNLI_ACC, SNLI_FREQ, SNLI_MNLI_ACC, SNLI_MNLI_FREQ]])
+
+    data_freq = [d[:] for d in data[:]]
+    for i in range(len(data_freq)):
+        data_freq[i][0] = 0
+        data_freq[i][2] = 0
+
+    data_acc = [d[:] for d in data[:]]
+    for i in range(len(data_acc)):
+        data_acc[i][1] = 0.0
+        data_acc[i][3] = 0.0
+
+    print('acc data', data_acc)
+    print('freq_data', data_freq)
+
+    plot_data_freq = [[] for i in range(len(data_freq[0]))]
+    for d in data_freq:
+        for i in range(len(d)):
+            plot_data_freq[i].append(d[i])
+
+    plot_data_acc = [[] for i in range(len(data_acc[0]))]
+    for d in data_acc:
+        for i in range(len(d)):
+            plot_data_acc[i].append(d[i])
+
+    print('## plotdata freq', plot_data_freq)
+
+
+    num_groups = len(x_labels)
+
+    fig, ax1 = plt.subplots()
+    index = np.arange(num_groups)
+    bar_width = 1/(num_groups + 1)
+    rotate = 0
+    legend_labels = ['Accuracy (SNLI)', 'Amount of samples (SNLI)', 'Accuracy (SNLI + MultiNLI)', 'Amount of samples (SNLI + MultiNLI)']
+    colors = ['#d95f0e', '#fe9929', '#2c7fb8', '#41b6c4']
+
+    ncol = 2
+    for i, lbl in enumerate(legend_labels):
+        ax1.bar(index + i * (bar_width + .02), plot_data_acc[i], bar_width,  label=lbl, color=colors[i])
+
+    ax1.set_ylabel('Accuracy (%)')
+    ax1.set_xlabel('Amount of contradiction samples in train data with the replaced words')
+
+    ax2 = ax1.twinx()
+    for i, lbl in enumerate(legend_labels):
+        ax2.bar(index + i * (bar_width+.02), plot_data_freq[i], bar_width,  label=lbl, color=colors[i])
+    ax2.set_ylabel('Amount of samples in test data')
+    #plt.title(title)
+    #if ncol == 3:
+    #    plt.xticks(index + (i-1) * bar_width , x_labels, rotation=rotate)
+    #else:
+    plt.xticks(index + i * (bar_width/2+0.01), x_labels, rotation=rotate)
+    plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
+                mode="expand", borderaxespad=0, ncol=ncol)
+    plt.subplots_adjust(top=0.8)
 
     plt.show()
 
@@ -458,7 +629,7 @@ def plot_freq_acc(esim_file, residual_file, decomposable_file):
     #asym_freq_bins(decomposable_content)
     print()
 
-    PLOT_ALL = False
+    PLOT_ALL = True
 
     x_labels = [str(bin_sizes[i]) for i in range(len(bin_sizes) - 1)]
     x_labels.append(str(bin_sizes[-2]) + '+')
@@ -779,6 +950,7 @@ def create_counts_lower(dataset_path, out_path):
     # test
     loaded = torch.load(out_path)
     print(loaded['a'])
+
 
 
 
