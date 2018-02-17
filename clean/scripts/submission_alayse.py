@@ -199,8 +199,8 @@ def find_samples(testset_path, file, group):
     group_words = set()
     for sample in testset:
         if sample['category'] == group and sample['gold_label'] == 'contradiction':
-            instrument_words.add(sample['replaced1'])
-            instrument_words.add(sample['replaced2'])
+            group_words.add(sample['replaced1'])
+            group_words.add(sample['replaced2'])
 
     regexps = [(re.compile('\\b' + w + '\\b')) for w in list(group_words)]
     counter = 0
