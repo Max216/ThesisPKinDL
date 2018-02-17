@@ -102,7 +102,7 @@ def main():
         plot_freq_acc_file(args['<file>'])
     elif args['labelstats']:
         label_stats(args['<results>'])
-    elif args['<find_samples>']:
+    elif args['find_samples']:
         find_samples(args['<testset>'],args['<file>'], args['<group>'])
 
 
