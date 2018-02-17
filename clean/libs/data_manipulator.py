@@ -171,13 +171,13 @@ class DataManipulator:
                 for sent in [sent1, sent2]:
                     if regexp.search(sent):
                         hashed = hash(sent)
-                        if hashed not in already_seen:
-                            print(sent)
-                            already_seen.add(hashed)
+                        #if hashed not in already_seen:
+                        #    print(sent)
+                        #    already_seen.add(hashed)
                         counter += 1
 
-                if counter >= max_amount:
-                    break
+                #if counter >= max_amount:
+                #    break
             print('Found', counter, 'examples')
             print()
 
