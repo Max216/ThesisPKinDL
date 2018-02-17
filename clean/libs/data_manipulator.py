@@ -166,15 +166,15 @@ class DataManipulator:
             counter = 0
             regexp = re.compile('\\b' + word + '\\b')
             print('# Looking for:', word)
-            already_seen = set()
+            #already_seen = set()
             for sent1, sent2, _ in self.samples:
                 for sent in [sent1, sent2]:
                     if regexp.search(sent):
-                        hashed = hash(sent)
-                        if hashed not in already_seen:
-                            print(sent)
-                            already_seen.add(hashed)
-                            counter += 1
+                        #hashed = hash(sent)
+                            #if hashed not in already_seen:
+                            #print(sent)
+                            #already_seen.add(hashed)
+                        counter += 1
 
                 #if counter >= max_amount:
                 #    break
