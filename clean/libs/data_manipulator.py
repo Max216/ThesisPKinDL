@@ -176,8 +176,8 @@ class DataManipulator:
                             already_seen.add(hashed)
                             counter += 1
 
-                if counter >= max_amount:
-                    break
+                #if counter >= max_amount:
+                #    break
             print('Found', counter, 'examples')
             print()
 

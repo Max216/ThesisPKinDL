@@ -16,9 +16,9 @@ from scipy import spatial
 
 import matplotlib.pyplot as plt
 
-COLOR_DECOMPOSABLE = '#660000'
-COLOR_ESIM = '#000066'
-COLOR_RESIDUAL = '#006600'
+COLOR_DECOMPOSABLE = '#FFC312'
+COLOR_ESIM = '#ED4C67'
+COLOR_RESIDUAL = '#1289A7'
 
 
 def create_word_mapping():
@@ -329,20 +329,52 @@ def freq_bins(content, bins = [500,1500,5000,25000,50000]):
                     break
             else:
                 # last bin
+
                 contents[-1].append(c)
 
+    test = contents[-1]
+    print('verify:', min([max([t[4], t[5]]) for t in test]))
+
+    results = []
     for i in range(len(bins)):
+        bin_result = []
         if i < len(bins) - 1:
             print('max-freq', bins[i],'>>', len(contents[i]), plt_file_acc(contents[i]))
+            bin_result.append(plt_file_acc(contents[i]))
         else:
             print('min-freq', bins[i],'>>', len(contents[i]), plt_file_acc(contents[i]))
+            bin_result.append(plt_file_acc(contents[i]))
+        results.append(bin_result)
+
+    return bins, [r[0] for r in results]
 
     
-    #print('max-freq 1500', len(content2), plt_file_acc(content2))
-    #print('max-freq 4500', len(content3), plt_file_acc(content3))
-    #print('max-freq 10000', len(content4), plt_file_acc(content4))
-    #print('max-freq 50000', len(content5), plt_file_acc(content5))
-    #print('min-freq 50000+', len(content6), plt_file_acc(content6))
+def asym_freq_bins(content, split1=500, split2=1500):
+    content_rare = []
+    content_semi_rare = []
+    content_semi_often = []
+    content_often = []
+
+
+    for c in content:
+        count1 = c[4]
+        count2 = c[5]
+
+        if count1 <= split1 and count2 <= split1:
+            content_rare.append(c)
+        elif count1 <= split2 and count2 <= split1:
+            content_semi_rare.append(c)
+        elif count1 <= split1 and count2 <= split2:
+            content_semi_rare.append(c)
+        elif count1 <= split2 or count2 <= split2:
+            content_semi_often.append(c)
+        else:
+            content_often.append(c)
+
+    print('content_rare', len(content_rare), plt_file_acc(content_rare))
+    print('content_semi_rare', len(content_semi_rare), plt_file_acc(content_semi_rare))
+    print('content_semi_often', len(content_semi_often), plt_file_acc(content_semi_often))
+    print('content_often', len(content_often), plt_file_acc(content_often))
 
 def load_txt_result(path):
     #([w1,w2,gold_lbl,predicted_lbl,str(cnt1), str(cnt2),category,str(similarity)])
@@ -359,6 +391,52 @@ def load_txt_result(path):
 
     return content
 
+
+def plot_multi_bar_chart(data, legend_labels, colors, width=0.2, rotate=0, ncol=3):
+    '''
+    Plot a bar chart with several bars per x value
+
+    :param data     data to plot: [(label_x, [v1, v2, ...]), (...)]
+    :param x_labels   x_labels,
+    :param title   title
+    '''
+    x_labels = [lbl for lbl, _ in data]
+    data = [vals for _, vals in data]
+
+    plot_data = [[] for i in range(len(data[0]))]
+    for d in data:
+        for i in range(len(d)):
+            plot_data[i].append(d[i])
+
+    print('## plotdata', plot_data)
+
+
+    num_groups = len(x_labels)
+
+    fig, ax = plt.subplots()
+    index = np.arange(num_groups)
+    bar_width = width
+
+    for i, lbl in enumerate(legend_labels):
+        if ncol == 3:
+            plt.bar(index + i * bar_width, plot_data[i], bar_width,  label=lbl, color=colors[i])
+        else:
+            plt.bar(index + i * bar_width, plot_data[i], bar_width,  label=lbl, color=colors[i])
+
+    plt.ylabel('Accuracy (%)')
+    plt.xlabel('Occurences of most frequent word of word-pair')
+    #plt.title(title)
+    if ncol == 3:
+        plt.xticks(index + i* bar_width, x_labels, rotation=rotate)
+    else:
+        plt.xticks(index + i * bar_width/2, x_labels, rotation=rotate)
+    plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
+                mode="expand", borderaxespad=0, ncol=ncol)
+    plt.subplots_adjust(top=0.8)
+
+
+    plt.show()
+
 def plot_freq_acc(esim_file, residual_file, decomposable_file):
     
     esim_content = load_txt_result(esim_file)
@@ -366,16 +444,38 @@ def plot_freq_acc(esim_file, residual_file, decomposable_file):
     decomposable_content = load_txt_result(decomposable_file)
 
     print('# esim')
-    freq_bins(esim_content)
+    bin_sizes, result_esim = freq_bins(esim_content)
+    #asym_freq_bins(esim_content)
     print()
 
     print('# residual')
-    freq_bins(residual_content)
+    bin_sizes, result_res = freq_bins(residual_content)
+    #asym_freq_bins(residual_content)
     print()
 
     print('# decomposable')
-    freq_bins(residual_content)
+    bin_sizes, result_decomp = freq_bins(decomposable_content)
+    #asym_freq_bins(decomposable_content)
     print()
+
+    PLOT_ALL = False
+
+    x_labels = [str(bin_sizes[i]) for i in range(len(bin_sizes) - 1)]
+    x_labels.append(str(bin_sizes[-2]) + '+')
+    if PLOT_ALL:
+        data = [(x_labels[i], (result_esim[i] * 100, result_res[i] * 100, result_decomp[i] * 100)) for i in range(len(x_labels))]
+        legend_labels = ['ESIM', 'Residual Encoder', 'Decomposable Attention']
+        colors = [COLOR_ESIM, COLOR_RESIDUAL, COLOR_DECOMPOSABLE]
+        ncol=3
+
+    else:
+        data = [(x_labels[i], (result_esim[i] * 100, result_res[i] * 100)) for i in range(len(x_labels))]
+        legend_labels = ['ESIM', 'Residual Encoder']
+        colors = [COLOR_ESIM, COLOR_RESIDUAL]
+        ncol=2
+
+
+    plot_multi_bar_chart(data, legend_labels, colors=colors, ncol=ncol)
 
 def plot_cos_evalshit(cos_file, bin_size = 0.05):
 
