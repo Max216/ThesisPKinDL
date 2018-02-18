@@ -71,11 +71,14 @@ def main():
         submission_alayse.py plot_file <file>
         submission_alayse.py plot_freq_acc_file <file>
         submission_alayse.py find_samples <testset> <file> <group>
+        submission_alayse.py validate_esim <esim_results>
     """)
 
 
     if args['create_counts']:
         create_counts(args['<data_in>'], args['<file_out>'])
+    elif args['validate_esim']:
+        validate_esim(args['<validate_esim>'])
     elif args['wc']:
         word_count(args['<wordcount>'], args['<word>'])
     elif args['create_counts_lower']:
@@ -104,6 +107,23 @@ def main():
         label_stats(args['<results>'])
     elif args['find_samples']:
         find_samples(args['<testset>'],args['<file>'], args['<group>'])
+
+
+def validate_esim(esim_file):
+    with open(esim_file) as f_in:
+        content = [line.strip().split('\t') for line in f_in.readlines()]
+    GOLD = 2
+    PREDICTED = 3
+
+    incorrect = 0
+    correct = 0
+    for c in content:
+        if c[GOLD] != c[PREDICTED]:
+            incorrect += 1
+        else:
+            correct += 1
+
+    print(correct / len(content), '==', correct / (correct + incorrect))
 
 
 
