@@ -78,7 +78,7 @@ def main():
     if args['create_counts']:
         create_counts(args['<data_in>'], args['<file_out>'])
     elif args['validate_esim']:
-        validate_esim(args['<validate_esim>'])
+        validate_esim(args['<esim_results>'])
     elif args['wc']:
         word_count(args['<wordcount>'], args['<word>'])
     elif args['create_counts_lower']:
