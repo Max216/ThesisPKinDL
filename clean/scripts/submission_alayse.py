@@ -115,7 +115,7 @@ def main():
 def add_wc_snli_mnli(word_count_path, result_in_path, result_out_path):
     word_count_snli_mnli =torch.load(word_count_path)
 
-    with open(result_in_path) f_in:
+    with open(result_in_path) as f_in:
         samples = [json.loads(line.strip()) for line in f_in.readlines()]
 
     for sample in samples:
