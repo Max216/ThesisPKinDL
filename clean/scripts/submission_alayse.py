@@ -132,8 +132,8 @@ def add_wc_snli_mnli(word_count_path, result_in_path, result_out_path):
         else:
             cnt_w2 = min([word_count_snli_mnli[w] for w in w2])
 
-        sample['count1_snli_mnli'] = cnt_w1
-        sample['count2_snli_mnli'] = cnt_w2
+        sample['count1'] = cnt_w1
+        sample['count2'] = cnt_w2
 
     with open(result_out_path, 'w') as f_out:
         for s in samples:
