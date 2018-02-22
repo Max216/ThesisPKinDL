@@ -17,11 +17,11 @@ from libs import model_tools, evaluate, collatebatch
 
 DEFAULT_ITERATIONS = 5
 DEFAULT_LR = 0.0002
-DEFAULT_VALIDATE_AFTER = 2000
-DEFAULT_BATCH_SIZE = 32
+DEFAULT_VALIDATE_AFTER = [10000,6000,2000,1000]
+DEFAULT_BATCH_SIZE = 2
 
 
-def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
+def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after_vals=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
     '''
     Train a model and always store the best current result.
 
@@ -56,6 +56,12 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
     start_time = time.time()
     start_lr = lr
     for epoch in range(iterations):
+
+        if len(validate_after_vals) < epoch:
+            validate_after = validate_after_vals[epoch]
+        else:
+            validate_after = validate_after_vals[-1]
+
         print('Train epoch', epoch + 1)
 
         total_loss = 0
@@ -74,9 +80,9 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
                 optimizer.zero_grad()
 
                 # predict
-                premise_var = autograd.Variable(m.cuda_wrap(premise_batch))
-                hyp_var = autograd.Variable(m.cuda_wrap(hyp_batch))
-                lbl_var = autograd.Variable(m.cuda_wrap(lbl_batch))
+                premise_var = autograd.Variable(premise_batch)
+                hyp_var = autograd.Variable(hyp_batch)
+                lbl_var = autograd.Variable(lbl_batch)
 
                 prediction = classifier(premise_var, hyp_var)
                 loss = F.cross_entropy(prediction, lbl_var)
@@ -91,7 +97,7 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
                     until_validation = validate_after
 
                     # validate
-                    acc_train = evaluate.eval(classifier, train_set, batch_size, padding_token)
+                    acc_train = evaluate.eval_splits(classifier, train_set_splits, batch_size, padding_token)
                     acc_dev = evaluate.eval(classifier, dev_set, batch_size, padding_token)
                     mean_loss = total_loss[0] / number_batches
 
@@ -99,6 +105,9 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
                     print('Accuracy on train data:', acc_train)
                     print('Accuracy on dev data:', acc_dev)   
                     print('Mean loss:', mean_loss)
+                    running_time = time.time() - start_time
+                    print('Running time:', running_time, 'seconds.')
+
                     sys.stdout.flush()
 
                     classifier.train()

@@ -27,8 +27,8 @@ class SentEncoderDataset(Dataset):
             torch.LongTensor([embedding_holder.word_index(w) for w in p]),
             torch.LongTensor([embedding_holder.word_index(w) for w in h]),
             tag_to_idx[lbl],
-            torch.LongTensor([len_p]),
-            torch.LongTensor([len_h])
+            len_p,
+            len_h
         ) for (p, h, lbl, len_p, len_h) in samples]
 
     def __len__(self):

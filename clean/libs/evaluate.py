@@ -46,6 +46,27 @@ def predict_tokenized(classifier, embedding_holder, p, h, index_to_tag=data_tool
     _, predicted_idx = torch.max(scores, dim=1)
     return index_to_tag[predicted_idx.data[0]]
 
+def eval_splits(classifier, data_splits, batch_size, padding_token, twister=None):
+    classifier.eval()
+    data_loaders = [DataLoader(data, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token)) for data in data_splits]
+
+    correct = 0
+    total = sum([len(data) for data in data_loaders])
+
+    for loader in data_loaders:
+        for premise_batch, hyp_batch, lbl_batch in loader:
+            prediction = classifier(
+                autograd.Variable(premise_batch),
+                autograd.Variable(hyp_batch)#,
+                #twister=twister
+            ).data
+
+            # count corrects
+            _, predicted_idx = torch.max(prediction, dim=1)
+            correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+
+    return correct / total
+
 def eval(classifier, data, batch_size, padding_token, twister=None):
     '''
     Evaluate a model
@@ -64,14 +85,14 @@ def eval(classifier, data, batch_size, padding_token, twister=None):
 
     for premise_batch, hyp_batch, lbl_batch in data_loader:
         prediction = classifier(
-            autograd.Variable(m.cuda_wrap(premise_batch)),
-            autograd.Variable(m.cuda_wrap(hyp_batch)),
-            twister=twister
+            autograd.Variable(premise_batch),
+            autograd.Variable(hyp_batch)#,
+            #twister=twister
         ).data
 
         # count corrects
         _, predicted_idx = torch.max(prediction, dim=1)
-        correct += torch.sum(torch.eq(m.cuda_wrap(lbl_batch), predicted_idx))
+        correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
 
     return correct / total
 
@@ -83,8 +104,8 @@ def predict_outcomes(classifier, dataset, batch_size, padding_token, twister=Non
     for premise_batch, hyp_batch, lbl_batch in data_loader:
         prediction = classifier(
             autograd.Variable(m.cuda_wrap(premise_batch)),
-            autograd.Variable(m.cuda_wrap(hyp_batch)),
-            twister=twister
+            autograd.Variable(m.cuda_wrap(hyp_batch))#,
+            #twister=twister
         ).data
 
         # count corrects
@@ -114,8 +135,8 @@ def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifi
     for premise_batch, hyp_batch, lbl_batch in data_loader:
         prediction = classifier(
             autograd.Variable(m.cuda_wrap(premise_batch)),
-            autograd.Variable(m.cuda_wrap(hyp_batch)),
-            twister=twister
+            autograd.Variable(m.cuda_wrap(hyp_batch))#,
+            #twister=twister
         ).data
 
         # count corrects

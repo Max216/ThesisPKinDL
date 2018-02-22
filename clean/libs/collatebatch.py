@@ -3,6 +3,9 @@ Use that to automatically apply padding in the dataset
 '''
 
 import torch
+import numpy as np
+
+from libs import model as m
 
 class CollateBatch(object):
     '''
@@ -16,28 +19,45 @@ class CollateBatch(object):
         return torch.cat([tensor, tensor.new(length - tensor.size(0), *tensor.size()[1:]).fill_(self.padding_token)])
         
     def __call__(self, batch):
-        #sizes = torch.LongTensor([[len(premise), len(hypothesis)] for premise, hypothesis, _ in batch])
+
+        premise, hypothesis, label, len_p, len_h = [list(a) for a in zip(*batch)]
+
+        max_len_premise = int(np.max(len_p))
+        max_len_hypothesis = int(np.max(len_h))
+
+        p = torch.cat([self.pad(m.cuda_wrap(p_sent), max_len_premise).view(-1,1) for p_sent in premise], dim=1)
+        h = torch.cat([self.pad(m.cuda_wrap(h_sent), max_len_hypothesis).view(-1,1) for h_sent in hypothesis], dim=1)
+        l = m.cuda_wrap(torch.LongTensor(label))
+
+        return p,h,l
+
+
+
+        #sizes = torch.LongTensor([[len(premise), len(hypothesis)] for premise, hypothesis, _, _2, _3 in batch])
         #(max_length_premise, max_length_hypothesis), idxs = torch.max(sizes, dim=0)
-        print('nbatch', batch)
-        sizes = batch[:,-2:]
-        print('sizes', sizes)
-        1/0
-        maxlen, idxs = torch.max(sizes, dim=0)
-        maxlen = maxlen.view(-1)
-        max_length_premise = maxlen[0]
-        max_length_hypothesis = maxlen[1]
+        #print('nbatch', batch)
+        #sizes = batch[:,-2:]
+        #print('sizes', sizes)
+        #1/0
+        #maxlen, idxs = torch.max(sizes, dim=0)
+        #maxlen = maxlen.view(-1)
+        #max_length_premise = maxlen[0]
+        #max_length_hypothesis = maxlen[1]
         
         # add padding to shorter sentences than longest within minibatch
-        batch_size = len(batch)
-        p = torch.LongTensor(max_length_premise, batch_size)
-        h = torch.LongTensor(max_length_hypothesis, batch_size)
-        l = torch.LongTensor(batch_size)
+        #batch_size = len(batch)
+        #p = torch.LongTensor(max_length_premise, batch_size)
+        #h = torch.LongTensor(max_length_hypothesis, batch_size)
+        #l = torch.LongTensor(batch_size)
         
-        cnt = 0
-        for premise, hypothesis, lbl in batch:
-            l[cnt] = lbl
-            p[:,cnt] = self.pad(premise, max_length_premise)
-            h[:,cnt] = self.pad(hypothesis, max_length_hypothesis)
-            cnt +=1
+        #cnt = 0
+        #for premise, hypothesis, lbl,_,_2 in batch:
+        #    l[cnt] = lbl
+        #    p[:,cnt] = self.pad(premise, max_length_premise)
+        #    h[:,cnt] = self.pad(hypothesis, max_length_hypothesis)
+        #    cnt +=1
+
+        #print('final p', p)
+        #1/0
         
-        return (p, h, l)
+        #return (p, h, l)
