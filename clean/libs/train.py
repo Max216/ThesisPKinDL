@@ -18,7 +18,7 @@ from libs import model_tools, evaluate, collatebatch
 DEFAULT_ITERATIONS = 5
 DEFAULT_LR = 0.0002
 DEFAULT_VALIDATE_AFTER = [10000,6000,2000,1000]
-DEFAULT_BATCH_SIZE = 2
+DEFAULT_BATCH_SIZE = 32
 
 
 def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after_vals=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
