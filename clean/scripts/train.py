@@ -3,7 +3,7 @@ sys.path.append('./../')
 
 from docopt import docopt
  
-from libs import model_tools, data_tools, train
+from libs import model_tools, data_tools, train, data_handler
 from libs import model as m
 
 def main():
@@ -23,8 +23,8 @@ def main():
     appendix = args['--appendix'] or ''
     m_settings = m.ModelSettings([('sent-rep', sent_fn)])
 
-    datahandler_train = data_tools.get_datahandler_train(path_train)
-    datahandler_dev =  data_tools.get_datahandler_dev(path_dev)
+    datahandler_train = data_handler.get_datahandler_train(path_train)
+    datahandler_dev =  data_handler.get_datahandler_dev(path_dev)
 
     if embedding_path != None:
         embedding_holder = eh.EmbeddingHolder(embedding_path)
