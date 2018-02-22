@@ -98,7 +98,7 @@ class Datahandler:
     def get_dataset_splits(self, embedding_holder, split_size=16000):
         splits = []
         start_idx = 0
-        while start_idx < len(self.samples)
+        while start_idx < len(self.samples):
             if len(self.samples[start_idx:]) > split_size:
                 splits.append(SentEncoderDataset(self.samples[start_idx:]))
             else:
