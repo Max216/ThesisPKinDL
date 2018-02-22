@@ -100,7 +100,7 @@ class Datahandler:
         start_idx = 0
         while start_idx < len(self.samples):
             print('remain samples to split:', len(self.samples[start_idx:]))
-            if len(self.samples[start_idx:]) > split_size:
+            if len(self.samples[start_idx:]) < split_size:
                 print('>> use all')
                 splits.append(SentEncoderDataset(self.samples[start_idx:], embedding_holder, self.tag_to_idx))
             else:
