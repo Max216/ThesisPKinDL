@@ -57,7 +57,7 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
     start_lr = lr
     for epoch in range(iterations):
         print(validate_after_vals)
-        if len(validate_after_vals) < epoch:
+        if len(validate_after_vals) > epoch:
             print('use current')
             validate_after = validate_after_vals[epoch]
         else:
