@@ -21,7 +21,7 @@ DEFAULT_VALIDATE_AFTER = 2000
 DEFAULT_BATCH_SIZE = 32
 
 
-def train_model(name, classifier, padding_token, train_set, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
+def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
     '''
     Train a model and always store the best current result.
 
@@ -50,7 +50,8 @@ def train_model(name, classifier, padding_token, train_set, dev_set, iterations=
     # actual training
     optimizer = optim.Adam(classifier.parameters(), lr=lr)
 
-    train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(padding_token))
+
+    train_loader = [DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(padding_token)) for train_set in train_set_splits]
 
     start_time = time.time()
     start_lr = lr
@@ -60,55 +61,56 @@ def train_model(name, classifier, padding_token, train_set, dev_set, iterations=
         total_loss = 0
         number_batches = 0
 
-        for premise_batch, hyp_batch, lbl_batch in train_loader:
-            
-            # update stats
-            number_batches += 1
-            until_validation -= batch_size
-            samples_seen += batch_size
+        for train_split in train_loader:
+            for premise_batch, hyp_batch, lbl_batch in train_split:
+                
+                # update stats
+                number_batches += 1
+                until_validation -= batch_size
+                samples_seen += batch_size
 
-            # reset gradients
-            classifier.zero_grad()
-            optimizer.zero_grad()
+                # reset gradients
+                classifier.zero_grad()
+                optimizer.zero_grad()
 
-            # predict
-            premise_var = autograd.Variable(m.cuda_wrap(premise_batch))
-            hyp_var = autograd.Variable(m.cuda_wrap(hyp_batch))
-            lbl_var = autograd.Variable(m.cuda_wrap(lbl_batch))
+                # predict
+                premise_var = autograd.Variable(m.cuda_wrap(premise_batch))
+                hyp_var = autograd.Variable(m.cuda_wrap(hyp_batch))
+                lbl_var = autograd.Variable(m.cuda_wrap(lbl_batch))
 
-            prediction = classifier(premise_var, hyp_var)
-            loss = F.cross_entropy(prediction, lbl_var)
-            total_loss += loss.data
+                prediction = classifier(premise_var, hyp_var)
+                loss = F.cross_entropy(prediction, lbl_var)
+                total_loss += loss.data
 
-            # update model
-            loss.backward()
-            optimizer.step()
+                # update model
+                loss.backward()
+                optimizer.step()
 
-            # Check if validate
-            if until_validation <= 0:
-                until_validation = validate_after
+                # Check if validate
+                if until_validation <= 0:
+                    until_validation = validate_after
 
-                # validate
-                acc_train = evaluate.eval(classifier, train_set, batch_size, padding_token)
-                acc_dev = evaluate.eval(classifier, dev_set, batch_size, padding_token)
-                mean_loss = total_loss[0] / number_batches
+                    # validate
+                    acc_train = evaluate.eval(classifier, train_set, batch_size, padding_token)
+                    acc_dev = evaluate.eval(classifier, dev_set, batch_size, padding_token)
+                    mean_loss = total_loss[0] / number_batches
 
-                print('After seeing', samples_seen, 'samples:')
-                print('Accuracy on train data:', acc_train)
-                print('Accuracy on dev data:', acc_dev)   
-                print('Mean loss:', mean_loss)
-                sys.stdout.flush()
-
-                classifier.train()
-
-                if acc_dev > best_dev_acc:
-                    best_model = copy.deepcopy(classifier.state_dict())
-                    best_dev_acc = acc_dev
-                    best_train_acc = acc_train
-
-                    print('Saving current best model!')
+                    print('After seeing', samples_seen, 'samples:')
+                    print('Accuracy on train data:', acc_train)
+                    print('Accuracy on dev data:', acc_dev)   
+                    print('Mean loss:', mean_loss)
                     sys.stdout.flush()
-                    model_tools.store(name, best_model, 'temp')
+
+                    classifier.train()
+
+                    if acc_dev > best_dev_acc:
+                        best_model = copy.deepcopy(classifier.state_dict())
+                        best_dev_acc = acc_dev
+                        best_train_acc = acc_train
+
+                        print('Saving current best model!')
+                        sys.stdout.flush()
+                        model_tools.store(name, best_model, 'temp')
 
         # Half decay lr
         decay = epoch // 2

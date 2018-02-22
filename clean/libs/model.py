@@ -184,7 +184,8 @@ class EntailmentClassifier(nn.Module):
         
         self.dropout1 = nn.Dropout(p=dropout)
 
-    def forward(self, sent1, sent2, output_sent_info=False, twister=None):
+    #def forward(self, sent1, sent2, output_sent_info=False, twister=None):
+    def forward(self, sent1, sent2, output_sent_info=False):
         batch_size = sent1.size()[1]
         
         # Map to embeddings
@@ -205,9 +206,9 @@ class EntailmentClassifier(nn.Module):
         idxs2 = idxs2.view(batch_size, -1)
 
 
-        if twister != None:
-            sent1_representation = twister.twist_representation(sent1_representation, 'premise', activations=idxs1, sent=sent1)
-            sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis', activations=idxs2, sent=sent1)
+        #if twister != None:
+        #    sent1_representation = twister.twist_representation(sent1_representation, 'premise', activations=idxs1, sent=sent1)
+        #    sent2_representation = twister.twist_representation(sent2_representation, 'hypothesis', activations=idxs2, sent=sent1)
         
         # Create feature tensor
         feedforward_input = torch.cat((

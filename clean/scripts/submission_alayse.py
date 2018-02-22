@@ -73,11 +73,14 @@ def main():
         submission_alayse.py find_samples <testset> <file> <group>
         submission_alayse.py validate_esim <esim_results>
         submission_alayse.py add_wc_snli_mnli <word_count> <results_in> <results_out>
+        submission_alayse.py plot_freq_acc_single <file>
     """)
 
 
     if args['create_counts']:
         create_counts(args['<data_in>'], args['<file_out>'])
+    elif args['plot_freq_acc_single']:
+        plot_acc_by_freq_single(args['<file>'])
     elif args['add_wc_snli_mnli']:
         add_wc_snli_mnli(args['<word_count>'], args['<results_in>'], args['<results_out>'])
     elif args['validate_esim']:
@@ -598,6 +601,34 @@ def plot_multi_bar_chart(data, legend_labels, colors, width=0.2, rotate=0, ncol=
 
     plt.show()
 
+def plot_acc_by_freq_single(file_path):
+    with open(file_path) as f_in:
+        content = [line.strip().split() for line in f_in.readlines()][1:]
+
+    LABEL = 0
+    SNLI_FREQ = 1
+    SNLI_ACC = 2
+    SNLI_MNLI_FREQ = 3
+    SNLI_MNLI_ACC = 4
+
+    for i in range(len(content)):
+        content[i][SNLI_FREQ] = int(content[i][SNLI_FREQ])
+        content[i][SNLI_MNLI_FREQ] = int(content[i][SNLI_MNLI_FREQ])
+        content[i][SNLI_ACC] = float(content[i][SNLI_ACC]) * 100
+        content[i][SNLI_MNLI_ACC] = float(content[i][SNLI_MNLI_ACC]) * 100
+
+    x_labels = [c[LABEL] for c in content]
+    num_groups = len(x_labels)
+    index = np.arange(num_groups)
+    data_acc = [content[i][SNLI_ACC] for i in range(len(content))]
+
+    plt.plot(index, data_acc, '-o')
+    plt.ylim(ymin=0)
+    plt.xticks(index, x_labels, rotation=0)
+    plt.ylabel('Accuracy (%)')
+    plt.xlabel('Amount of contradiction samples in train data with the replaced words')
+    plt.show()
+
 def plot_freq_acc_file(file_path):
     LABEL = 0
     SNLI_FREQ = 1
@@ -618,6 +649,8 @@ def plot_freq_acc_file(file_path):
     num_groups = len(x_labels)
     ncol = 2
 
+    data_acc = [content[i][SNLI_ACC] for i in range(len(content))]
+
 
     # plot accuracy per category
     data_acc = [[content[i][SNLI_ACC], content[i][SNLI_MNLI_ACC]] for i in range(len(content))]
@@ -637,7 +670,7 @@ def plot_freq_acc_file(file_path):
 
     for i, lbl in enumerate(legend_labels):
         plt.plot(index, plot_data_acc[i], '-o',  label=lbl, color=colors[i])
-    plt.xticks(index, x_labels, rotation=rotate)
+    plt.xticks(index, x_labels, rotation=12)
     plt.ylabel('Accuracy (%)')
     plt.xlabel(' ')
 
@@ -654,14 +687,14 @@ def plot_freq_acc_file(file_path):
             plot_data_freq[i].append(d[i])
 
 
-    plt.subplot(2, 1, 2)
+    ax = plt.subplot(2, 1, 2)
     for i, lbl in enumerate(legend_labels):
         plt.plot(index, plot_data_freq[i], '-o',  label=lbl, color=colors[i])
-    plt.xticks(index, x_labels, rotation=rotate)
+    plt.xticks(index, x_labels, rotation=12)
     plt.ylabel('Amount of samples')
-    plt.xlabel('Amount of contradiction samples in train data containing a word-pair')
+    #plt.xlabel('Amount of contradiction samples in train data containing a word-pair')
     #plt.subplots_adjust(top=-0.5, bottom=-0.6)
-
+    ax.set(xlabel='Frequency of the more frequent word of word-pair in train set')
     plt.show()
 
 

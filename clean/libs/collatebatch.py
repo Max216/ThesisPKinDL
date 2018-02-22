@@ -16,8 +16,12 @@ class CollateBatch(object):
         return torch.cat([tensor, tensor.new(length - tensor.size(0), *tensor.size()[1:]).fill_(self.padding_token)])
         
     def __call__(self, batch):
-        sizes = torch.LongTensor([[len(premise), len(hypothesis)] for premise, hypothesis, _ in batch])
+        #sizes = torch.LongTensor([[len(premise), len(hypothesis)] for premise, hypothesis, _ in batch])
         #(max_length_premise, max_length_hypothesis), idxs = torch.max(sizes, dim=0)
+        print('nbatch', batch)
+        sizes = batch[:,-2:]
+        print('sizes', sizes)
+        1/0
         maxlen, idxs = torch.max(sizes, dim=0)
         maxlen = maxlen.view(-1)
         max_length_premise = maxlen[0]
