@@ -21,7 +21,7 @@ DEFAULT_VALIDATE_AFTER = [10000,6000,2000,1000]
 DEFAULT_BATCH_SIZE = 32
 
 
-def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after_vals=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE):
+def train_model(name, classifier, padding_token, train_set_splits, dev_set, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after_vals=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE, validate_train=False):
     '''
     Train a model and always store the best current result.
 
@@ -63,6 +63,7 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
             validate_after = validate_after_vals[-1]
 
         print('Train epoch', epoch + 1)
+        print('Validate after:', validate_after)
 
         total_loss = 0
         number_batches = 0
@@ -97,7 +98,10 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
                     until_validation = validate_after
 
                     # validate
-                    acc_train = evaluate.eval_splits(classifier, train_set_splits, batch_size, padding_token)
+                    if validate_train:
+                        acc_train = evaluate.eval_splits(classifier, train_set_splits, batch_size, padding_token)
+                    else:
+                        acc_train = 'not calculated'
                     acc_dev = evaluate.eval(classifier, dev_set, batch_size, padding_token)
                     mean_loss = total_loss[0] / number_batches
 
