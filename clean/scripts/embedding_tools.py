@@ -7,7 +7,7 @@ sys.path.append('./../')
 
 from docopt import docopt
  
-from libs import data_tools
+from libs import data_tools, data_handler
 
 def diff(embeddings1, embeddings2):
 
@@ -29,9 +29,9 @@ def diff(embeddings1, embeddings2):
 
 
 def cfd(embedding_path, data1_path, data2_path, data3_path, name_out):
-    datahandler1 = data_tools.Datahandler(data1_path)
-    datahandler2 = data_tools.Datahandler(data2_path)
-    datahandler3 = data_tools.Datahandler(data3_path)
+    datahandler1 = data_handler.Datahandler(data1_path)
+    datahandler2 = data_handler.Datahandler(data2_path)
+    datahandler3 = data_handler.Datahandler(data3_path)
     datahandler1.merge([datahandler2, datahandler3])
     vocab = datahandler1.vocab()
 
