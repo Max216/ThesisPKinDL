@@ -49,7 +49,7 @@ def main():
         cfd  = create for data: Create embedding files for a given dataset.
 
     Usage:
-        embedding_tools.py cfd <embeddings> <data_train> <data_dev><data_test> <name_out>
+        embedding_tools.py cfd <embeddings> <data_train> <data_dev> <data_test> <name_out>
         embedding_tools.py diff <embeddings1> <embeddings2>
 
     """)
