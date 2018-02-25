@@ -132,7 +132,7 @@ class Datahandler:
         :return [word1, ...]
         '''
 
-        combined_premise_hyp = [premise + hyp for premise, hyp, _ in self.samples]
+        combined_premise_hyp = [premise + hyp for premise, hyp, _, _2,_3 in self.samples]
         return set([w for p_h in combined_premise_hyp for w in p_h])
 
 
