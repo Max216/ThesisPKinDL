@@ -28,10 +28,11 @@ def diff(embeddings1, embeddings2):
 
 
 
-def cfd(embedding_path, data1_path, data2_path, name_out):
+def cfd(embedding_path, data1_path, data2_path, data3_path, name_out):
     datahandler1 = data_tools.Datahandler(data1_path)
     datahandler2 = data_tools.Datahandler(data2_path)
-    datahandler1.merge([datahandler2])
+    datahandler3 = data_tools.Datahandler(data3_path)
+    datahandler1.merge([datahandler2, datahandler3])
     vocab = datahandler1.vocab()
 
     print('Total vocab in files:', len(vocab))
@@ -48,7 +49,7 @@ def main():
         cfd  = create for data: Create embedding files for a given dataset.
 
     Usage:
-        embedding_tools.py cfd <embeddings> <data_train> <data_dev> <name_out>
+        embedding_tools.py cfd <embeddings> <data_train> <data_dev><data_test> <name_out>
         embedding_tools.py diff <embeddings1> <embeddings2>
 
     """)
@@ -56,10 +57,11 @@ def main():
     embeddings  = args['<embeddings>']
     data_train  = args['<data_train>']
     data_dev  = args['<data_dev>']
+    data_test  = args['<data_test>']
     name_out  = args['<name_out>']
 
     if args['cfd']:
-        cfd(embeddings, data_train, data_dev, name_out)
+        cfd(embeddings, data_train, data_dev, data_test, name_out)
     elif args['diff']:
         diff(args['<embeddings1>'], args['<embeddings2>'])
 
