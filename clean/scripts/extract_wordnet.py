@@ -151,6 +151,16 @@ def create_data(count_path, vocab_path, out_path):
         result.extend(list(set(cohyponyms)))
 
 
+    # Clean data
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: set()))
+    for w1, w2, relation in result:
+        data[w1][w2].add(relation)
+
+    for w1 in data:
+        for w2 in data[w1]:
+            if len(data[w1][w2]) > 1:
+                print('Conflict:', w1, w2, data[w1][w2])
+
     with open(out_path, 'w') as f_out:
         for w1, w2, relation in result:
             f_out.write('\t'.join([w1, w2, relation]) + '\n')
