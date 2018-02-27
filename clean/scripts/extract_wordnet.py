@@ -43,7 +43,7 @@ def show_words(word_data, synset):
 def create_data(count_path, vocab_path, out_path):
 
     # use maximum this amount of synsets
-    MAX_AMOUNT_SYNSETS = 2
+    MAX_AMOUNT_SYNSETS = 1
 
     # look for this distant hypernyms/hyponyms
     SEARCH_DEPTH = 1
