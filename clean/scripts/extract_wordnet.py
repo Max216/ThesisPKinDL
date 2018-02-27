@@ -108,8 +108,8 @@ def create_data(count_path, vocab_path, out_path):
                     for w2 in antonym_names:
                         antonyms.append((w1, w2, 'antonym'))
 
-        results.extend(list(set(antonyms)))
-        
+        result.extend(list(set(antonyms)))
+
         # Get Cohyponyms
 
     with open(out_path, 'w') as f_out:
