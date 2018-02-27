@@ -94,7 +94,22 @@ def create_data(count_path, vocab_path, out_path):
         result.extend(list(set(synonyms)))
 
         # Get Antonyms
+        antonyms = []
+        for syns in selected_synsets:
+            lemmas = syns.lemmas()
+            lemmas = [lemma for lemma in lemmas if lemma.name() in vocab]
 
+            for lemma  in lemmas:
+                antonym_names = [anto.name() for anto in lemma.antonyms()]
+                antonym_names = [anto for anto in antonym_names if anto in vocab]
+                lemma_names = [lemma.name() for lemma in lemmas]
+
+                for w1 in lemma_names:
+                    for w2 in antonym_names:
+                        antonyms.append((w1, w2, 'antonym'))
+
+        results.extend(list(set(antonyms)))
+        
         # Get Cohyponyms
 
     with open(out_path, 'w') as f_out:
