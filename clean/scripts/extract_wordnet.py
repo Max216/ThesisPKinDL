@@ -124,13 +124,13 @@ def create_data(count_path, vocab_path, out_path):
 
             # Then co-hyponyms
             hyponyms = hypern.closure(hypo, depth=SEARCH_DEPTH)
-            hypernyms = [h for h in hypern if h.name() != syns.name()]
+            hyponyms = [h for h in hyponyms if h.name() != syns.name()]
 
-            hypernym_names = [n for n in h.lemma_names() for h in hypernyms]
-            hypernym_names = list(set(hypernym_names).intersection(vocab))
+            hyponym_names = [n for n in h.lemma_names() for h in hyponyms]
+            hyponym_names = list(set(hyponym_names).intersection(vocab))
 
             for w1 in syns_in_vocab:
-                for w2 in hypernym_names:
+                for w2 in hyponym_names:
                     cohyponyms.append((w1, w2, 'cohyponym'))
 
         result.extend(list(set(hypernyms)))
