@@ -2,6 +2,7 @@ import json
 import spacy
 import collections
 import torch
+import random
 nlp = spacy.load('en')
 
 from docopt import docopt
@@ -20,6 +21,7 @@ def main():
         extract_wordnet.py show_hyper_count <data> <amount>
         extract_wordnet.py words <word_data> <synset>
         extract_wordnet.py create <count_data> <vocab> <out>
+        extract_wordnet.py sample <file> <amount>
     """)
 
     if args['count_hyper']:
@@ -30,7 +32,17 @@ def main():
         show_words(args['<word_data>'], args['<synset>'])
     elif args['create']:
         create_data(args['<count_data>'], args['<vocab>'], args['<out>'])
+    elif args['sample']:
+        sample(args['<file>'], int(args['<amount>']))
 
+
+def sample(file_path, amount):
+    with open(file_path) as f_in:
+        data = [line.strip() for line in f_in.readlines()]
+
+    samples = random.sample(data, amount)
+    for s in samples:
+        print(s)
 
 def tokenize(sent):
     doc = nlp(sent,  parse=False, tag=False, entity=False)
