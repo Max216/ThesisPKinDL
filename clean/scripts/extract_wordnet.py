@@ -134,7 +134,7 @@ def create_data(count_path, vocab_path, out_path):
                     cohyponyms.append((w1, w2, 'cohyponym'))
 
         result.extend(list(set(hypernyms)))
-        result.extend(list(set(cohyponym)))
+        result.extend(list(set(cohyponyms)))
 
 
     with open(out_path, 'w') as f_out:
