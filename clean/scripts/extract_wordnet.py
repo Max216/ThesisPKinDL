@@ -129,6 +129,7 @@ def create_data(count_path, vocab_path, out_path):
 
             hyponym_names = [name for h in hyponyms for name in h.lemma_names() ]
             hyponym_names = list(set(hyponym_names).intersection(vocab))
+            hyponym_names = [name for name in hyponym_names if name not in syns_in_vocab]
 
             for w1 in syns_in_vocab:
                 for w2 in hyponym_names:
