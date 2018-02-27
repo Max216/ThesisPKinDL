@@ -56,6 +56,7 @@ def create_data(count_path, vocab_path, out_path):
 
     with open(vocab_path) as f_in:
         vocab = [line.strip() for line in f_in.readlines()]
+        vocab = [w for w in vocab if w not in spacy.en.language_data.STOP_WORDS and w.lower() not in spacy.en.language_data.STOP_WORDS]
 
     result = []
 
