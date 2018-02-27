@@ -19,6 +19,7 @@ def main():
         extract_wordnet.py count_hyper <data> <out_counts> <out_words>
         extract_wordnet.py show_hyper_count <data> <amount>
         extract_wordnet.py words <word_data> <synset>
+        extract_wordnet.py create <count_data> <vocab> <out>
     """)
 
     if args['count_hyper']:
@@ -27,6 +28,8 @@ def main():
         show_hypernym_count(args['<data>'], int(args['<amount>']))
     elif args['words']:
         show_words(args['<word_data>'], args['<synset>'])
+    elif args['create']:
+        create_data(args['<count_data>'], args['<vocab>'], args['<out>'])
 
 
 def tokenize(sent):
@@ -36,6 +39,70 @@ def tokenize(sent):
 def show_words(word_data, synset):
     words = torch.load(word_data)
     print(words[synset])
+
+def create_data(count_path, vocab_path, out_path):
+
+    # use maximum this amount of synsets
+    MAX_AMOUNT_SYNSETS = 2
+
+    # look for this distant hypernyms/hyponyms
+    SEARCH_DEPTH = 1
+
+    # helper functions
+    hyper = lambda s: s.hypernyms()
+    hypo = lambda s: s.hyponyms()
+
+    count_data = torch.load(count_path)
+
+    with open(vocab_path) as f_in:
+        vocab = [line.strip() for line in f_in.readlines()]
+
+    result = []
+
+    for w in vocab:
+        # find synsets
+        synsets = wn.synsets(w, pos=wn.NOUN)
+
+        # Map them with direct hypernyms
+        synset_pairs = [(syns, list(syns.closure(hyper, depth=SEARCH_DEPTH))) for syns in synsets]
+
+        # score and divide them
+        synset_with_hypernym = sorted([(syns, hyper, count_data.get(hyper.name(), 0)) for hyper in hypernyms for syns, hypernyms in synsets], key=lambda x: -x[-1])
+
+        # select best synsets and hypernyms
+        selected_synsets = set()
+        selected_hypernyms = set()
+        selected_relations = []
+        for i in range(len(synset_with_hypernym)):
+            syns, hypern, score = synset_with_hypernym[i]
+            selected_synsets.add(syns)
+            selected_hypernyms.add(hypern)
+            selected_relations.append((syns, hypern))
+
+            if max(len(selected_synsets), len(selected_hypernyms)) >=MAX_AMOUNT_SYNSETS:
+                break
+
+
+        # Get synonyms
+        synonyms = []
+        for syns in selected_synsets:
+            syns_in_vocab = set(syns.lemma_names()).intersection(vocab)
+            for s1 in syns_in_vocab:
+                for s2 in syns_in_vocab:
+                    if s1 != s2:
+                        synonyms.append((s1, s2, 'synonym'))
+        result.extend(list(set(synonyms)))
+
+        # Get Antonyms
+
+        # Get Cohyponyms
+
+    with open(out_path, 'w') as f_out:
+        for w1, w2, relation in result:
+            f_out.write('\t'.join([w1, w2, relation]) + '\n')
+
+
+
 
 def get_token_counts(data_path):
     print('Read data:', data_path)
