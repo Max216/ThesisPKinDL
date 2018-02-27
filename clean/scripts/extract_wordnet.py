@@ -72,7 +72,7 @@ def count_hypernyms(data_path, out_path):
     # Go through all words
     for w in word_counter:
         checked_words += 1
-        print('Analyse:', w, '(' + str(checked_words) + '/' + str(total_words))
+        print('Analyse:', w, '(' + str(checked_words) + '/' + str(total_words) + ')')
 
         w_synsets = wn.synsets(w, pos=wn.NOUN)
 
@@ -95,7 +95,6 @@ def count_hypernyms(data_path, out_path):
                     if valid:
                         # add counts
                         for node in root_path:
-                            print('##', node.name())
                             hypernym_counter[node.name()] += word_counter[w]
 
     torch.save(hypernym_counter, out_path)
