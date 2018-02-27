@@ -16,12 +16,12 @@ def main():
     args = docopt("""Tools to extract a subset of relevant informaation from WordNet. 
 
     Usage:
-        extract_wordnet.py count_hyper <data> <out>
+        extract_wordnet.py count_hyper <data> <out_counts> <out_words>
         extract_wordnet.py show_hyper_count <data>
     """)
 
     if args['count_hyper']:
-        count_hypernyms(args['<data>'], args['<out>'])
+        count_hypernyms(args['<data>'], args['<out_counts>'], args['<out_words>'])
     elif args['show_hyper_count']:
         show_hypernym_count(args['<data>'])
 
@@ -56,7 +56,7 @@ def show_hypernym_count(data_path):
     print(counter.most_common()[:100])
 
 
-def count_hypernyms(data_path, out_path):
+def count_hypernyms(data_path, out_path_counts, out_path_words):
     word_counter = get_token_counts(data_path)
 
     # Just top print progress
@@ -68,6 +68,7 @@ def count_hypernyms(data_path, out_path):
     noun_synsets = set(wn.all_synsets('n'))
 
     hypernym_counter = collections.defaultdict(int)
+    synset_word_counter = collections.defaultdict(lambda: collections.defaultdict(int))
 
     # Go through all words
     for w in word_counter:
@@ -96,8 +97,10 @@ def count_hypernyms(data_path, out_path):
                         # add counts
                         for node in root_path:
                             hypernym_counter[node.name()] += word_counter[w]
+                            synset_word_counter[node.name()][w] = word_counter[w]
 
-    torch.save(hypernym_counter, out_path)
+    torch.save(hypernym_counter, out_path_counts)
+    torch.save(synset_word_counter, out_path_words)
 
 
 
