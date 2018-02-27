@@ -28,7 +28,7 @@ def tokenize(sent):
     return [token.text for token in doc]
 
 def get_token_counts(data_path):
-    print('Read data:', path)
+    print('Read data:', data_path)
     with open(data_path) as f_in:
         data = [json.loads(line.strip()) for line in f_in.readlines()]
 
