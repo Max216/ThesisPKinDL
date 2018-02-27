@@ -17,10 +17,13 @@ def main():
 
     Usage:
         extract_wordnet.py count_hyper <data> <out>
+        extract_wordnet.py show_hyper_count <data>
     """)
 
     if args['count_hyper']:
         count_hypernyms(args['<data>'], args['<out>'])
+    elif args['show_hyper_count']:
+        show_hypernym_count(args['<data>'])
 
 
 def tokenize(sent):
@@ -43,7 +46,11 @@ def get_token_counts(data_path):
     return word_counter
 
 
-
+def show_hypernym_count(data_path):
+    hyper_count = torch.load(data_path)
+    counter = collections.Counter(hyper_count)
+    print('Most frequent 100 hypernyms')
+    print(counter.most_common()[:100])
 
 
 def count_hypernyms(data_path, out_path):
