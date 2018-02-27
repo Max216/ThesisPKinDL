@@ -68,7 +68,7 @@ def count_hypernyms(data_path, out_path_counts, out_path_words):
     noun_synsets = set(wn.all_synsets('n'))
 
     hypernym_counter = collections.defaultdict(int)
-    synset_word_counter = collections.defaultdict(lambda: collections.defaultdict(int))
+    synset_word_counter = collections.defaultdict(lambda: dict())
 
     # Go through all words
     for w in word_counter:
