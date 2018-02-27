@@ -110,7 +110,32 @@ def create_data(count_path, vocab_path, out_path):
 
         result.extend(list(set(antonyms)))
 
-        # Get Cohyponyms
+        # Get Cohyponyms, hypernyms
+        hypernyms = []
+        cohyponyms = []
+        for syns, hypern in selected_relations:
+            
+            # first hypernyms
+            hypernym_in_vocab = list(set(hypern.lemma_names()).intersection(vocab))
+            syns_in_vocab = set(syns.lemma_names()).intersection(vocab)
+            for w1 in syns_in_vocab:
+                for w2 in hypernym_in_vocab:
+                    hypernyms.append((w1, w2, 'hypernym'))
+
+            # Then co-hyponyms
+            hyponyms = hypern.closure(hypo, depth=SEARCH_DEPTH)
+            hypernyms = [h for h in hypernyms if h.name() != syns.name()]
+
+            hypernym_names = [n for n in h.lemma_names() for h in hypernyms]
+            hypernym_names = list(set(hypernym_names).intersection(vocab))
+
+            for w1 in syns_in_vocab:
+                for w2 in hypernym_names:
+                    cohyponyms.append((w1, w2, 'cohyponym'))
+
+        result.extend(list(set(hypernyms)))
+        result.extend(list(set(cohyponym)))
+
 
     with open(out_path, 'w') as f_out:
         for w1, w2, relation in result:
