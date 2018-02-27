@@ -40,6 +40,9 @@ def get_token_counts(data_path):
         words.extend(tokenize(d['sentence1']))
         words.extend(tokenize(d['sentence2']))
 
+    print('Filter out stopwords')
+    words = [w for w in words if w not in spacy.en.language_data.STOP_WORDS]
+
     word_counter = collections.Counter(words)
     print('Found', len(words), 'tokens and', len(word_counter), 'distinct tokens.')
 
