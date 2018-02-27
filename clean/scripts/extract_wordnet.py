@@ -4,6 +4,8 @@ import collections
 import torch
 nlp = spacy.load('en')
 
+from docopt import docopt
+
 import nltk
 from nltk.corpus import wordnet as wn
 
