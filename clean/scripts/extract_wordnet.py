@@ -67,7 +67,7 @@ def create_data(count_path, vocab_path, out_path):
         synset_pairs = [(syns, list(syns.closure(hyper, depth=SEARCH_DEPTH))) for syns in synsets]
 
         # score and divide them
-        synset_with_hypernym = sorted([(syns, hyper, count_data.get(hyper.name(), 0)) for hyper in hypernyms for syns, hypernyms in synsets], key=lambda x: -x[-1])
+        synset_with_hypernym = sorted([(syns, hyper, count_data.get(hyper.name(), 0)) for syns, hypernyms in synsets for hyper in hypernyms], key=lambda x: -x[-1])
 
         # select best synsets and hypernyms
         selected_synsets = set()
