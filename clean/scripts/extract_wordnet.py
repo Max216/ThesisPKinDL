@@ -18,17 +18,24 @@ def main():
     Usage:
         extract_wordnet.py count_hyper <data> <out_counts> <out_words>
         extract_wordnet.py show_hyper_count <data> <amount>
+        extract_wordnet.py words <word_data> <synset>
     """)
 
     if args['count_hyper']:
         count_hypernyms(args['<data>'], args['<out_counts>'], args['<out_words>'])
     elif args['show_hyper_count']:
         show_hypernym_count(args['<data>'], int(args['<amount>']))
+    elif args['words']:
+        show_words(args['<word_data>'], args['<synset>'])
 
 
 def tokenize(sent):
     doc = nlp(sent,  parse=False, tag=False, entity=False)
     return [token.text for token in doc]
+
+def show_words(word_data, synset):
+    words = torch.load(word_data)
+    print(words[synset])
 
 def get_token_counts(data_path):
     print('Read data:', data_path)
