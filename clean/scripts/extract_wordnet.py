@@ -85,8 +85,8 @@ def count_hypernyms(data_path, out_path):
                     if valid:
                         # add counts
                         for node in root_path:
-                            print('##', node)
-                            hypernym_counter[node] += word_counter[w]
+                            print('##', node.name())
+                            hypernym_counter[node.name()] += word_counter[w]
 
     torch.save(hypernym_counter, out_path)
 
