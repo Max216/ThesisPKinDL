@@ -54,16 +54,16 @@ def concat_hypernyms(embedding_file, all_embeddings, path_out):
 
     print('Load all embeddings')
     all_embeddings_dict = dict()
-    with open(all_embeddings) as f_in:
+    with open(all_embeddings, 'rb') as f_in:
         for line in f_in:
-            entries = line.strip().split(' ')
+            entries = line.strip().split(b' ')
             word, entries = entries[0], entries[1:]
-            try:
-                if isinstance(word, six.binary_type):
-                    word = word.decode('utf-8')
-            except:
-                print('non-UTF8 token', repr(word), 'ignored')
-                continue
+            #try:
+            if isinstance(word, six.binary_type):
+                word = word.decode('utf-8')
+            #except:
+            #    print('non-UTF8 token', repr(word), 'ignored')
+            #    continue
 
             all_embeddings_dict[word] = ' '.join([val.decode('utf-8') for val in entries])
 
