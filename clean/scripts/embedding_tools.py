@@ -56,7 +56,7 @@ def concat_hypernyms(embedding_file, all_embeddings, path_out):
     all_embeddings_dict = dict()
     with open(all_embeddings, 'rb') as f_in:
         for line in f_in:
-            entries = line.strip().split(b' ')
+            entries = line.strip().split(' ')
             word, entries = entries[0], entries[1:]
             try:
                 if isinstance(word, six.binary_type):
