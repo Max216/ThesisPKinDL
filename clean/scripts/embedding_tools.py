@@ -109,6 +109,9 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, path_out):
 
 
 def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
+
+    dim = -1
+
     with open(embedding_file) as f_in:
         used_embeddings = [line.strip() for line in f_in.readlines()]
 
@@ -118,8 +121,26 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
         hypernym_embedding_dict = dict()
 
         for line in hypernym_embedding_lines:
-            pass
-            
+            splitted = line.split(' ')
+            if dim == -1:
+                dim = len(splitted[1:])
+                print('dim hypernyms:', dim)
+            vec = ' '.join(splitted[1:])
+            word = splitted[0]
+
+            hypernym_embedding_dict[word] = vec
+
+        unk_vec = ' '.join([str(float(0)) for i in range(dim)])
+        with open(out_file, 'w') as f_out:
+            for embd in used_embeddings:
+                word = embd.split(' ')[0]
+                if word in hypernym_embedding_dict:
+                    embd = embd + ' ' + hypernym_embedding_dict[word]
+                else:
+                    embd = embd + ' ' + unk_vec
+
+                f_out.write(embd + '\n')
+
 
 def main():
     args = docopt("""Deal with embeddings. 
