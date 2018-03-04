@@ -52,6 +52,19 @@ def show_words(word_data, synset):
     words = torch.load(word_data)
     print(words[synset])
 
+def resolve_label_conflict(labels):
+    if 'synonym' in labels:
+        return synonym
+    if 'antonym' in labels:
+        return 'antonym'
+    if 'hypernym' in labels:
+        return 'hypernyms'
+    if 'cohyponym' in labels:
+        return 'cohyponym'
+
+    # SHOULD NOT BE HERE
+    1/0
+
 def create_data(count_path, vocab_path, out_path):
 
     # use maximum this amount of synsets
@@ -159,7 +172,7 @@ def create_data(count_path, vocab_path, out_path):
     for w1 in data:
         for w2 in data[w1]:
             if len(data[w1][w2]) > 1:
-                print('Conflict:', w1, w2, data[w1][w2])
+                data[w1][w2] = set(resolve_label_conflict(data[w1][w2]))
 
     with open(out_path, 'w') as f_out:
         for w1, w2, relation in result:
