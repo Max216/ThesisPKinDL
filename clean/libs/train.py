@@ -15,9 +15,9 @@ from libs import model as m
 from libs import model_tools, evaluate, collatebatch
 
 
-DEFAULT_ITERATIONS = 7
+DEFAULT_ITERATIONS = 8
 DEFAULT_LR = 0.0002
-DEFAULT_VALIDATE_AFTER = [9000,1000,100,1000]
+DEFAULT_VALIDATE_AFTER = [9000,3000,2000]
 DEFAULT_BATCH_SIZE = 32
 
 
