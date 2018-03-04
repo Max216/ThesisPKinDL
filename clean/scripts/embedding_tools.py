@@ -12,6 +12,10 @@ import nltk
 from nltk.corpus import wordnet as wn
 import six
 
+import spacy
+nlp = spacy.load('en')
+
+
 
 def diff(embeddings1, embeddings2):
 
