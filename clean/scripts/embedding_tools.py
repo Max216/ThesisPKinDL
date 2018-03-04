@@ -72,6 +72,9 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, path_out):
     print('Prepocess WordNet')
     hyper = lambda s: s.hypernyms()
 
+    dim = len(all_embeddings_dict.items()[0][1])
+    print('dim=', dim)
+
     print('Find hypernyms')
     results = []
     combined_results = []
