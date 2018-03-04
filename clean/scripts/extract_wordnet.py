@@ -173,6 +173,8 @@ def create_data(count_path, vocab_path, out_path):
         for w2 in data[w1]:
             if len(data[w1][w2]) > 1:
                 data[w1][w2] = resolve_label_conflict(data[w1][w2])
+            else:
+                data[w1][w2] = data[w1][w2][0]
 
     with open(out_path, 'w') as f_out:
         for w1 in data:
