@@ -48,7 +48,7 @@ def cfd(embedding_path, data1_path, data2_path, data3_path, name_out):
         for line in used_embeddings:
             f_out.write(line)
 
-def concat_hypernyms(embedding_file, all_embeddings, path_out):
+def create_hypernym_embeddings(embedding_file, all_embeddings, path_out):
 
     print('Load embeddings within SNLI')
     with open(embedding_file) as f_in:
@@ -77,42 +77,31 @@ def concat_hypernyms(embedding_file, all_embeddings, path_out):
     combined_results = []
     for stored in stored_embeddings:
         word = stored.split(' ')[0]
-        synsets = wn.synsets(word, pos=wn.NOUN)
-        if len(synsets) > 0:
+        if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
+            synsets = wn.synsets(word, pos=wn.NOUN)
+            if len(synsets) > 0:
 
-            # Just use first synset
-            syns = synsets[0]
+                # Just use first synset
+                syns = synsets[0]
 
-            # Find hypernyms
-            hypernyms = [hyp for hyp in syns.closure(hyper, depth=1)]
-            if len(hypernyms) > 0:
-                lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
+                # Find hypernyms
+                hypernyms = [hyp for hyp in syns.closure(hyper, depth=1)]
+                if len(hypernyms) > 0:
+                    lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
 
-                if len(lemmas) > 0:
-                    # check if it is in embeddings
-                    for lemma in lemmas:
-                        if lemma in all_embeddings_dict:
-                            results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
-                            combined_results.append(stored.strip() + ' ' + all_embeddings_dict[lemma] + '\n')
-                            added = True
-                            break
+                    if len(lemmas) > 0:
+                        # check if it is in embeddings
+                        for lemma in lemmas:
+                            if lemma in all_embeddings_dict:
+                                results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
+                                combined_results.append(stored.strip() + ' ' + all_embeddings_dict[lemma] + '\n')
+                                added = True
+                                break
 
     with open(path_out, 'w') as f_out:
         print('Found', len(results), 'hypernyms')
         for line in results:
             f_out.write(line)
-
-    # use also combined
-    splitted = path_out.split('.')
-    ending = splitted[-1]
-    name = '.'.join(splitted[:-1])
-    path_out = name + '.combined.' + ending
-
-    with open(path_out, 'w') as f_out:
-        print('Found', len(combined_results), 'hypernyms')
-        for line in combined_results:
-            f_out.write(line)
-
 
 
 
@@ -125,7 +114,8 @@ def main():
     Usage:
         embedding_tools.py cfd <embeddings> <data_train> <data_dev> <data_test> <name_out>
         embedding_tools.py diff <embeddings1> <embeddings2>
-        embedding_tools.py concat_hypernyms <embedding_file> <all_embeddings> <name_out>
+        embedding_tools.py hypernyms <embedding_file> <all_embeddings> <name_out>
+        embedding_tools.py concat_hypernyms <embedding_file> <hypernym_embedding_file> <name_out>
 
     """)
 
@@ -139,6 +129,8 @@ def main():
         cfd(embeddings, data_train, data_dev, data_test, name_out)
     elif args['diff']:
         diff(args['<embeddings1>'], args['<embeddings2>'])
+    elif args['hypernyms']:
+        create_hypernym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], args['<name_out>'])
     elif args['concat_hypernyms']:
         concat_hypernyms(args['<embedding_file>'], args['<all_embeddings>'], args['<name_out>'])
 
