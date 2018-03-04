@@ -10,6 +10,8 @@ from docopt import docopt
 from libs import data_tools, data_handler
 import nltk
 from nltk.corpus import wordnet as wn
+import six
+
 
 def diff(embeddings1, embeddings2):
 
