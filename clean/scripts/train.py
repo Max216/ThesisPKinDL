@@ -5,6 +5,7 @@ from docopt import docopt
  
 from libs import model_tools, data_tools, train, data_handler
 from libs import model as m
+from libs import embeddingholder as eh
 
 def main():
     args = docopt("""Train a neural network.
