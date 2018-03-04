@@ -68,10 +68,16 @@ def resolve_label_conflict(labels):
 def create_data(count_path, vocab_path, out_path):
 
     # use maximum this amount of synsets
-    MAX_AMOUNT_SYNSETS = 2
+    MAX_AMOUNT_SYNSETS = 1
 
     # look for this distant hypernyms/hyponyms
     SEARCH_DEPTH = 1
+
+
+
+    # Specially treat animals
+    animal_synsets = set(list(list(wn.synsets('animal', wn.NOUN))[0].closure(lambda s: s.hyponyms()))).difference(
+        set(list(list(wn.synsets('person', wn.NOUN))[0].closure(lambda s: s.hyponyms()))))
 
     # helper functions
     hyper = lambda s: s.hypernyms()
@@ -267,4 +273,5 @@ def count_hypernyms(data_path, out_path_counts, out_path_words):
 
 if __name__ == '__main__':
     main()
+
 
