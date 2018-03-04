@@ -54,7 +54,7 @@ def show_words(word_data, synset):
 
 def resolve_label_conflict(labels):
     if 'synonym' in labels:
-        return synonym
+        return 'synonym'
     if 'antonym' in labels:
         return 'antonym'
     if 'hypernym' in labels:
@@ -172,11 +172,15 @@ def create_data(count_path, vocab_path, out_path):
     for w1 in data:
         for w2 in data[w1]:
             if len(data[w1][w2]) > 1:
-                data[w1][w2] = set(resolve_label_conflict(data[w1][w2]))
+                data[w1][w2] = resolve_label_conflict(data[w1][w2])
 
     with open(out_path, 'w') as f_out:
-        for w1, w2, relation in result:
-            f_out.write('\t'.join([w1, w2, relation]) + '\n')
+        for w1 in data:
+            current = data[w1]
+            for w2 in current:
+                f_out.write('\t'.join([w1, w2, current[w2]]) + '\n')
+        #for w1, w2, relation in data:
+        #    f_out.write('\t'.join([w1, w2, relation]) + '\n')
 
 
 
