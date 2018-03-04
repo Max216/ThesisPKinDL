@@ -74,31 +74,44 @@ def concat_hypernyms(embedding_file, all_embeddings, path_out):
 
     print('Find hypernyms')
     results = []
+    combined_results = []
+    for stored in stored_embeddings:
+        word = stored.split(' ')[0]
+        synsets = wn.synsets(word, pos=wn.NOUN)
+        if len(synsets) > 0:
+
+            # Just use first synset
+            syns = synsets[0]
+
+            # Find hypernyms
+            hypernyms = [hyp for hyp in syns.closure(hyper, depth=1)]
+            if len(hypernyms) > 0:
+                lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
+
+                if len(lemmas) > 0:
+                    # check if it is in embeddings
+                    for lemma in lemmas:
+                        if lemma in all_embeddings_dict:
+                            results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
+                            combined_results.append(stored.strip() + ' ' + all_embeddings_dict[lemma] + '\n')
+                            added = True
+                            break
+
     with open(path_out, 'w') as f_out:
-        for stored in stored_embeddings:
-            word = stored.split(' ')[0]
-            synsets = wn.synsets(word, pos=wn.NOUN)
-            if len(synsets) > 0:
-
-                # Just use first synset
-                syns = synsets[0]
-
-                # Find hypernyms
-                hypernyms = [hyp for hyp in syns.closure(hyper, depth=1)]
-                if len(hypernyms) > 0:
-                    lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
-
-                    if len(lemmas) > 0:
-                        # check if it is in embeddings
-                        for lemma in lemmas:
-                            if lemma in all_embeddings_dict:
-                                results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
-                                added = True
-                                break
-
         print('Found', len(results), 'hypernyms')
         for line in results:
-            f_out.print(line)
+            f_out.write(line)
+
+    # use also combined
+    splitted = path_out.split('.')
+    ending = splitted[-1]
+    name = '.'.join(splitted[:-1])
+    path_out = name + '.combined.' + ending
+
+    with open(path_out, 'w') as f_out:
+        print('Found', len(combined_results), 'hypernyms')
+        for line in combined_results:
+            f_out.write(line)
 
 
 
