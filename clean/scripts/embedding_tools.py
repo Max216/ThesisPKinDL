@@ -167,7 +167,7 @@ def main():
     elif args['hypernyms']:
         create_hypernym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], args['<name_out>'])
     elif args['concat_hypernyms']:
-        concat_hypernyms(args['<embedding_file>'], args['<all_embeddings>'], args['<name_out>'])
+        concat_hypernyms(args['<embedding_file>'], args['<hypernym_embedding_file>'], args['<name_out>'])
 
 
 if __name__ == '__main__':
