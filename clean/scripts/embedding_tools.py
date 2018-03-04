@@ -86,7 +86,7 @@ def concat_hypernyms(embedding_file, all_embeddings, path_out):
                 # Find hypernyms
                 hypernyms = [hyp for hyp in syns.closure(hyper, depth=1)]
                 if len(hypernyms) > 0:
-                    lemmas = [lemma for lemma in hypernyms[0].lemmas() if len(lemma.split(' ')) == 1]
+                    lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
 
                     if len(lemmas) > 0:
                         # check if it is in embeddings
