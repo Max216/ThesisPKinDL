@@ -93,7 +93,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                     syns = synsets[0]
 
                     # Find hypernyms
-                    hypernyms = syns.closure(hyper, depth=1)
+                    hypernyms = [h for h in syns.closure(hyper, depth=1)]
                     if len(hypernyms) == 0:
                         done = True
                     else:
