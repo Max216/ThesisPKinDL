@@ -123,7 +123,9 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
 
             if added_vec:
                 # normalize
+                print('vec before:', vec[:10])
                 vec = vec / count
+                print('vec after:', vec[:10])
                 results.append(word + ' ' + ' '.join([str(val) for val in vec.tolist()]) + '\n')
 
     with open(path_out, 'w') as f_out:
