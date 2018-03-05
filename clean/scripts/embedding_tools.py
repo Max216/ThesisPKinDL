@@ -15,6 +15,7 @@ import six
 import spacy
 nlp = spacy.load('en')
 
+import numpy as np
 
 
 def diff(embeddings1, embeddings2):
