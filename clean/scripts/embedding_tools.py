@@ -76,7 +76,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
             all_embeddings_dict[word] = arr
 
     #print('Prepocess WordNet')
-    hyper = lambda s: s.hypernyms()
+    #hyper = lambda s: s.hypernyms()
 
     print('Find hypernyms')
     results = []
@@ -101,7 +101,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                     syns = synsets[0]
 
                     # Find hypernyms
-                    hypernyms = [h for h in syns.closure(hyper, depth=1)]
+                    hypernyms = syns.hypernyms() + syns.instance_hypernyms()
                     if len(hypernyms) == 0:
                         done = True
                         print('Done as no hypernyms')

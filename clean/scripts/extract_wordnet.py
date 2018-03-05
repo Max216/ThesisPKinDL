@@ -38,6 +38,8 @@ def main():
     elif args['create_using_first']:
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
 
+def create_data_using_first_synset(vocab_path, out_path):
+    
 
 def sample(file_path, amount):
     with open(file_path) as f_in:
