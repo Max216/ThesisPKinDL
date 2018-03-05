@@ -86,6 +86,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
         if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
             synsets = wn.synsets(word, pos=wn.NOUN)
             vec  = None
+            added_vec = False
             while count < amount:
                 if len(synsets) == 0:
                     done = True
@@ -105,8 +106,9 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                             # check if it is in embeddings
                             for lemma in lemmas:
                                 if lemma in all_embeddings_dict:
-                                    if vec == None:
+                                    if added_vec == False:
                                         vec = all_embeddings_dict[lemma]
+                                        added_vec = True
                                     else:
                                         vec += all_embeddings_dict[lemma]
                                     #results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
@@ -119,7 +121,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                 if done:
                     break
 
-            if vec != None:
+            if added_vec:
                 # normalize
                 vec = vec / count
                 results.append(word + ' ' + ' '.join([str(val) for val in vec.tolist()]) + '\n')
