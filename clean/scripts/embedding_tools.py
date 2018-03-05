@@ -84,6 +84,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
         done = False
         if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
             synsets = wn.synsets(word, pos=wn.NOUN)
+            vec  = None
             while count < amount:
                 if len(synsets) == 0:
                     done = True
