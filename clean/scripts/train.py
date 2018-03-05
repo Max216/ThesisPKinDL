@@ -11,7 +11,7 @@ def main():
     args = docopt("""Train a neural network.
 
     Usage:
-        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>]
+        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
 
     """)
 
@@ -20,6 +20,8 @@ def main():
     encoding_dim = args['--encoding']
     hidden_dim = args['--hidden']
     embedding_path = args['--embeddings']
+    embd1 = args['--embd1']
+    embd2 = args['--embd2']
     sent_fn = args['--sentfn'] or 'normal'
     appendix = args['--appendix'] or ''
     m_settings = m.ModelSettings([('sent-rep', sent_fn)])
@@ -30,7 +32,16 @@ def main():
     if embedding_path != None:
         embedding_holder = eh.EmbeddingHolder(embedding_path)
     else:
-        embedding_holder = None
+        embedding_holder = eh.create_embeddingholder()
+
+    if embd1 != None:
+        embd1_holder = eh.EmbeddingHolder(embd1)
+        embedding_holder.concat(embd1_holder)
+        # merge
+
+    if embd2 != None:
+        embd2_holder = eh.EmbeddingHolder(embd2)
+        embedding_holder.concat(embd2_holder)
 
     if args['new']:
         print('Create model ... ')

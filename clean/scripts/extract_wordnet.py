@@ -76,8 +76,8 @@ def create_data(count_path, vocab_path, out_path):
 
 
     # Specially treat animals
-    animal_synsets = set(list(list(wn.synsets('animal', wn.NOUN))[0].closure(lambda s: s.hyponyms()))).difference(
-        set(list(list(wn.synsets('person', wn.NOUN))[0].closure(lambda s: s.hyponyms()))))
+    #animal_synsets = set(list(list(wn.synsets('animal', wn.NOUN))[0].closure(lambda s: s.hyponyms()))).difference(
+    #    set(list(list(wn.synsets('person', wn.NOUN))[0].closure(lambda s: s.hyponyms()))))
 
     # helper functions
     hyper = lambda s: s.hypernyms()

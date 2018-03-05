@@ -15,7 +15,7 @@ class EmbeddingHolder:
     OOV = '@@OOV@@'
     PADDING = '@@PADDING@@'
     
-    def __init__(self, path):
+    def __init__(self, path, include_oov_padding = True):
 
 
         # red previously stored binary word embeddings and vocab
@@ -28,15 +28,37 @@ class EmbeddingHolder:
         self.dimen = wv.shape[1]
         
         # Add OOV and PADDING
-        words[self.OOV] = amount
-        self.oov_index = amount
-        words[self.PADDING] = amount+1
-        unk = np.random.random_sample((wv.shape[1],))
-        padding = np.zeros(self.dimen)
-        wv = np.vstack((wv, unk, padding))
+        if include_oov_padding:
+            words[self.OOV] = amount
+            self.oov_index = amount
+            words[self.PADDING] = amount+1
+            unk = np.random.random_sample((wv.shape[1],))
+            padding = np.zeros(self.dimen)
+            wv = np.vstack((wv, unk, padding))
         
         self.words = words
         self.embeddings = wv
+
+    def concat(self, other):
+        '''
+        Concatenate each embedding with an additional vector. All unknowns will be set to zero.
+        '''
+
+        copied = np.zeros((self.embeddings.shape[0], other.embeddings.shape[1]))
+
+        count_used_words = 0
+        for w in self.words:
+            if w in other.words:
+                copied[self.words[w]] = other.embeddings[other.words[w]]
+                count_used_words += 1
+
+
+        self.embeddings = np.hstack((self.embeddings, copied))
+        print('new matrix:', copied)
+        print('Used:', count_used_words)
+        print('new embedding shape:', self.embeddings.shape)
+
+
     
     def embedding_matrix(self):
         """
