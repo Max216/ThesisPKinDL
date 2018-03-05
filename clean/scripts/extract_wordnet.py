@@ -22,6 +22,7 @@ def main():
         extract_wordnet.py words <word_data> <synset>
         extract_wordnet.py create <count_data> <vocab> <out>
         extract_wordnet.py sample <file> <amount>
+        extract_wordnet.py create_using_first <vocab> <outpath>
     """)
 
     if args['count_hyper']:
@@ -34,6 +35,8 @@ def main():
         create_data(args['<count_data>'], args['<vocab>'], args['<out>'])
     elif args['sample']:
         sample(args['<file>'], int(args['<amount>']))
+    elif args['create_using_first']:
+        create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
 
 
 def sample(file_path, amount):

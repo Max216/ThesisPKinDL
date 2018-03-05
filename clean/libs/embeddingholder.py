@@ -54,6 +54,7 @@ class EmbeddingHolder:
 
 
         self.embeddings = np.hstack((self.embeddings, copied))
+        self.dimen = wv.shape[1]
         print('new matrix:', copied)
         print('Used:', count_used_words)
         print('new embedding shape:', self.embeddings.shape)
