@@ -34,7 +34,7 @@ def main():
     if args['eval']:
         embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
         embeddings_diff = []
-        if new_embeddings != None:
+        if embeddings_path != None:
             print ('Merge embeddings')
             embedding_holder_new = embeddingholder.EmbeddingHolder(new_embeddings)
             embeddings_diff = embedding_holder.add_unknowns_from(embedding_holder_new)
