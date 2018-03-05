@@ -10,13 +10,16 @@ def main():
     args = docopt("""Evaluate a model on an adversarial dataset.
 
     Usage:
-        evaluate_adversarial_samples.py evaluate <model_path> <dataset_path>
+        evaluate_adversarial_samples.py evaluate <model_path> <dataset_path> [--embd1=<embd1>] [--embd2=<embd2>]
         evaluate_adversarial_samples.py experiment1 <model_path> <dataset_path> <output_path>
     """)
 
     model_path = args['<model_path>']
     dataset_path = args['<dataset_path>']
     output_path = args['<output_path>']
+
+    embd1 = args['--embd1']
+    embd2 = args['--embd2']
 
     # load model
     if model_path.split('.')[-1] == 'model':
@@ -30,6 +33,11 @@ def main():
         classifier_name, classifier, embedding_holder = model_tools.load(model_path)
 
     embedding_holder = embeddingholder.create_embeddingholder()
+    if embd1 != None:
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
+    if embd2 != None:
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
+
     dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
         

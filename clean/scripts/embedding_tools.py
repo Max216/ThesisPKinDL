@@ -72,7 +72,9 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
             #    print('non-UTF8 token', repr(word), 'ignored')
             #    continue
 
-            all_embeddings_dict[word] = np.asarray([float(val.decode('utf-8')) for val in entries])
+            arr = np.asarray([float(val.decode('utf-8')) for val in entries])
+            print('max cval in representation:', np.max(arr))
+            all_embeddings_dict[word] = arr
 
     #print('Prepocess WordNet')
     hyper = lambda s: s.hypernyms()
