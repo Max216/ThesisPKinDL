@@ -84,13 +84,17 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
         word = stored.split(' ')[0]
         count = 0
         done = False
+        print('new word:', word)
         if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
             synsets = wn.synsets(word, pos=wn.NOUN)
             vec  = None
             added_vec = False
+            print('is not in stopwords')
             while count < amount:
+                print('current count:', count)
                 if len(synsets) == 0:
                     done = True
+                    print('Done due to not enough synsets')
                 else:
 
                     # Just use first synset
@@ -100,6 +104,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                     hypernyms = [h for h in syns.closure(hyper, depth=1)]
                     if len(hypernyms) == 0:
                         done = True
+                        print('Done as no hypernyms')
                     else:
                         lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
 
@@ -109,10 +114,13 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                                 if lemma in all_embeddings_dict:
                                     if added_vec == False:
                                         vec = all_embeddings_dict[lemma]
+                                        print('set vector to', vec.tolist()[:10])
                                         added_vec = True
                                     else:
+                                        print('adding to vec:', all_embeddings_dict[lemma].tolist()[:10])
                                         vec += all_embeddings_dict[lemma]
                                     #results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
+                                    print('current vec:', vec.tolist()[:10])
                                     count += 1
                                     break
 
