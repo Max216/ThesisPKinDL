@@ -71,7 +71,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
             #    print('non-UTF8 token', repr(word), 'ignored')
             #    continue
 
-            all_embeddings_dict[word] = ' '.join([val.decode('utf-8') for val in entries])
+            all_embeddings_dict[word] = np.asarray([float(val.decode('utf-8')) for val in entries])
 
     #print('Prepocess WordNet')
     hyper = lambda s: s.hypernyms()
@@ -104,7 +104,11 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                             # check if it is in embeddings
                             for lemma in lemmas:
                                 if lemma in all_embeddings_dict:
-                                    results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
+                                    if vec == None:
+                                        vec = all_embeddings_dict[lemma]
+                                    else:
+                                        vec += all_embeddings_dict[lemma]
+                                    #results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
                                     count += 1
                                     break
 
@@ -113,6 +117,11 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
 
                 if done:
                     break
+
+            if vec != None:
+                # normalize
+                vec = vec / count
+                results.append(word + ' ' + ' '.join([str(val) for val in vec.tolist()]) + '\n')
 
     with open(path_out, 'w') as f_out:
         print('Found', len(results), 'hypernyms')
