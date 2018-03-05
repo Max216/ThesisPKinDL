@@ -113,7 +113,7 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
                             for lemma in lemmas:
                                 if lemma in all_embeddings_dict:
                                     if added_vec == False:
-                                        vec = all_embeddings_dict[lemma]
+                                        vec = np.copy(all_embeddings_dict[lemma])
                                         print('set vector to', vec.tolist()[:10])
                                         added_vec = True
                                     else:
