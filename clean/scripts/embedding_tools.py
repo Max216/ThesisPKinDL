@@ -73,7 +73,6 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
             #    continue
 
             arr = np.asarray([float(val.decode('utf-8')) for val in entries])
-            print('max cval in representation:', np.max(arr))
             all_embeddings_dict[word] = arr
 
     #print('Prepocess WordNet')
@@ -125,8 +124,8 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
 
             if added_vec:
                 # normalize
-                print('vec before:', vec[:10])
-                vec = vec / count
+                print('vec before:', vec.tolist()[:10])
+                vec = [v / count for v in vec.tolist()]
                 print('vec after:', vec[:10])
                 results.append(word + ' ' + ' '.join([str(val) for val in vec.tolist()]) + '\n')
 
