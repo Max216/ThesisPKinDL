@@ -42,10 +42,10 @@ def main():
             embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
         if embd2:
             embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
-        evaluate(model_path, data_path, embedding_holder)
+        evaluate(model_path, data_path, embedding_holder, embeddings_diff=embeddings_diff)
 
 
-def evaluate(model_path, data_path, embedding_holder, twister=None):
+def evaluate(model_path, data_path, embedding_holder, twister=None, embeddings_diff=False):
     # Load model
 
 
