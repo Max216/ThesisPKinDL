@@ -41,7 +41,8 @@ def main():
 
 def closest_hypernym(syns, vocab=None):
     found = None
-    while found == None:
+    found_bool = False
+    while not found_bool:
         hypernyms = syns.hypernyms() + syns.instance_hypernyms()
         if len(hypernyms) == 0:
             return None
@@ -52,9 +53,10 @@ def closest_hypernym(syns, vocab=None):
                 for lemma_name in hyper.lemma_names():
                     if lemma_name in vocab:
                         found = hyper
+                        found_bool = True
                         break
 
-                if found == None:
+                if not found_bool
                     syns = hyper
 
 
