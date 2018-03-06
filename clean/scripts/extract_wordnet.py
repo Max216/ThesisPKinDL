@@ -66,6 +66,13 @@ def finalize_data(data_path, out_path):
     for key in label_dict:
         print(key, len(label_dict[key]))
 
+    with open(out_path, 'w') as f_out:
+        for key in label_dict:
+            for val in label_dict[key]:
+                sample = [val[0], val[1], key]
+                f_out.write('\t'.join(sample) + '\n')
+
+
 def first_hypernym(syns, vocab=None, min_dist_to_top=4):
     hypernyms = syns.hypernyms() + syns.instance_hypernyms()
     if len(hypernyms) == 0:
