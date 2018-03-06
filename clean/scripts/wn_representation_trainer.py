@@ -7,6 +7,8 @@ from collections import defaultdict
 from docopt import docopt
 from torch.utils.data import DataLoader
 
+import sys
+sys.path.append('./../') 
 
 from libs import embeddingholder as eh
 
