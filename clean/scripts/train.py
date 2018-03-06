@@ -7,6 +7,9 @@ from libs import model_tools, data_tools, train, data_handler
 from libs import model as m
 from libs import embeddingholder as eh
 
+import torch
+import numpy as np
+
 def main():
     args = docopt("""Train a neural network.
 
@@ -14,6 +17,9 @@ def main():
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
 
     """)
+
+    torch.manual_seed(6)
+    np.seed(6)
 
     path_train  = args['--tdata']
     path_dev = args['--ddata']
