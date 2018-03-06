@@ -9,6 +9,7 @@ from libs import embeddingholder as eh
 
 import torch
 import numpy as np
+import random
 
 def main():
     args = docopt("""Train a neural network.
@@ -19,7 +20,8 @@ def main():
     """)
 
     torch.manual_seed(6)
-    np.seed(6)
+    np.random.seed(6)
+    random.seed(6)
 
     path_train  = args['--tdata']
     path_dev = args['--ddata']
