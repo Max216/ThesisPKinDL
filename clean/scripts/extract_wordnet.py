@@ -45,7 +45,7 @@ def closest_hypernym(syns, vocab=None):
     while not found_bool:
         hypernyms = syns.hypernyms() + syns.instance_hypernyms()
         if len(hypernyms) == 0:
-            return None
+            return None, False
         else:
             hyper = hypernyms[0]
             if vocab != None:
