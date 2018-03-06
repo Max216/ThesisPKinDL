@@ -66,11 +66,16 @@ def finalize_data(data_path, out_path):
     for key in label_dict:
         print(key, len(label_dict[key]))
 
+    lines = []
     with open(out_path, 'w') as f_out:
         for key in label_dict:
             for val in label_dict[key]:
                 sample = [val[0], val[1], key]
-                f_out.write('\t'.join(sample) + '\n')
+                lines.append('\t'.join(sample) + '\n')
+
+        random.shuffle(lines)
+        for line in lines:
+            f_out.write(line)
 
 
 def first_hypernym(syns, vocab=None, min_dist_to_top=4):
