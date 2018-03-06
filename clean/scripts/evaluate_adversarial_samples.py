@@ -21,6 +21,8 @@ def main():
     embd1 = args['--embd1']
     embd2 = args['--embd2']
 
+    print(embd1)
+
     # load model
     if model_path.split('.')[-1] == 'model':
         # use compatability and older model
