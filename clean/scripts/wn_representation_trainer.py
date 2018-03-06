@@ -178,7 +178,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
-            print(reverse_embeddings[w1[0]], reverse_embeddings[w2[0]], labels[lbl[0]])
+            print(reverse_embeddings[w1[0][0]], reverse_embeddings[w2[0][0]], labels[lbl[0]])
 
 
     # Write out embeddings
