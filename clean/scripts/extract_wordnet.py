@@ -64,7 +64,8 @@ def closest_hypernym(syns, vocab=None):
             else:
                 # just use it
                 found = hyper
-    return found
+                found_bool = True
+    return found, found_bool
 
 def get_hyponyms_excluding_syns(hypernym, syns):
     all_hyponyms = hypernym.hyponyms() + hypernym.instance_hyponyms()
@@ -94,8 +95,8 @@ def create_data_using_first_synset(vocab_path, out_path):
             syns = all_syns[0]
 
             # get hypernyms/hyponyms
-            hyper = closest_hypernym(syns, vocab_set)
-            if hyper != None:
+            hyper, found_hyper = closest_hypernym(syns, vocab_set)
+            if found_hyper:
                 hyper_lemmas = lemma_in_vocab(hyper, vocab_set)
                 for lemma in hyper_lemmas:
                     result.append((word, lemma, 'hypernym'))
@@ -130,8 +131,8 @@ def create_data_using_first_synset(vocab_path, out_path):
                     result.append((anto, lemma_name, 'antonym'))
 
             # get cohyponyms
-            hyper = closest_hypernym(syns)
-            if hyper != None:
+            hyper, found_hyper = closest_hypernym(syns)
+            if found_hyper:
                 hyponyms = get_hyponyms_excluding_syns(hyper, syns)
                 hyponym_names = []
                 for hypo in hyponyms:
