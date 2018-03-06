@@ -54,6 +54,9 @@ def closest_hypernym(syns, vocab=None):
                         found = hyper
                         break
 
+                if found == None:
+                    syns = hyper
+
 
 
             else:
