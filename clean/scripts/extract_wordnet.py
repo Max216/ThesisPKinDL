@@ -41,12 +41,18 @@ def main():
 def first_hypernym(syns, vocab=None, min_dist_to_top=4):
     hypernyms = syns.hypernyms() + syns.instance_hypernyms()
     if len(hypernyms) == 0:
-        return None, False
+        if vocab == None:
+            return None, False
+        else:
+            return None, False, []
     else:
         hyper = hypernyms[0]
         dist_to_root = min([len(p) for p in hyper.hypernym_paths()])
         if dist_to_root < min_dist_to_top:
-            return None, False 
+            if vocab == None:                
+                return None, False 
+            else:
+                return None, False, []
 
         if vocab != None:
             found_lemmas = []
