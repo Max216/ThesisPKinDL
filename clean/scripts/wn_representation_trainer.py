@@ -174,10 +174,11 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     dataset = WordDataset(data, embedding_holder, tag_to_idx)
     data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size, shuffle=True)
     start_time = time.time()
+    reverse_embeddings = embedding_holder.reverse()
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
-            print(w1, w2, lbl)
+            print(reverse_embeddings[w1[0]], reverse_embeddings[w2[0]], labels[lbl[0]])
 
 
     # Write out embeddings
