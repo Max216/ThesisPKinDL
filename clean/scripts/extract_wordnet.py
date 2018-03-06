@@ -147,7 +147,26 @@ def create_data_using_first_synset(vocab_path, out_path):
 
     # Clean data
     print('Found:', len(result))
-    print('Remove simple duplicates:', len(list(set(result))))
+    result = list(set(result))
+    print('Remove simple duplicates:', len(result))
+
+    # Clean data
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: set()))
+    for w1, w2, relation in result:
+        data[w1][w2].add(relation)
+
+    for w1 in data:
+        for w2 in data[w1]:
+            if len(data[w1][w2]) > 1:
+                data[w1][w2] = resolve_label_conflict(data[w1][w2])
+            else:
+                data[w1][w2] = data[w1][w2].pop()
+
+    with open(out_path, 'w') as f_out:
+        for w1 in data:
+            current = data[w1]
+            for w2 in current:
+                f_out.write('\t'.join([w1, w2, current[w2]]) + '\n')
 
 def sample(file_path, amount):
     with open(file_path) as f_in:
