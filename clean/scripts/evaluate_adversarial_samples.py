@@ -21,7 +21,11 @@ def main():
     embd1 = args['--embd1']
     embd2 = args['--embd2']
 
-    print(embd1)
+    embedding_holder = embeddingholder.create_embeddingholder()
+    if embd1 != None:
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
+    if embd2 != None:
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
 
     # load model
     if model_path.split('.')[-1] == 'model':
@@ -32,13 +36,9 @@ def main():
 
     else:
         # use normal model
-        classifier_name, classifier, embedding_holder = model_tools.load(model_path)
+        classifier_name, classifier, embedding_holder = model_tools.load(model_path, embedding_holder)
 
-    embedding_holder = embeddingholder.create_embeddingholder()
-    if embd1 != None:
-        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
-    if embd2 != None:
-        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
+    
 
     dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
