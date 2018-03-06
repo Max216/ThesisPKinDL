@@ -153,7 +153,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     batch_size = 128
 
     with open(data_path) as f_in:
-        data = [line.strip() for line in f_in.readlines()]
+        data = [line.strip().split('\t') for line in f_in.readlines()]
 
     data = [(d[0], d[1], d[2]) for d in data]
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
