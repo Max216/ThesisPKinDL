@@ -234,6 +234,8 @@ def resolve_label_conflict(labels):
         return 'antonym'
     if 'hypernym' in labels:
         return 'hypernyms'
+    if 'hyponym' in labels:
+        return 'hyponym'
     if 'cohyponym' in labels:
         return 'cohyponym'
 
