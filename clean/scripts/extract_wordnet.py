@@ -23,6 +23,7 @@ def main():
         extract_wordnet.py create <count_data> <vocab> <out>
         extract_wordnet.py sample <file> <amount>
         extract_wordnet.py create_using_first <vocab> <outpath>
+        extract_wordnet.py finalize_data <data_path> <out_path>
     """)
 
     if args['count_hyper']:
@@ -37,6 +38,33 @@ def main():
         sample(args['<file>'], int(args['<amount>']))
     elif args['create_using_first']:
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
+    elif args['finalize_data']:
+        finalize_data(args['<data_path>'], args['<out_path>'])
+
+def finalize_data(data_path, out_path):
+    with open(data_path) as f_in:
+        data = [line.strip().split('\t') for line in f_in.readlines()]
+
+    label_dict = collections.defaultdict(lambda: [])
+    for d in data:
+        label_dict[d[2]].append((d[0], d[1]))
+
+    max_count = max([len(label_dict[key]) for key in label_dict])
+
+    for key in label_dict:
+        orig_data = label_dict[key][:]
+
+        missing_samples = max_count - len(orig_data)
+        while missing_samples > len(orig_data):
+            missing_samples -= len(orig_data)
+            label_dict[key].extend(orig_data)
+
+        if missing_samples > 0:
+            label_dict[key].extend(random.sample(orig_data, missing_samples))
+
+
+    for key in label_dict:
+        print(key, len(label_dict[key]))
 
 def first_hypernym(syns, vocab=None, min_dist_to_top=4):
     hypernyms = syns.hypernyms() + syns.instance_hypernyms()
