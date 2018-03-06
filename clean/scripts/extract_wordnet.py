@@ -56,7 +56,7 @@ def closest_hypernym(syns, vocab=None):
                         found_bool = True
                         break
 
-                if not found_bool
+                if not found_bool:
                     syns = hyper
 
 
