@@ -108,6 +108,7 @@ class EmbeddingMatcher(nn.Module):
         """
         todo
         """
+        super(EmbeddingMatcher, self).__init__()
         self.nonlinearity = F.relu
         self.embedding_encoder = embedding_encoder
         self.hidden_layer = nn.Linear(embedding_encoder.get_dimension(), hidden_layer_dimension * 2)
@@ -132,6 +133,7 @@ class EmbeddingMatcherSimple(nn.Module):
         """
         todo
         """
+        super(EmbeddingMatcherSimple, self).__init__()
         self.nonlinearity = F.relu
         self.embedding_encoder = embedding_encoder
         self.out_layer = nn.Linear(embedding_encoder.get_dimension() * 2, out_dimension)
