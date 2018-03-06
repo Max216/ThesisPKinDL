@@ -38,6 +38,34 @@ def main():
     elif args['create_using_first']:
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
 
+def first_hypernym(syns, vocab=None, min_dist_to_top=4):
+    hypernyms = syns.hypernyms() + syns.instance_hypernyms()
+    if len(hypernyms) == 0:
+        return None, False
+    else:
+        hyper = hypernyms[0]
+        dist_to_root = min([len(p) for p in hyper.hypernym_paths()])
+        if dist_to_root < min_dist_to_top:
+            return None, False 
+
+        if vocab != None:
+            found_lemmas = []
+            for lemma_name in hyper.lemma_names():
+                splitted = lemma_name.split(' ')
+                if len(splitted) == 1:
+                    lemma = lemma_name
+                else:
+                    lemma = splitted[-1]
+
+                if lemma in vocab:
+                    found_lemmas.append(lemma)
+
+            if len(found_lemmas) == 0:
+                return None, False
+            else:
+                return hyper, True, found_lemmas
+        else:
+            return hyper, True
 
 def closest_hypernym(syns, vocab=None, min_dist_to_top=4):
     found = None
@@ -99,9 +127,10 @@ def create_data_using_first_synset(vocab_path, out_path):
             syns = all_syns[0]
 
             # get hypernyms/hyponyms
-            hyper, found_hyper = closest_hypernym(syns, vocab_set)
+            #hyper, found_hyper = closest_hypernym(syns, vocab_set)
+            hyper, found_hyper, hyper_lemmas = first_hypernym(syns, vocab_set)
             if found_hyper:
-                hyper_lemmas = lemma_in_vocab(hyper, vocab_set)
+                #hyper_lemmas = lemma_in_vocab(hyper, vocab_set)
                 for lemma in hyper_lemmas:
                     result.append((word, lemma, 'hypernym'))
                     result.append((lemma, word, 'hyponym'))
@@ -135,7 +164,7 @@ def create_data_using_first_synset(vocab_path, out_path):
                     result.append((anto, lemma_name, 'antonym'))
 
             # get cohyponyms
-            hyper, found_hyper = closest_hypernym(syns)
+            hyper, found_hyper = first_hypernym(syns)#closest_hypernym(syns)
             if found_hyper:
                 hyponyms = get_hyponyms_excluding_syns(hyper, syns)
                 hyponym_names = []
