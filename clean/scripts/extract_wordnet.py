@@ -170,7 +170,7 @@ def create_data_using_first_synset(vocab_path, out_path):
                     result.append((anto, lemma_name, 'antonym'))
 
             # get cohyponyms
-            hyper, found_hyper = first_hypernym(syns)#closest_hypernym(syns)
+            hyper, found_hyper = first_hypernym(syns, min_dist_to_top=6)#closest_hypernym(syns)
             if found_hyper:
                 hyponyms = get_hyponyms_excluding_syns(hyper, syns)
                 hyponym_names = []
