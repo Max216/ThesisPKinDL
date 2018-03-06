@@ -38,8 +38,105 @@ def main():
     elif args['create_using_first']:
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
 
+
+def closest_hypernym(syns, vocab=None):
+    found = None
+    while found == None:
+        hypernyms = syns.hypernyms() + syns.instance_hypernyms()
+        if len(hypernyms) == 0:
+            return None
+        else:
+            hyper = hypernyms[0]
+            if vocab != None:
+                # make sure that it is in vocab
+                for lemma_name in hyper.lemma_names():
+                    if lemma_name in vocab:
+                        found = hyper
+                        break
+
+
+
+            else:
+                # just use it
+                found = hyper
+    return found
+
+def get_hyponyms_excluding_syns(hypernym, syns):
+    all_hyponyms = hypernym.hyponyms() + hypernym.instance_hyponyms()
+    # exclude
+    all_hyponyms = [hypo for hypo in all_hyponyms if hypo.name() != syns.name()]
+
+    return all_hyponyms
+
+def lemma_in_vocab(syns, vocab_set):
+    return list(set(syns.lemma_names()) & vocab_set)
+
 def create_data_using_first_synset(vocab_path, out_path):
-    
+    with open(vocab_path) as f_in:
+        vocab = [line.strip() for line in f_in.readlines()]
+
+    vocab_set = set(vocab)
+    result = []
+    for word in vocab:
+        all_syns = wn.synsets(word)
+
+        if len(all_syns) > 0:
+            syns = all_syns[0]
+
+            # get hypernyms/hyponyms
+            hyper = closest_hypernym(syns, vocab_set)
+            if hyper != None:
+                hyper_lemmas = lemma_in_vocab(hyper, vocab_set)
+                for lemma in hyper_lemmas:
+                    result.append((word, lemma, 'hypernym'))
+                    result.append((lemma, word, 'hyponym'))
+
+            # get synonyms
+            syns_lemmas = lemma_in_vocab(syns, vocab_set)
+            for w1 in syns_lemmas:
+                for w2 in syns_lemmas:
+                    result.append((w1, w2, 'synonym'))
+            # as this is lemmatized, also include original word
+            for w1 in syns_lemmas:
+                result.append((word, w1, 'synonym'))
+                result.append((w1, word, 'synonym'))
+
+            # get antonyms
+            lemmas = syns.lemmas()
+            lemmas = [lemma for lemma in lemmas if lemma.name() in vocab]
+
+            all_antonyms = []
+            for lemma in lemmas:
+                antonym_names = [anto.name() for anto in lemma.antonyms()]
+                antonym_names = [anto for anto in antonym_names if anto in vocab]
+                all_antonyms.extend(antonym_names)
+
+            lemma_names = list(set(lemma_in_vocab(syns, vocab_set) + [word]))
+            all_antonyms = list(set(all_antonyms))
+
+            for lemma_name in lemma_names:
+                for anto in all_antonyms:
+                    result.append((lemma_name, anto, 'antonym'))
+                    result.append((anto, lemma_name, 'antonym'))
+
+            # get cohyponyms
+            hyper = closest_hypernym(syns)
+            if hyper != None:
+                hyponyms = get_hyponyms_excluding_syns(hyper, syns)
+                hyponym_names = []
+                for hypo in hyponyms:
+                    hypo_lemmas = [w for w in list(set(hypo.lemma_names()) & vocab_set) if w not in lemma_names]
+                    hyponym_names.extend(hypo_lemmas)
+
+                hyponym_names = list(set(hyponym_names))
+                for w in lemma_names:
+                    for cohypo in hyponym_names:
+                        result.append((w, cohypo, 'cohyponym'))
+                        result.append((cohypo, w, 'cohyponym'))
+
+    # Clean data
+    print('Found:', len(result))
+    print('Remove simple duplicates:', len(list(set(result))))
 
 def sample(file_path, amount):
     with open(file_path) as f_in:
