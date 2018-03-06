@@ -143,6 +143,94 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
             f_out.write(line)
 
 
+def create_holonym_embeddings(embedding_file, all_embeddings, amount, path_out):
+
+    print('Load embeddings within SNLI')
+    with open(embedding_file) as f_in:
+        stored_embeddings = [line.rstrip() for line in f_in.readlines()]
+
+    print('Load all embeddings')
+    all_embeddings_dict = dict()
+    with open(all_embeddings, 'rb') as f_in:
+        for line in f_in:
+            entries = line.strip().split(b' ')
+            word, entries = entries[0], entries[1:]
+            #try:
+            if isinstance(word, six.binary_type):
+                word = word.decode('utf-8')
+            #except:
+            #    print('non-UTF8 token', repr(word), 'ignored')
+            #    continue
+
+            arr = np.asarray([float(val) for val in entries])
+            all_embeddings_dict[word] = arr
+
+
+    print('Find holonyms')
+    results = []
+    for stored in stored_embeddings:
+        word = stored.split(' ')[0]
+        count = 0
+        done = False
+        print('new word:', word)
+        if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
+            synsets = wn.synsets(word, pos=wn.NOUN)
+            vec  = None
+            added_vec = False
+            print('is not in stopwords')
+            while count < amount:
+                print('current count:', count)
+                if len(synsets) == 0:
+                    done = True
+                    print('Done due to not enough synsets')
+                else:
+
+                    # Just use first synset
+                    syns = synsets[0]
+
+                    # Find holonyms
+                    holonyms = syns.part_holonyms()
+                    if len(holonyms) == 0:
+                        done = True
+                        print('Done as no holonyms')
+                    else:
+                        lemmas = [lemma.name() for lemma in holonyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
+
+                        if len(lemmas) > 0:
+                            # check if it is in embeddings
+                            for lemma in lemmas:
+                                if lemma in all_embeddings_dict:
+                                    if added_vec == False:
+                                        vec = np.copy(all_embeddings_dict[lemma])
+                                        print('set vector to', vec.tolist()[:10])
+                                        added_vec = True
+                                    else:
+                                        print('adding to vec:', all_embeddings_dict[lemma].tolist()[:10])
+                                        vec += all_embeddings_dict[lemma]
+                                    #results.append(word + ' ' + all_embeddings_dict[lemma] + '\n')
+                                    print('current vec:', vec.tolist()[:10])
+                                    count += 1
+                                    break
+
+                        # go up one level for next iteration
+                        synsets = holonyms
+
+                if done:
+                    break
+
+            if added_vec:
+                # normalize
+                print('vec before:', vec.tolist()[:10])
+                vec = [v / count for v in vec.tolist()]
+                print('vec after:', vec[:10])
+                results.append(word + ' ' + ' '.join([str(val) for val in vec]) + '\n')
+
+    with open(path_out, 'w') as f_out:
+        print('Found', len(results), 'holonyms')
+        for line in results:
+            f_out.write(line)
+
+
 def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
 
     dim = -1
@@ -185,6 +273,7 @@ def main():
         embedding_tools.py cfd <embeddings> <data_train> <data_dev> <data_test> <name_out>
         embedding_tools.py diff <embeddings1> <embeddings2>
         embedding_tools.py hypernyms <embedding_file> <all_embeddings> <amount> <name_out>
+        embedding_tools.py holonyms <embedding_file> <all_embeddings> <amount> <name_out>
         embedding_tools.py concat_hypernyms <embedding_file> <hypernym_embedding_file> <name_out>
 
     """)
@@ -201,6 +290,8 @@ def main():
         diff(args['<embeddings1>'], args['<embeddings2>'])
     elif args['hypernyms']:
         create_hypernym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'])
+    elif args['holonyms']:
+        create_holonym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'])
     elif args['concat_hypernyms']:
         concat_hypernyms(args['<embedding_file>'], args['<hypernym_embedding_file>'], args['<name_out>'])
 
