@@ -67,7 +67,7 @@ def first_hypernym(syns, vocab=None, min_dist_to_top=4):
                     found_lemmas.append(lemma)
 
             if len(found_lemmas) == 0:
-                return None, False
+                return None, False, []
             else:
                 return hyper, True, found_lemmas
         else:
