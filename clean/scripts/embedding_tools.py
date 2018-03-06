@@ -53,7 +53,10 @@ def cfd(embedding_path, data1_path, data2_path, data3_path, name_out):
         for line in used_embeddings:
             f_out.write(line)
 
-def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out):
+def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out, pos):
+
+    if pos == None:
+        pos = wn.NOUN
 
     print('Load embeddings within SNLI')
     with open(embedding_file) as f_in:
@@ -86,7 +89,11 @@ def create_hypernym_embeddings(embedding_file, all_embeddings, amount, path_out)
         done = False
         print('new word:', word)
         if word not in spacy.en.language_data.STOP_WORDS and word.lower() not in spacy.en.language_data.STOP_WORDS:
-            synsets = wn.synsets(word, pos=wn.NOUN)
+            
+            if pos == 'any':
+                synsets = wn.synsets(word)
+            else:
+                synsets = wn.synsets(word, pos=pos)
             vec  = None
             added_vec = False
             print('is not in stopwords')
@@ -272,7 +279,7 @@ def main():
     Usage:
         embedding_tools.py cfd <embeddings> <data_train> <data_dev> <data_test> <name_out>
         embedding_tools.py diff <embeddings1> <embeddings2>
-        embedding_tools.py hypernyms <embedding_file> <all_embeddings> <amount> <name_out>
+        embedding_tools.py hypernyms <embedding_file> <all_embeddings> <amount> <name_out> [--pos=<pos>]
         embedding_tools.py holonyms <embedding_file> <all_embeddings> <amount> <name_out>
         embedding_tools.py concat_hypernyms <embedding_file> <hypernym_embedding_file> <name_out>
 
@@ -289,7 +296,7 @@ def main():
     elif args['diff']:
         diff(args['<embeddings1>'], args['<embeddings2>'])
     elif args['hypernyms']:
-        create_hypernym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'])
+        create_hypernym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'], args['--pos'])
     elif args['holonyms']:
         create_holonym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'])
     elif args['concat_hypernyms']:
