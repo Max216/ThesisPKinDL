@@ -39,7 +39,7 @@ def main():
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
 
 
-def closest_hypernym(syns, vocab=None):
+def closest_hypernym(syns, vocab=None, min_dist_to_top=4):
     found = None
     found_bool = False
     while not found_bool:
@@ -48,6 +48,10 @@ def closest_hypernym(syns, vocab=None):
             return None, False
         else:
             hyper = hypernyms[0]
+            dist_to_root = min([len(p) for p in hyper.hypernym_paths()])
+            if dist_to_root < min_dist_to_top:
+                return None, False
+
             if vocab != None:
                 # make sure that it is in vocab
                 for lemma_name in hyper.lemma_names():
@@ -162,11 +166,15 @@ def create_data_using_first_synset(vocab_path, out_path):
             else:
                 data[w1][w2] = data[w1][w2].pop()
 
+    cnt_final = 0
     with open(out_path, 'w') as f_out:
         for w1 in data:
             current = data[w1]
             for w2 in current:
+                cnt_final += 1
                 f_out.write('\t'.join([w1, w2, current[w2]]) + '\n')
+
+    print('Wrote out:', cnt_final)
 
 def sample(file_path, amount):
     with open(file_path) as f_in:
