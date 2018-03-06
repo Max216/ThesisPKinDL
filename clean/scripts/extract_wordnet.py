@@ -77,7 +77,11 @@ def create_data_using_first_synset(vocab_path, out_path):
 
     vocab_set = set(vocab)
     result = []
+    total_len = len(vocab)
+    cnt = 0
     for word in vocab:
+        cnt += 1
+        print(word, '--', cnt, '/', total_len)
         all_syns = wn.synsets(word)
 
         if len(all_syns) > 0:
