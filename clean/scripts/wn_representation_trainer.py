@@ -157,8 +157,8 @@ class EmbeddingMatcherSimple(nn.Module):
 
 def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path):
     lr = 8e-4
-    iterations = 30
-    validate_after = 1000000
+    iterations = 60
+    validate_after = 5000000
     batch_size = 256
 
     with open(data_path) as f_in:
