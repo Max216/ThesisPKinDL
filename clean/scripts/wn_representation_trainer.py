@@ -226,7 +226,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
                     ).data
 
                     _, predicted_idx = torch.max(prediction, dim=1)
-                    correct += torch.sum(torch.eq(lbl, predicted_idx))
+                    correct += torch.sum(torch.eq(autograd.Variable(cuda_wrap(lbl)), predicted_idx))
 
                 total = len(data)
                 print('Accuracy after samples:', samples_seen, '->', correct/total)
