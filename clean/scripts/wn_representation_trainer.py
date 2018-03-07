@@ -138,15 +138,18 @@ class EmbeddingMatcherSimple(nn.Module):
         super(EmbeddingMatcherSimple, self).__init__()
         self.nonlinearity = F.relu
         self.embedding_encoder = embedding_encoder
+        print('embedding-out dimension:', embedding_encoder.get_dimension())
         self.out_layer = nn.Linear(embedding_encoder.get_dimension() * 2, out_dimension)
 
     def forward(self, words1, words2):
-        batch_size = words1.size()[1]
+        print('words shape:', words1.size(), words2.size())
         representations1 = self.embedding_encoder(words1).view(batch_size, -1)
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
+        print('representation sizes:', representations1.size(), representations2.size())
         feed_forward_input = torch.cat((representations1, representations2), 1)
 
+        print('FF input:', feed_forward_input.size())
         return F.softmax(self.out_layer(feed_forward_input))
 
 
