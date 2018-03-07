@@ -155,7 +155,7 @@ class EmbeddingMatcherSimple(nn.Module):
         return F.softmax(self.out_layer(feed_forward_input))
 
 
-def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path):
+def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path, embedding_path):
     lr = 8e-4
     iterations = 60
     validate_after = 5000000
@@ -168,7 +168,11 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
     tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
     print(tag_to_idx)
-    embedding_holder = eh.create_embeddingholder()
+
+    if embedding_path == None:
+        embedding_holder = eh.create_embeddingholder()
+    else:
+        embedding_holder = eh.EmbeddingHolder(embedding_path)
 
     # Train
     encoder = cuda_wrap(EmbeddingEncoder(embedding_holder.embedding_matrix(), encoder_hidden_dim, encoder_out_dim))
@@ -256,12 +260,12 @@ def main():
     args = docopt("""Create wordnet embeddings. 
 
     Usage:
-        wn_representation_model.py train <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path>
+        wn_representation_model.py train <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
 
     """)
 
     if args['train']:
-        train(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'])
+        train(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
 
 
 if __name__ == '__main__':
