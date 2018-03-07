@@ -144,7 +144,7 @@ class EmbeddingMatcherSimple(nn.Module):
     def forward(self, words1, words2):
         #print('words shape:', words1.size(), words2.size())
         batch_size = words1.size()[0]
-        print('words1:', words1.size())
+        #print('words1:', words1.size())
         representations1 = self.embedding_encoder(words1).view(batch_size, -1)
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
@@ -243,7 +243,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
         vocab = list(set([w1 for w1, w2, lbl in data] + [w2 for w1, w2, lbl in data]))
         matcher.eval()
         for w in vocab:
-            w_index = cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1))
+            w_index = autograd.Variable(cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1)))
             print(w_index.size())
             embedding = matcher.embedding_encoder(w_index).cpu().numpy().list()
             print(w + ' ' + ' '.join([str(v) for v in embedding]))
