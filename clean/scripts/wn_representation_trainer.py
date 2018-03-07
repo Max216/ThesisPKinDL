@@ -166,7 +166,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     embedding_holder = eh.create_embeddingholder()
 
     # Train
-    encoder = EmbeddingEncoder(embedding_holder.embedding_matrix(), encoder_hidden_dim, encoder_out_dim)
+    encoder = cuda_wrap(EmbeddingEncoder(embedding_holder.embedding_matrix(), encoder_hidden_dim, encoder_out_dim))
     if matcher_hidden_dim == 0:
         matcher = cuda_wrap(EmbeddingMatcherSimple(encoder, len(labels)))
     else:
