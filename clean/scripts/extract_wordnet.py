@@ -24,6 +24,7 @@ def main():
         extract_wordnet.py sample <file> <amount>
         extract_wordnet.py create_using_first <vocab> <outpath>
         extract_wordnet.py finalize_data <data_path> <out_path>
+        extract_wordnet.py merge_labels1 <data_path> <out_path>
     """)
 
     if args['count_hyper']:
@@ -40,6 +41,31 @@ def main():
         create_data_using_first_synset(args['<vocab>'], args['<outpath>'])
     elif args['finalize_data']:
         finalize_data(args['<data_path>'], args['<out_path>'])
+    elif args['merge_labels1']:
+        merge_labels1(args['<data_path>'], args['<out_path>'])
+
+def merge_labels1(data_path, out_path):
+    '''
+    combine labels for synonym+hypernym, antonym+cohyponym, ignore hyponym 
+    '''
+    with open(data_path) as f_in:
+        data = [line.strip().split('\t') for line in f_in.readlines()]
+
+    new_data = []
+    for d in data:
+        if d[2] == 'cohyponym' or d[2] == 'antonym':
+            new_data.append((d[0], d[1], 'other'))
+        elif d[2] == 'synonym' or d[2] == 'hypernym':
+            new_data.append((d[0], d[1], 'same'))
+        elif d[2] == 'hyponym':
+            pass
+        else:
+            print(d[2])
+            1/0
+
+    with open(out_path, 'w') as f_out:
+        for w1,w2,lbl in new_data:
+            f_out.write('\t'.join([w1, w2, lbl]) + '\n')
 
 def finalize_data(data_path, out_path):
     with open(data_path) as f_in:
