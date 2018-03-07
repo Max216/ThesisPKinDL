@@ -206,7 +206,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
 
             prediction = matcher(var_w1, var_w2)
             loss = F.cross_entropy(prediction, var_lbl)
-            total_loss += loss.data
+            #total_loss += loss.data
 
             # update model
             loss.backward()
