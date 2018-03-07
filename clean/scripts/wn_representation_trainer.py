@@ -196,11 +196,11 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
             until_validation -= lbl.size()[0]
 
             # predict
-            var_w1 = cuda_wrap(autograd.Variable(w1))
-            var_w2 = cuda_wrap(autograd.Variable(w2))
-            var_lbl = cuda_wrap(autograd.Variable(lbl))
+            var_w1 = autograd.Variable(cuda_wrap(w1))
+            var_w2 = autograd.Variable(cuda_wrap(w2))
+            var_lbl = autograd.Variable(cuda_wrap(lbl))
 
-            prediction = matcher(w1, w2)
+            prediction = matcher(var_w1, var_w2)
             loss = F.cross_entropy(prediction, var_lbl)
             total_loss += loss.data
 
