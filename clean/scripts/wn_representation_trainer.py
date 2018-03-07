@@ -15,7 +15,7 @@ from libs import embeddingholder as eh
 
 # For running on cluster
 import os; 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 # for cuda
 def make_with_cuda(t):
