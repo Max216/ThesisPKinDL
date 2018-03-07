@@ -144,6 +144,7 @@ class EmbeddingMatcherSimple(nn.Module):
     def forward(self, words1, words2):
         #print('words shape:', words1.size(), words2.size())
         batch_size = words1.size()[0]
+        print('words1:', words1.size())
         representations1 = self.embedding_encoder(words1).view(batch_size, -1)
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
