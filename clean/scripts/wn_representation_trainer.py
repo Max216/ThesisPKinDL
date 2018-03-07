@@ -245,7 +245,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
         for w in vocab:
             w_index = autograd.Variable(cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1)))
             print(w_index.size())
-            embedding = matcher.embedding_encoder(w_index).cpu().numpy().list()
+            embedding = matcher.embedding_encoder(w_index).data.cpu().numpy().list()
             print(w + ' ' + ' '.join([str(v) for v in embedding]))
     
 
