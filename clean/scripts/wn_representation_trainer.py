@@ -62,7 +62,7 @@ class EmbeddingEncoder(nn.Module):
         self.out_layer = nn.Linear(hidden_layer_dimension, representation_dimension)
 
     def forward(self, words):
-        batch_size = sent1.size()[1]
+        #batch_size = words.size()[1]
         embeddings = self.embedding_layer(words)
 
         out1 = self.nonlinearity(self.hidden_layer(embeddings))
