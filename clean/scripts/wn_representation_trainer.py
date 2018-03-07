@@ -155,7 +155,7 @@ class EmbeddingMatcherSimple(nn.Module):
 
 
 def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path):
-    lr = 4e-4
+    lr = 8e-4
     iterations = 1
     validate_after = 1000000
     batch_size = 256
@@ -243,6 +243,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
         matcher.eval()
         for w in vocab:
             w_index = cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1))
+            print(w_index.size())
             embedding = matcher.embedding_encoder(w_index).cpu().numpy().list()
             print(w + ' ' + ' '.join([str(v) for v in embedding]))
     
