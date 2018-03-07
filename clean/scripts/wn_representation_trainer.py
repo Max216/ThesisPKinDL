@@ -156,9 +156,9 @@ class EmbeddingMatcherSimple(nn.Module):
 
 def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path):
     lr = 4e-4
-    iterations = 20
-    validate_after = 500000
-    batch_size = 128
+    iterations = 1
+    validate_after = 1000000
+    batch_size = 256
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
@@ -237,7 +237,14 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
 
 
     # Write out embeddings
-    print('TODO write out')
+    print('Write out to file')
+    with open(out_path, 'w') as f_out:
+        vocab = list(set([w1 for w1, w2, lbl in data] + [w2 for w1, w2, lbl in data]))
+        matcher.eval()
+        for w in vocab:
+            w_index = cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1))
+            embedding = matcher.embedding_encoder(w_index).cpu().numpy().list()
+            print(w + ' ' + ' '.join([str(v) for v in embedding]))
     
 
 def main():
