@@ -117,7 +117,7 @@ class EmbeddingMatcher(nn.Module):
         self.out_layer  =nn.Linear(hidden_layer_dimension, out_dimension)
 
     def forward(self, words1, words2):
-        batch_size = words1.size()[1]
+        batch_size = words1.size()[0]
         representations1 = self.embedding_encoder(words1).view(batch_size, -1)
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
