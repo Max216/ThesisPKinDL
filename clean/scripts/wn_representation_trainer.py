@@ -217,6 +217,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
 
                 # evaluate
                 matcher.eval()
+                correct = 0
 
                 for w1, w2, lbl in eval_data_loader:
                     prediction = matcher(
