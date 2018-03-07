@@ -142,15 +142,15 @@ class EmbeddingMatcherSimple(nn.Module):
         self.out_layer = nn.Linear(embedding_encoder.get_dimension() * 2, out_dimension)
 
     def forward(self, words1, words2):
-        print('words shape:', words1.size(), words2.size())
+        #print('words shape:', words1.size(), words2.size())
         batch_size = words1.size()[0]
         representations1 = self.embedding_encoder(words1).view(batch_size, -1)
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
-        print('representation sizes:', representations1.size(), representations2.size())
+        #print('representation sizes:', representations1.size(), representations2.size())
         feed_forward_input = torch.cat((representations1, representations2), 1)
 
-        print('FF input:', feed_forward_input.size())
+        #print('FF input:', feed_forward_input.size())
         return F.softmax(self.out_layer(feed_forward_input))
 
 
@@ -226,7 +226,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
                     ).data
 
                     _, predicted_idx = torch.max(prediction, dim=1)
-                    correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+                    correct += torch.sum(torch.eq(lbl, predicted_idx))
 
                 total = len(data)
                 print('Accuracy after samples:', samples_seen, '->', correct/total)
