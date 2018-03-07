@@ -167,21 +167,71 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     # Train
     encoder = EmbeddingEncoder(embedding_holder.embedding_matrix(), encoder_hidden_dim, encoder_out_dim)
     if matcher_hidden_dim == 0:
-        matcher = EmbeddingMatcherSimple(encoder, len(labels))
+        matcher = cuda_wrap(EmbeddingMatcherSimple(encoder, len(labels)))
     else:
-        matcher = EmbeddingMatcher(encoder, matcher_hidden_dim, len(labels))
+        matcher = cuda_wrap(EmbeddingMatcher(encoder, matcher_hidden_dim, len(labels)))
 
     dataset = WordDataset(data, embedding_holder, tag_to_idx)
     data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size, shuffle=True)
+    eval_data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size, shuffle=False)
+
     start_time = time.time()
     reverse_embeddings = embedding_holder.reverse()
+    optimizer = optim.Adam(matcher.parameters(), lr=lr)
+    
+    until_validation=0
+    samples_seen = 0
+    matcher.train()
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
-            print(reverse_embeddings[w1[0][0]], reverse_embeddings[w2[0][0]], labels[lbl[0]])
+            #print(reverse_embeddings[w1[0][0]], reverse_embeddings[w2[0][0]], labels[lbl[0]])
+            # reset gradients
+            matcher.zero_grad()
+            optimizer.zero_grad()
+
+            print('samples in batch:', lbl.size()[0])
+            samples_seen += lbl.size()[0]
+            until_validation -= lbl.size()[0]
+
+            # predict
+            var_w1 = cuda_wrap(autograd.Variable(w1))
+            var_w2 = cuda_wrap(autograd.Variable(w2))
+            var_lbl = cuda_wrap(autograd.Variable(lbl))
+
+            prediction = matcher(premise_var, hyp_var)
+            loss = F.cross_entropy(prediction, lbl_var)
+            total_loss += loss.data
+
+            # update model
+            loss.backward()
+            optimizer.step()
+
+            if until_validation <= 0:
+                until_validation = validate_after
+
+                # evaluate
+                matcher.eval()
+
+                for w1, w2, lbl in eval_data_loader:
+                    prediction = matcher(
+                        autograd.Variable(cuda_wrap(w1)),
+                        autograd.Variable(cuda_wrap(w2))
+                    ).data
+
+                    _, predicted_idx = torch.max(prediction, dim=1)
+                    correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+
+                total = len(data)
+                print('Accuracy after samples:', samples_seen, '->', correct/total)
+
+                matcher.train()
+
+
 
 
     # Write out embeddings
+    print('TODO write out')
     
 
 def main():
