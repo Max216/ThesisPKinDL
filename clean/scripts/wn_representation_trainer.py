@@ -195,7 +195,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
             matcher.zero_grad()
             optimizer.zero_grad()
 
-            print('samples in batch:', lbl.size()[0])
+            #print('samples in batch:', lbl.size()[0])
             samples_seen += lbl.size()[0]
             until_validation -= lbl.size()[0]
 
