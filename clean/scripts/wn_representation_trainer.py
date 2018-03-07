@@ -113,7 +113,7 @@ class EmbeddingMatcher(nn.Module):
         super(EmbeddingMatcher, self).__init__()
         self.nonlinearity = F.relu
         self.embedding_encoder = embedding_encoder
-        self.hidden_layer = nn.Linear(embedding_encoder.get_dimension(), hidden_layer_dimension * 2)
+        self.hidden_layer = nn.Linear(embedding_encoder.get_dimension() * 2, hidden_layer_dimension)
         self.out_layer  =nn.Linear(hidden_layer_dimension, out_dimension)
 
     def forward(self, words1, words2):
