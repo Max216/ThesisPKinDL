@@ -2,7 +2,7 @@
 To deal with embeddings
 '''
 
-import sys
+import sys, json
 sys.path.append('./../')
 
 from docopt import docopt
@@ -272,6 +272,38 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
                 f_out.write(embd + '\n')
 
 
+def create_num_countries(dataset_path, out_path, dim):
+    with open(dataset_path) as f_in:
+        data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    numbers = [d for d in data if d['category'] in set(['ordinals', 'cardinals'])]
+    countries = [d for d in data if d['category'] in set(['countries', 'nationalities'])]
+
+    entailing_words_numbers = set([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'entailment'])
+    contradicting_words_numbers = set([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'contradiction'])
+
+    entailing_words_countries = set([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'entailment'])
+    contradicting_words_countries = set([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'contradiction'])
+
+    # remove overlaps
+    overlap_numbers = entailing_words_numbers & contradicting_words_numbers
+    overlap_counries = entailing_words_countries & contradicting_words_countries
+
+    entailing_words_countries = entailing_words_countries - overlap_counries
+    contradicting_words_countries = contradicting_words_countries - overlap_counries
+
+    entailing_words_numbers = entailing_words_numbers - overlap_numbers
+    contradicting_words_numbers = contradicting_words_numbers - overlap_numbers
+
+    with open(f_out, 'w') as f_out:
+        for entailment in [entailing_words_numbers, entailing_words_countries]:
+            for w1, w2 in entailment:
+                f_out.write('\t'.join([w1, w2, 'entailment']) + '\n')
+
+        for contradiction in [contradicting_words_countries, contradicting_words_numbers]:
+            for w1, w2 in contradiction:
+                f_out.write('\t'.join([w1, w2, 'contradiction']) + '\n')
+
 def main():
     args = docopt("""Deal with embeddings. 
         cfd  = create for data: Create embedding files for a given dataset.
@@ -282,6 +314,7 @@ def main():
         embedding_tools.py hypernyms <embedding_file> <all_embeddings> <amount> <name_out> [--pos=<pos>]
         embedding_tools.py holonyms <embedding_file> <all_embeddings> <amount> <name_out>
         embedding_tools.py concat_hypernyms <embedding_file> <hypernym_embedding_file> <name_out>
+        embedding_tools.py create_num_countries <dataset> <out> <dim>
 
     """)
 
@@ -301,6 +334,8 @@ def main():
         create_holonym_embeddings(args['<embedding_file>'], args['<all_embeddings>'], int(args['<amount>']), args['<name_out>'])
     elif args['concat_hypernyms']:
         concat_hypernyms(args['<embedding_file>'], args['<hypernym_embedding_file>'], args['<name_out>'])
+    elif args['create_num_countries']:
+        create_num_countries(args['<dataset>'], args['<out>'], int(args['<dim>'])
 
 
 if __name__ == '__main__':
