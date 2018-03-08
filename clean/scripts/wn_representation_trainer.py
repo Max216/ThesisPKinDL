@@ -193,7 +193,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     lr = 4e-4
     iterations = 60
     validate_after = 1024
-    batch_size = 256
+    batch_size = 10
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
