@@ -180,9 +180,9 @@ class CosSimMatcher(nn.Module):
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
     lr = 8e-4
-    iterations = 600
+    iterations = 60
     validate_after = 1024
-    batch_size = 20
+    batch_size = 256
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
