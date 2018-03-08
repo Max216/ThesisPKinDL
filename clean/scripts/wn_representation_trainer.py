@@ -203,7 +203,7 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
     tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
     tag_to_idx['entailment'] = 0
-    tag_to_idx['contradiction'] = 2
+    tag_to_idx['contradiction'] = encoder_out_dim / 2
     print(tag_to_idx)
 
     if embedding_path == None:
