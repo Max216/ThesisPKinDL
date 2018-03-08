@@ -155,6 +155,16 @@ class EmbeddingMatcherSimple(nn.Module):
         #print('FF input:', feed_forward_input.size())
         return F.softmax(self.out_layer(feed_forward_input))
 
+
+def eucledian_similarity(v1, v2):
+    print('vecs:', v1, v2)
+    diff = v1 - v2
+    print('diff:', diff)
+    squared = diff * diff
+    print('squared:', squared)
+    summed = squared.sum(dim=1)
+    print('summed:', summed)
+    1/0
 class CosSimMatcher(nn.Module):
     """
     Learn to predict relations between words based on WordNet.
@@ -175,8 +185,8 @@ class CosSimMatcher(nn.Module):
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
 
-        return F.cosine_similarity(representations1, representations2)
-
+        #return F.cosine_similarity(representations1, representations2)
+        return eucledian_similarity(representations1, representations2)
 
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
