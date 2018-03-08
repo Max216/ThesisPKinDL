@@ -56,7 +56,7 @@ class EmbeddingEncoder(nn.Module):
         num_embeddings = pretrained_embeddings.shape[0]
         embedding_dim = pretrained_embeddings.shape[1]
         self.embedding_layer = nn.Embedding(num_embeddings, embedding_dim)
-        torch.nn.init.xavier_uniform(self.embedding_layer.weight)
+        #torch.nn.init.xavier_uniform(self.embedding_layer.weight)
         #self.embedding_layer.weight.data.copy_(cuda_wrap(torch.from_numpy(pretrained_embeddings)))
 
         self.hidden_layer = nn.Linear(embedding_dim, hidden_layer_dimension)
@@ -157,14 +157,10 @@ class EmbeddingMatcherSimple(nn.Module):
 
 
 def eucledian_similarity(v1, v2):
-    print('vecs:', v1, v2)
     diff = v1 - v2
-    print('diff:', diff)
     squared = diff * diff
-    print('squared:', squared)
     summed = squared.sum(dim=1)
-    print('summed:', summed)
-    1/0
+    return summed.clone().zeros_().float() - summed
 class CosSimMatcher(nn.Module):
     """
     Learn to predict relations between words based on WordNet.
@@ -407,7 +403,7 @@ def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, ou
     
 
 def main():
-
+    torch.manual_seed(7)
     USE_TREE = True
 
     args = docopt("""Create wordnet embeddings. 
