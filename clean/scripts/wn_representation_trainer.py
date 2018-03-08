@@ -190,7 +190,7 @@ class CosSimMatcher(nn.Module):
         return eucledian_similarity(representations1, representations2)
 
 
-def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
+def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
     lr = 4e-4
     iterations = 100
     validate_after = 1024
@@ -449,14 +449,14 @@ def main():
 
     Usage:
         wn_representation_model.py train <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
-        wn_representation_model.py train_cos <train_data> <hidden_encoder> <representation_dim> <save_path> [--embedding=<embedding>]
+        wn_representation_model.py train_eucl <train_data> <hidden_encoder> <representation_dim> <save_path> [--embedding=<embedding>]
 
     """)
 
     if args['train']:
         train(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
-    elif args['train_cos']:
-        train_cos(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  args['<save_path>'], args['--embedding'])
+    elif args['train_eucl']:
+        train_eucl(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  args['<save_path>'], args['--embedding'])
 
 
 if __name__ == '__main__':
