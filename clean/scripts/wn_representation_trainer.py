@@ -239,7 +239,9 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             print('labels:', var_lbl)
 
-            multiplicator = var_lbl.data.clone().fill_(-1) * var_lbl.data
+            multiplicator_entailment = var_lbl.data.clone().fill_(-1) * var_lbl.data 
+            multiplicator_contradiction = var_lbl.data.clone().fill_(1) - var_lbl.data
+            multiplicator = multiplicator_entailment + multiplicator_contradiction
 
             print('multiplicator', multiplicator)
 
