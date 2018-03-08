@@ -194,7 +194,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     lr = 4e-4
     iterations = 100
     validate_after = 1024
-    batch_size = 256
+    batch_size = 5
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
@@ -234,8 +234,13 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     def calc_loss(prediction, lbl):
         multiplicator_entailment = lbl.data.clone().fill_(-1) * lbl.data 
         multiplicator_contradiction = lbl.data.clone().fill_(1) - lbl.data
+
+        print(multiplicator_entailment)
+        print(multiplicator_contradiction)
+        print('#')
+
         multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction, requires_grad=False)
-        print(multiplicator)
+        #print(multiplicator)
         #print('pred',prediction.size())
         #print('mult', multiplicator.size())
         loss = prediction * multiplicator.float()
