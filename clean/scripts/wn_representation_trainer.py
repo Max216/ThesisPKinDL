@@ -276,7 +276,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             prediction = matcher(var_w1, var_w2)
 
 
-            loss = -1 * calc_loss(prediction, var_lbl)
+            loss = calc_loss(prediction, var_lbl)
 
             #F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
