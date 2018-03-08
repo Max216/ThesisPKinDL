@@ -232,8 +232,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
 
     def calc_loss(prediction, lbl):
-        #multiplicator_entailment = lbl.data.clone().fill_(-1) * lbl.data 
-        #multiplicator_contradiction = lbl.data.clone().fill_(1) - lbl.data
+        multiplicator_entailment = lbl.data.clone().fill_(1) * lbl.data 
+        multiplicator_contradiction = lbl.data.clone().fill_(1) - multiplicator_entailment
 
         ##print(multiplicator_entailment)
         ##print(multiplicator_contradiction)
@@ -249,7 +249,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
         ##loss = prediction * multiplicator.float()
         #return loss_contradiction + loss_entailment
 
-        return -1 * prediction.sum()
+        return 1 - prediction.sum()
 
     for i in range(iterations):
         print('Train iteration:', i+1)
