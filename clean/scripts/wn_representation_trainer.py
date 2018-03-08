@@ -238,8 +238,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             prediction = matcher(var_w1, var_w2)
 
             
-            print('label', lbl)
-            print(lbl.size())
+            multiplicator = var_lbl.data.clone().fill_(-1)
+            print('multiplicator', multiplicator)
 
             loss = F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
