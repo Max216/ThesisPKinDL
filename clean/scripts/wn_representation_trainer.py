@@ -163,7 +163,7 @@ def eucledian_similarity(v1, v2):
     zero = summed.clone()
     zero.data.zero_()
     return zero.float() - summed
-    
+
 class CosSimMatcher(nn.Module):
     """
     Learn to predict relations between words based on WordNet.
@@ -184,15 +184,15 @@ class CosSimMatcher(nn.Module):
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
 
-        #return F.cosine_similarity(representations1, representations2)
-        return eucledian_similarity(representations1, representations2)
+        return F.cosine_similarity(representations1, representations2)
+        #return eucledian_similarity(representations1, representations2)
 
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
     lr = 4e-4
     iterations = 60
     validate_after = 1024
-    batch_size = 10
+    batch_size = 256
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
