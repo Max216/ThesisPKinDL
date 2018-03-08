@@ -341,7 +341,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             w_index = autograd.Variable(cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1)))
             #print(w_index.size())
             embedding = matcher.embedding_encoder(w_index).data[0].cpu().numpy().tolist()[0]
-            f_out.write(w + ' ' + ' '.join([str(v) for v in embedding]) + '\n')
+            f_out.write(' '.join([w] + [str(v) for v in embedding]) + '\n')
 
 def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path, embedding_path):
     lr = 8e-4
