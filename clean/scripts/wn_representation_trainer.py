@@ -212,6 +212,12 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     until_validation=0
     samples_seen = 0
     matcher.train()
+
+    # verify that entailment is one!
+    if tag_to_idx['entailment'] != 1 or len(tag_to_idx) != 2:
+        print('entailment must be one, only two labels, or fix that!')
+        1/0
+
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
@@ -230,8 +236,11 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             var_lbl = autograd.Variable(cuda_wrap(lbl))
 
             prediction = matcher(var_w1, var_w2)
-            print(prediction.size())
-            print(prediction)
+
+            
+            print('label', lbl)
+            print(lbl.size())
+
             loss = F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
 
