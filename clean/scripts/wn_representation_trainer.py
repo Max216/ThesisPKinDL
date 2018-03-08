@@ -251,7 +251,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
 
 
-        return (-1 * only_contradiction.sum()) + only_entailment.sum()
+        return (-2 * only_contradiction.sum()) + only_entailment.sum()
 
     for i in range(iterations):
         print('Train iteration:', i+1)
