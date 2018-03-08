@@ -273,17 +273,21 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
 
 
 def create_num_countries(dataset_path, out_path, dim):
+
+    def only_single_words(arr):
+        return set([(w1, w2) for w1, w2 in list(arr) if len(w1.split(' ')) == 1 and len(w2.split(' ')) == 1])
+
     with open(dataset_path) as f_in:
         data = [json.loads(line.strip()) for line in f_in.readlines()]
 
     numbers = [d for d in data if d['category'] in set(['ordinals', 'cardinals'])]
     countries = [d for d in data if d['category'] in set(['countries', 'nationalities'])]
 
-    entailing_words_numbers = set([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'entailment'])
-    contradicting_words_numbers = set([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'contradiction'])
+    entailing_words_numbers = only_single_words([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'entailment'])
+    contradicting_words_numbers = only_single_words([(d['replaced1'], d['replaced2']) for d in numbers if d['gold_label'] == 'contradiction'])
 
-    entailing_words_countries = set([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'entailment'])
-    contradicting_words_countries = set([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'contradiction'])
+    entailing_words_countries = only_single_words([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'entailment'])
+    contradicting_words_countries = only_single_words([(d['replaced1'], d['replaced2']) for d in countries if d['gold_label'] == 'contradiction'])
 
     # remove overlaps
     overlap_numbers = entailing_words_numbers & contradicting_words_numbers
