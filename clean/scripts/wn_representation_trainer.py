@@ -270,7 +270,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             # predict
             var_w1 = autograd.Variable(cuda_wrap(w1))
             var_w2 = autograd.Variable(cuda_wrap(w2))
-            var_lbl = autograd.Variable(cuda_wrap(lbl))
+            var_lbl = autograd.Variable(cuda_wrap(lbl)).float()
 
             prediction = matcher(var_w1, var_w2)
 
@@ -305,7 +305,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                         autograd.Variable(cuda_wrap(w2))
                     )
 
-                    total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl))).data[0]
+                    total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl)).float()).data[0]
 
                     np_cos_sim = prediction.data.cpu().numpy()
                     #print('np_cos_sim', np_cos_sim)
