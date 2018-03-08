@@ -247,8 +247,10 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             loss = prediction * multiplicator.float()
             print(loss.size())
-            print(loss)
-            print(prediction)
+            print('loss', loss)
+            print('prediction',prediction)
+            loss = loss.sum()
+            print('loss:', loss)
             #F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
 
