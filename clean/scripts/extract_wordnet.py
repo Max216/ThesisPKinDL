@@ -25,7 +25,7 @@ def main():
         extract_wordnet.py create_using_first <vocab> <outpath>
         extract_wordnet.py finalize_data <data_path> <out_path>
         extract_wordnet.py merge_labels1 <data_path> <out_path>
-        extract_wordnet.py merge_labels2 <data_path> <lbl_same> <lbl_different> <out_path>
+        extract_wordnet.py merge_labels <data_path> <lbl_same> <lbl_different> <out_path>
     """)
 
     if args['count_hyper']:
