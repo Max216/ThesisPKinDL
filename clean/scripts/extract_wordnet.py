@@ -25,6 +25,7 @@ def main():
         extract_wordnet.py create_using_first <vocab> <outpath>
         extract_wordnet.py finalize_data <data_path> <out_path>
         extract_wordnet.py merge_labels1 <data_path> <out_path>
+        extract_wordnet.py merge_labels2 <data_path> <lbl_same> <lbl_different> <out_path>
     """)
 
     if args['count_hyper']:
@@ -43,6 +44,23 @@ def main():
         finalize_data(args['<data_path>'], args['<out_path>'])
     elif args['merge_labels1']:
         merge_labels1(args['<data_path>'], args['<out_path>'])
+    elif args['merge_labels']:
+        merge_labels_general(args['<data_path>'],args['<lbl_same>'], args['<lbl_different>'], args['<out_path>'])
+
+def merge_labels_general(data_path, lbl_same, lbl_different, out_path):
+    with open(data_path) as f_in:
+        data = [line.strip().split('\t') for line in f_in.readlines()]
+
+    data = [(d[0], d[1], d[2]) for d in data]
+
+    data_same = [(w1, w2, 'entailment') for w1, w2, lbl in data if lbl == lbl_same]
+    data_different = [(w1, w2, 'contradiction') for w1, w2, lbl in data if lbl == lbl_different]
+
+    with open(out_path, 'w') as f_out:
+        for w1, w2, lbl in data_same + data_different:
+            f_out.write('\t'.join([w1, w2, lbl]) + '\n')
+
+
 
 def merge_labels1(data_path, out_path):
     '''
