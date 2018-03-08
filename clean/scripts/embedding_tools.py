@@ -335,7 +335,7 @@ def main():
     elif args['concat_hypernyms']:
         concat_hypernyms(args['<embedding_file>'], args['<hypernym_embedding_file>'], args['<name_out>'])
     elif args['create_num_countries']:
-        create_num_countries(args['<dataset>'], args['<out>'], int(args['<dim>'])
+        create_num_countries(args['<dataset>'], args['<out>'], int(args['<dim>']))
 
 
 if __name__ == '__main__':
