@@ -187,7 +187,7 @@ class CosSimMatcher(nn.Module):
 
 
         #return F.cosine_similarity(representations1, representations2)
-        return eucledian_similarity(representations1, representations2)
+        return eucledian_dist(representations1, representations2)
 
 
 def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
