@@ -218,6 +218,14 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
         print('entailment must be one, only two labels, or fix that!')
         1/0
 
+
+    def calc_loss(prediction, lbl):
+        multiplicator_entailment = var_lbl.data.clone().fill_(-1) * var_lbl.data 
+        multiplicator_contradiction = var_lbl.data.clone().fill_(1) - var_lbl.data
+        multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction, requires_grad=False)
+        loss = prediction * multiplicator.float()
+        return loss.sum()
+
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
@@ -237,20 +245,10 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             prediction = matcher(var_w1, var_w2)
 
-            print('labels:', var_lbl)
+            
 
-            multiplicator_entailment = var_lbl.data.clone().fill_(-1) * var_lbl.data 
-            multiplicator_contradiction = var_lbl.data.clone().fill_(1) - var_lbl.data
-            multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction, requires_grad=False)
+            loss = calc_loss(prediction, var_lbl)
 
-            print('multiplicator', multiplicator)
-
-            loss = prediction * multiplicator.float()
-            print(loss.size())
-            print('loss', loss)
-            print('prediction',prediction)
-            loss = loss.sum()
-            print('loss:', loss)
             #F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
 
@@ -265,18 +263,22 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                 matcher.eval()
                 correct = 0
 
+                total_loss = 0
+
                 for w1, w2, lbl in eval_data_loader:
                     prediction = matcher(
                         autograd.Variable(cuda_wrap(w1)),
                         autograd.Variable(cuda_wrap(w2))
-                    ).data
+                    )
 
-                    _, predicted_idx = torch.max(prediction, dim=1)
-                    correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
+                    total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl))).data[0]
 
-                total = len(data)
-                print('Accuracy after samples:', samples_seen, '->', correct/total)
+                    #_, predicted_idx = torch.max(prediction, dim=1)
+                    #correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
 
+                #total = len(data)
+                #print('Accuracy after samples:', samples_seen, '->', correct/total)
+                print('Loss:', total_loss)
                 matcher.train()
 
 
