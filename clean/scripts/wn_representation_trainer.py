@@ -182,7 +182,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     lr = 8e-4
     iterations = 600
     validate_after = 1024
-    batch_size = 256
+    batch_size = 20
 
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readlines()]
@@ -237,8 +237,10 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             prediction = matcher(var_w1, var_w2)
 
-            
-            multiplicator = var_lbl.data.clone().fill_(-1)
+            print('labels:', var_lbl)
+
+            multiplicator = var_lbl.data.clone().fill_(-1) * var_lbl.data
+
             print('multiplicator', multiplicator)
 
             loss = F.cross_entropy(prediction, var_lbl)
