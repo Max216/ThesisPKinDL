@@ -202,7 +202,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     data = [(d[0], d[1], d[2]) for d in data]
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
     tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
-    tag_to_idx['contradiction'] = 2
+    tag_to_idx['contradiction'] = -5
     print(tag_to_idx)
 
     if embedding_path == None:
