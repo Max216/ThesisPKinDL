@@ -379,7 +379,7 @@ def main():
 
     Usage:
         wn_representation_model.py train <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
-        wn_representation_model.py train_cos <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
+        wn_representation_model.py train_cos <train_data> <hidden_encoder> <representation_dim> <save_path> [--embedding=<embedding>]
 
     """)
 
