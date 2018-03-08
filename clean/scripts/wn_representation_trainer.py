@@ -247,7 +247,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
         #print('pred',prediction.size())
         #print('mult', multiplicator.size())
         #loss = prediction * multiplicator.float()
-        return loss_contradiction
+        return loss_contradiction + loss_entailment
 
     for i in range(iterations):
         print('Train iteration:', i+1)
@@ -307,11 +307,13 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                     for i in lbl.cpu().numpy().tolist():
                         if i == 1:
                             count_entailment += 1
+                            cos_sim_entailment += np_cos_sim[i]
 
                         else:
                             count_contradiction += 1
+                            cos_sim_contradiction += np_cos_sim[i]
 
-                print('e', count_entailment, 'c', count_contradiction)
+                print('e', cos_sim_entailment/count_entailment, 'c', cos_sim_contradiction/count_contradiction)
 
                     #_, predicted_idx = torch.max(prediction, dim=1)
                     #correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
