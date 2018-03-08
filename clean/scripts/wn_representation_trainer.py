@@ -158,13 +158,13 @@ class EmbeddingMatcherSimple(nn.Module):
         return F.softmax(self.out_layer(feed_forward_input))
 
 
-def eucledian_similarity(v1, v2):
+def eucledian_dist(v1, v2):
     diff = v1 - v2
     squared = diff * diff
     summed = squared.sum(dim=1)
     #zero = summed.clone()
     #zero.data.zero_()
-    return  summed * -1
+    return  summed
 
 class CosSimMatcher(nn.Module):
     """
@@ -202,7 +202,8 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
     data = [(d[0], d[1], d[2]) for d in data]
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
     tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
-    tag_to_idx['contradiction'] = -1
+    tag_to_idx['entailment'] = 0
+    tag_to_idx['contradiction'] = 10
     print(tag_to_idx)
 
     if embedding_path == None:
@@ -227,8 +228,8 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
     matcher.train()
 
     # verify that entailment is one!
-    if tag_to_idx['entailment'] != 1 or len(tag_to_idx) != 2:
-        print('entailment must be one, only two labels, or fix that!')
+    if tag_to_idx['entailment'] != 10 or len(tag_to_idx) != 2:
+        print('entailment must be 10, only two labels, or fix that!')
         1/0
 
 
@@ -311,7 +312,7 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
                     np_cos_sim = prediction.data.cpu().numpy()
                     #print('np_cos_sim', np_cos_sim)
                     for i in lbl.cpu().numpy().tolist():
-                        if i == 1:
+                        if i == 10:
                             count_entailment += 1
                             cos_sim_entailment += np_cos_sim[i]
 
