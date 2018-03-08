@@ -239,8 +239,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
         #print(multiplicator_contradiction)
         #print('#')
 
-        loss_entailment = (autograd.Variable(multiplicator_entailment) * prediction).sum()
-        loss_contradiction = (autograd.Variable(multiplicator_contradiction) * prediction).sum()
+        loss_entailment = (autograd.Variable(multiplicator_entailment).float() * prediction).sum()
+        loss_contradiction = (autograd.Variable(multiplicator_contradiction).float() * prediction).sum()
 
         #multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction)
         #print(multiplicator)
