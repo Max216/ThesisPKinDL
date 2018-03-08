@@ -311,8 +311,10 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
 
                     np_cos_sim = prediction.data.cpu().numpy()
                     #print('np_cos_sim', np_cos_sim)
+
+                    ent_idx = tag_to_idx['entailment']
                     for i in lbl.cpu().numpy().tolist():
-                        if i == 10:
+                        if lbl[i] == ent_idx:
                             count_entailment += 1
                             cos_sim_entailment += np_cos_sim[i]
 
