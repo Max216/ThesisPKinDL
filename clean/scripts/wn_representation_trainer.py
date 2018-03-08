@@ -162,9 +162,9 @@ def eucledian_similarity(v1, v2):
     diff = v1 - v2
     squared = diff * diff
     summed = squared.sum(dim=1)
-    zero = summed.clone()
-    zero.data.zero_()
-    return zero.float() - summed
+    #zero = summed.clone()
+    #zero.data.zero_()
+    return  summed
 
 class CosSimMatcher(nn.Module):
     """
@@ -186,8 +186,8 @@ class CosSimMatcher(nn.Module):
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
 
-        return F.cosine_similarity(representations1, representations2)
-        #return eucledian_similarity(representations1, representations2)
+        #return F.cosine_similarity(representations1, representations2)
+        return eucledian_similarity(representations1, representations2)
 
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
