@@ -16,7 +16,7 @@ from libs import embeddingholder as eh
 
 # For running on cluster
 import os; 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 # for cuda
 def make_with_cuda(t):
@@ -164,7 +164,7 @@ def eucledian_similarity(v1, v2):
     summed = squared.sum(dim=1)
     #zero = summed.clone()
     #zero.data.zero_()
-    return  summed
+    return  summed * -1
 
 class CosSimMatcher(nn.Module):
     """
@@ -186,8 +186,8 @@ class CosSimMatcher(nn.Module):
         representations2 = self.embedding_encoder(words2).view(batch_size, -1)
 
 
-        return F.cosine_similarity(representations1, representations2)
-        #return eucledian_similarity(representations1, representations2)
+        #return F.cosine_similarity(representations1, representations2)
+        return eucledian_similarity(representations1, representations2)
 
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
