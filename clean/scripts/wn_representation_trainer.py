@@ -273,6 +273,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                         autograd.Variable(cuda_wrap(w2))
                     )
 
+                    print('#', prediction.size())
+                    print('##', lbl.size())
                     total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl))).data[0]
 
                     #_, predicted_idx = torch.max(prediction, dim=1)
