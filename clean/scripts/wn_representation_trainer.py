@@ -164,6 +164,7 @@ class CosSimMatcher(nn.Module):
         todo
         """
         super(CosSimMatcher, self).__init__()
+        self.embedding_encoder = embedding_encoder
 
     def forward(self, words1, words2):
         #print('words shape:', words1.size(), words2.size())
