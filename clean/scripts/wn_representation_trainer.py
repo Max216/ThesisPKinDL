@@ -154,6 +154,124 @@ class EmbeddingMatcherSimple(nn.Module):
         #print('FF input:', feed_forward_input.size())
         return F.softmax(self.out_layer(feed_forward_input))
 
+class CosSimMatcher(nn.Module):
+    """
+    Learn to predict relations between words based on WordNet.
+    """
+
+    def __init__(self, embedding_encoder):
+        """
+        todo
+        """
+        super(CosSimMatcher, self).__init__()
+
+    def forward(self, words1, words2):
+        #print('words shape:', words1.size(), words2.size())
+        batch_size = words1.size()[0]
+        #print('words1:', words1.size())
+        representations1 = self.embedding_encoder(words1).view(batch_size, -1)
+        representations2 = self.embedding_encoder(words2).view(batch_size, -1)
+
+
+        return F.cosine_similarity(representations1, representations2)
+
+
+
+def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
+    lr = 8e-4
+    iterations = 600
+    validate_after = 1024
+    batch_size = 256
+
+    with open(data_path) as f_in:
+        data = [line.strip().split('\t') for line in f_in.readlines()]
+
+    data = [(d[0], d[1], d[2]) for d in data]
+    labels = sorted(list(set([lbl for w1, w2, lbl in data])))
+    tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
+    print(tag_to_idx)
+
+    if embedding_path == None:
+        embedding_holder = eh.create_embeddingholder()
+    else:
+        embedding_holder = eh.EmbeddingHolder(embedding_path)
+
+    # Train
+    encoder = cuda_wrap(EmbeddingEncoder(embedding_holder.embedding_matrix(), encoder_hidden_dim, encoder_out_dim))
+    matcher = cuda_wrap(CosSimMatcher(encoder))
+
+    dataset = WordDataset(data, embedding_holder, tag_to_idx)
+    data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size, shuffle=True)
+    eval_data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size, shuffle=False)
+
+    start_time = time.time()
+    reverse_embeddings = embedding_holder.reverse()
+    optimizer = optim.Adam(matcher.parameters(), lr=lr)
+    
+    until_validation=0
+    samples_seen = 0
+    matcher.train()
+    for i in range(iterations):
+        print('Train iteration:', i+1)
+        for w1, w2, lbl in data_loader:
+            #print(reverse_embeddings[w1[0][0]], reverse_embeddings[w2[0][0]], labels[lbl[0]])
+            # reset gradients
+            matcher.zero_grad()
+            optimizer.zero_grad()
+
+            #print('samples in batch:', lbl.size()[0])
+            samples_seen += lbl.size()[0]
+            until_validation -= lbl.size()[0]
+
+            # predict
+            var_w1 = autograd.Variable(cuda_wrap(w1))
+            var_w2 = autograd.Variable(cuda_wrap(w2))
+            var_lbl = autograd.Variable(cuda_wrap(lbl))
+
+            prediction = matcher(var_w1, var_w2)
+            print(prediction.size())
+            print(prediction)
+            loss = F.cross_entropy(prediction, var_lbl)
+            #total_loss += loss.data
+
+            # update model
+            loss.backward()
+            optimizer.step()
+
+            if until_validation <= 0:
+                until_validation = validate_after
+
+                # evaluate
+                matcher.eval()
+                correct = 0
+
+                for w1, w2, lbl in eval_data_loader:
+                    prediction = matcher(
+                        autograd.Variable(cuda_wrap(w1)),
+                        autograd.Variable(cuda_wrap(w2))
+                    ).data
+
+                    _, predicted_idx = torch.max(prediction, dim=1)
+                    correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
+
+                total = len(data)
+                print('Accuracy after samples:', samples_seen, '->', correct/total)
+
+                matcher.train()
+
+
+
+
+    # Write out embeddings
+    print('Write out to file')
+    with open(out_path, 'w') as f_out:
+        vocab = list(set([w1 for w1, w2, lbl in data] + [w2 for w1, w2, lbl in data]))
+        matcher.eval()
+        for w in vocab:
+            w_index = autograd.Variable(cuda_wrap(torch.LongTensor([embedding_holder.word_index(w)]).view(1,-1)))
+            #print(w_index.size())
+            embedding = matcher.embedding_encoder(w_index).data[0].cpu().numpy().tolist()[0]
+            f_out.write(w + ' ' + ' '.join([str(v) for v in embedding]) + '\n')
 
 def train(data_path, encoder_hidden_dim, encoder_out_dim, matcher_hidden_dim, out_path, embedding_path):
     lr = 8e-4
@@ -261,11 +379,14 @@ def main():
 
     Usage:
         wn_representation_model.py train <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
+        wn_representation_model.py train_cos <train_data> <hidden_encoder> <representation_dim> <hidden_matcher> <save_path> [--embedding=<embedding>]
 
     """)
 
     if args['train']:
         train(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
+    elif args['train_cos']:
+        train_cos(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
 
 
 if __name__ == '__main__':
