@@ -303,8 +303,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                     total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl))).data[0]
 
                     np_cos_sim = prediction.data.cpu().numpy()
-                    print('np_cos_sim', np_cos_sim)
-                    for i in lbl[0].cpu().numpy().tolist():
+                    #print('np_cos_sim', np_cos_sim)
+                    for i in lbl.cpu().numpy().tolist():
                         if i == 1:
                             count_entailment += 1
 
