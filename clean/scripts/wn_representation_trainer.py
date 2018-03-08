@@ -228,9 +228,9 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
     matcher.train()
 
     # verify that entailment is one!
-    if tag_to_idx['entailment'] != 10 or len(tag_to_idx) != 2:
-        print('entailment must be 10, only two labels, or fix that!')
-        1/0
+    #if tag_to_idx['entailment'] != 10 or len(tag_to_idx) != 2:
+    #    print('entailment must be 10, only two labels, or fix that!')
+    #    1/0
 
 
     def calc_loss(prediction, lbl):
