@@ -286,51 +286,49 @@ def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddi
             loss.backward()
             optimizer.step()
 
-            if until_validation <= 0:
-                until_validation = validate_after
 
-                # evaluate
-                matcher.eval()
-                correct = 0
+        # evaluate
+        matcher.eval()
+        correct = 0
 
-                total_loss = 0
+        total_loss = 0
 
-                count_entailment = 0
-                count_contradiction = 0
+        count_entailment = 0
+        count_contradiction = 0
 
-                cos_sim_entailment = 0
-                cos_sim_contradiction = 0
+        cos_sim_entailment = 0
+        cos_sim_contradiction = 0
 
-                for w1, w2, lbl in eval_data_loader:
-                    prediction = matcher(
-                        autograd.Variable(cuda_wrap(w1)),
-                        autograd.Variable(cuda_wrap(w2))
-                    )
+        for w1, w2, lbl in eval_data_loader:
+            prediction = matcher(
+                autograd.Variable(cuda_wrap(w1)),
+                autograd.Variable(cuda_wrap(w2))
+            )
 
-                    total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl)).float()).data[0]
+            total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl)).float()).data[0]
 
-                    np_cos_sim = prediction.data.cpu().numpy()
-                    #print('np_cos_sim', np_cos_sim)
+            np_cos_sim = prediction.data.cpu().numpy()
+            #print('np_cos_sim', np_cos_sim)
 
-                    ent_idx = tag_to_idx['entailment']
-                    for i in range(len(lbl.cpu().numpy().tolist())):
-                        if lbl[i] == ent_idx:
-                            count_entailment += 1
-                            cos_sim_entailment += np_cos_sim[i]
+            ent_idx = tag_to_idx['entailment']
+            for i in range(len(lbl.cpu().numpy().tolist())):
+                if lbl[i] == ent_idx:
+                    count_entailment += 1
+                    cos_sim_entailment += np_cos_sim[i]
 
-                        else:
-                            count_contradiction += 1
-                            cos_sim_contradiction += np_cos_sim[i]
+                else:
+                    count_contradiction += 1
+                    cos_sim_contradiction += np_cos_sim[i]
 
-                print('e', cos_sim_entailment/count_entailment, 'c', cos_sim_contradiction/count_contradiction)
+        print('e', cos_sim_entailment/count_entailment, 'c', cos_sim_contradiction/count_contradiction)
 
-                    #_, predicted_idx = torch.max(prediction, dim=1)
-                    #correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
+            #_, predicted_idx = torch.max(prediction, dim=1)
+            #correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
 
-                #total = len(data)
-                #print('Accuracy after samples:', samples_seen, '->', correct/total)
-                print('Loss:', total_loss)
-                matcher.train()
+        #total = len(data)
+        #print('Accuracy after samples:', samples_seen, '->', correct/total)
+        print('Loss:', total_loss)
+        matcher.train()
 
 
 
