@@ -160,7 +160,10 @@ def eucledian_similarity(v1, v2):
     diff = v1 - v2
     squared = diff * diff
     summed = squared.sum(dim=1)
-    return summed.clone().zeros_().float() - summed
+    zero = summed.clone()
+    zero.data.zero_()
+    return zero.float() - summed
+    
 class CosSimMatcher(nn.Module):
     """
     Learn to predict relations between words based on WordNet.
