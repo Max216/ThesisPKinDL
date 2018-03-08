@@ -232,15 +232,15 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
 
     def calc_loss(prediction, lbl):
-        multiplicator_entailment = lbl.data.clone().fill_(1) * lbl.data 
-        multiplicator_contradiction = lbl.data.clone().fill_(1) - multiplicator_entailment
+        #multiplicator_entailment = lbl.data.clone().fill_(1) * lbl.data 
+        #multiplicator_contradiction = lbl.data.clone().fill_(1) - multiplicator_entailment
 
         ##print(multiplicator_entailment)
         ##print(multiplicator_contradiction)
         ##print('#')
 
-        only_entailment = autograd.Variable(multiplicator_entailment).float() * prediction
-        only_contradiction = autograd.Variable(multiplicator_contradiction).float() * prediction
+        #only_entailment = autograd.Variable(multiplicator_entailment).float() * prediction
+        #only_contradiction = autograd.Variable(multiplicator_contradiction).float() * prediction
 
         ##multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction)
         ##print(multiplicator)
@@ -251,8 +251,10 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
 
 
-        return only_contradiction.sum() + (-1 * only_entailment.sum())
+        #return only_contradiction.sum() + (-1 * only_entailment.sum())
+        pass
 
+    calc_loss = nn.MSELoss()
     for i in range(iterations):
         print('Train iteration:', i+1)
         for w1, w2, lbl in data_loader:
@@ -272,7 +274,6 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             prediction = matcher(var_w1, var_w2)
 
-            
 
             loss = calc_loss(prediction, var_lbl)
 
