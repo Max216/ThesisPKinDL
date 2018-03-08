@@ -223,6 +223,8 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
         multiplicator_entailment = var_lbl.data.clone().fill_(-1) * var_lbl.data 
         multiplicator_contradiction = var_lbl.data.clone().fill_(1) - var_lbl.data
         multiplicator = autograd.Variable(multiplicator_entailment + multiplicator_contradiction, requires_grad=False)
+        print('pred',prediction.size())
+        print('mult', multiplicator.size())
         loss = prediction * multiplicator.float()
         return loss.sum()
 
