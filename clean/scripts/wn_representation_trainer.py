@@ -191,7 +191,7 @@ class CosSimMatcher(nn.Module):
 
 
 def train_eucl(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
-    lr = 4e-4
+    lr = 8e-4
     iterations = 100
     validate_after = 20000
     batch_size = 1024
