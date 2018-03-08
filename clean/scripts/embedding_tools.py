@@ -295,7 +295,7 @@ def create_num_countries(dataset_path, out_path, dim):
     entailing_words_numbers = entailing_words_numbers - overlap_numbers
     contradicting_words_numbers = contradicting_words_numbers - overlap_numbers
 
-    with open(f_out, 'w') as f_out:
+    with open(out_path, 'w') as f_out:
         for entailment in [entailing_words_numbers, entailing_words_countries]:
             for w1, w2 in entailment:
                 f_out.write('\t'.join([w1, w2, 'entailment']) + '\n')
