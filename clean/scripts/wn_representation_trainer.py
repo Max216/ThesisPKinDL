@@ -60,6 +60,7 @@ class EmbeddingEncoder(nn.Module):
         #self.embedding_layer.weight.data.copy_(cuda_wrap(torch.from_numpy(pretrained_embeddings)))
 
         self.hidden_layer = nn.Linear(embedding_dim, hidden_layer_dimension)
+        self.hidden_layer2 = nn.Linear(hidden_layer_dimension, hidden_layer_dimension)
         self.out_layer = nn.Linear(hidden_layer_dimension, representation_dimension)
 
     def forward(self, words):
@@ -67,7 +68,8 @@ class EmbeddingEncoder(nn.Module):
         embeddings = self.embedding_layer(words)
 
         out1 = self.nonlinearity(self.hidden_layer(embeddings))
-        return F.tanh(self.out_layer(out1))
+        out2 = self.nonlinearity(self.hidden_layer2(out1))
+        return F.tanh(self.out_layer(out2))
 
     def get_dimension(self):
         """
