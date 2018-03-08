@@ -202,7 +202,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
     data = [(d[0], d[1], d[2]) for d in data]
     labels = sorted(list(set([lbl for w1, w2, lbl in data])))
     tag_to_idx = dict([(labels[i], i) for i in range(len(labels))])
-    tag_to_idx['contradiction'] = -5
+    tag_to_idx['contradiction'] = -1
     print(tag_to_idx)
 
     if embedding_path == None:
@@ -276,7 +276,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
             prediction = matcher(var_w1, var_w2)
 
 
-            loss = calc_loss(prediction, var_lbl)
+            loss = -1 * calc_loss(prediction, var_lbl)
 
             #F.cross_entropy(prediction, var_lbl)
             #total_loss += loss.data
