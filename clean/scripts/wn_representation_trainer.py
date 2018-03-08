@@ -190,7 +190,7 @@ class CosSimMatcher(nn.Module):
 
 def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embedding_path):
     lr = 4e-4
-    iterations = 60
+    iterations = 100
     validate_after = 1024
     batch_size = 256
 
