@@ -386,7 +386,7 @@ def main():
     if args['train']:
         train(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
     elif args['train_cos']:
-        train_cos(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  int(args['<hidden_matcher>']),  args['<save_path>'], args['--embedding'])
+        train_cos(args['<train_data>'], int(args['<hidden_encoder>']), int(args['<representation_dim>']),  args['<save_path>'], args['--embedding'])
 
 
 if __name__ == '__main__':
