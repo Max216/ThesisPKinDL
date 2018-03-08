@@ -245,7 +245,7 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
             print('multiplicator', multiplicator)
 
-            loss = prediction * multiplicator
+            loss = prediction * multiplicator.float()
             print(loss.size())
             print(loss)
             print(prediction)
