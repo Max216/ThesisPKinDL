@@ -56,7 +56,8 @@ class EmbeddingEncoder(nn.Module):
         num_embeddings = pretrained_embeddings.shape[0]
         embedding_dim = pretrained_embeddings.shape[1]
         self.embedding_layer = nn.Embedding(num_embeddings, embedding_dim)
-        self.embedding_layer.weight.data.copy_(cuda_wrap(torch.from_numpy(pretrained_embeddings)))
+        torch.nn.init.xavier_uniform(self.embedding_layer.weight)
+        #self.embedding_layer.weight.data.copy_(cuda_wrap(torch.from_numpy(pretrained_embeddings)))
 
         self.hidden_layer = nn.Linear(embedding_dim, hidden_layer_dimension)
         self.out_layer = nn.Linear(hidden_layer_dimension, representation_dimension)
