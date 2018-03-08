@@ -288,6 +288,12 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
 
                 total_loss = 0
 
+                count_entailment = 0
+                count_contradiction = 0
+
+                cos_sim_entailment = 0
+                cos_sim_contradiction = 0
+
                 for w1, w2, lbl in eval_data_loader:
                     prediction = matcher(
                         autograd.Variable(cuda_wrap(w1)),
@@ -295,6 +301,17 @@ def train_cos(data_path, encoder_hidden_dim, encoder_out_dim, out_path, embeddin
                     )
 
                     total_loss += calc_loss(prediction, autograd.Variable(cuda_wrap(lbl))).data[0]
+
+                    np_cos_sim = prediction.data.cpu().numpy()
+                    print('np_cos_sim', np_cos_sim)
+                    for i in lbl[0].cpu().numpy().tolist():
+                        if i == 1:
+                            count_entailment += 1
+
+                        else:
+                            count_contradiction += 1
+
+                print('e', count_entailment, 'c', count_contradiction)
 
                     #_, predicted_idx = torch.max(prediction, dim=1)
                     #correct += torch.sum(torch.eq(cuda_wrap(lbl), predicted_idx))
