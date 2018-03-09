@@ -72,7 +72,15 @@ class Datahandler:
         self.samples = sorted(self.samples, key=lambda x: x[3])
 
     def get_sentences(self):
-        return list(set([s1 for s1, s2, lbl, s1_len, s2_len in self.samples] + [s2 for s1, s2, lbl, s1_len, s2_len in self.samples]))
+        used_keys = set()
+        unique_sents = []
+        for s1, s2, lbl, s1_len, s2_len in self.samples:
+            for s in [s1, s2]:
+                key = ''.join(s)
+                if key not in used_keys:
+                    used_keys.add(key)
+                    unique_sents.append(s)
+        return unique_sents
 
     def get_dataset_for_category(self, embedding_holder, category):
         curent_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
