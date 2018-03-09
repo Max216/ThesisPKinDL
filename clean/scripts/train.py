@@ -6,7 +6,7 @@ from docopt import docopt
 from libs import model_tools, data_tools, train, data_handler
 from libs import model as m
 from libs import embeddingholder as eh
-from libs import multitask
+from libs import multitask, config
 
 import torch
 import numpy as np
@@ -72,7 +72,10 @@ def main():
         print('Store result as', model_name)
         train_set = [datahandler_train.get_dataset(embedding_holder)]
         dev_set = datahandler_dev.get_dataset(embedding_holder)
-        mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder)
+
+        if path_train == None:
+            path_train = config.PATH_TRAIN_DATA
+        mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder, path_train).get_target_dataset()
         multitask_learner = multitask.MTNetwork(600 * 2 + embedding_holder.dim(), 2)
         train.train_model_multitask_sent(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
     elif args['new_mt_word']:

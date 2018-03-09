@@ -43,7 +43,12 @@ class SentenceInOutTarget:
     """
 
     def __init__(self, data_path, embedding_holder, dataset_path):
+        """
+        data_path for target.tsv
+        dataset for snli.jsonl
+        """
 
+        self.embedding_holder = embedding_holder
         self.labels = dict([('entailment', 0), ('contradiction', 1)])
 
         with open(data_path) as f_in:
@@ -80,8 +85,8 @@ class SentenceInOutTarget:
         self.samples = samples
 
 
-    def get_target_dataset(self, embedding_holder):
-        return SentMTDataset(self.samples, embedding_holder, self.labels)
+    def get_target_dataset(self):
+        return SentMTDataset(self.samples, self.embedding_holder, self.labels)
 
 
 class MTNetwork(nn.Module):
