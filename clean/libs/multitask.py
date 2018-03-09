@@ -10,6 +10,8 @@ from torch.utils.data import DataLoader, Dataset
 
 from libs import data_handler
 
+import collections
+
 
 class SentMTDataset(Dataset):
     '''
