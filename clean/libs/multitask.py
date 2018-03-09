@@ -75,7 +75,7 @@ class SentenceInOutTarget:
             entailing_words = set()
             for w in list(sent_set):
                 if w in knowledge_dict_ent:
-                    c_knowledge = list(knowledge_dic_ent[w])
+                    c_knowledge = list(knowledge_dict_ent[w])
                     entailing_words.add(w2)
                     samples.extend([(sent, w2, 'entailment') for w2 in c_knowledge])
 
