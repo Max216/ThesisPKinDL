@@ -76,7 +76,7 @@ def main():
         if path_train == None:
             path_train = config.PATH_TRAIN_DATA
         mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder, path_train).get_target_dataset()
-        multitask_learner = multitask.MTNetwork(600 * 2 + embedding_holder.dim(), 2)
+        multitask_learner = multitask.MTNetwork(classifier, 600 * 2 + embedding_holder.dim(), 2)
         train.train_model_multitask_sent(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
     elif args['new_mt_word']:
         print('Multitask word leanring')
