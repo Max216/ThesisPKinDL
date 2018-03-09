@@ -89,7 +89,7 @@ class MTNetwork(nn.Module):
     Map the embedding to a smaller represerntation
     """
 
-    def __init__(self, classifier input_dim, output_dim):
+    def __init__(self, classifier, input_dim, output_dim):
         """
         Initialize a new network to create representations based on WordNet information.
         :param pretrained_embeddings    pretrained embedding matrix
