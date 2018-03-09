@@ -54,7 +54,7 @@ class SentenceInOutTarget:
         with open(data_path) as f_in:
             data = [line.strip().split('\t') for line in f_in.readlines()]
 
-        sentence_dataset_handler = data_handler.DataHandler(dataset_path)
+        sentence_dataset_handler = data_handler.Datahandler(dataset_path)
         sentences = sentence_dataset_handler.get_sentences()
 
         knowledge_dict_ent = collections.defaultdict(lambda : set())
