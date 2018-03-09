@@ -161,7 +161,7 @@ class EntailmentClassifier(nn.Module):
     followed by a FeedForward network of three layers.
     """
     
-    def __init__(self, pretrained_embeddings, padding_idx, dimen_hidden, dimen_out, sent_encoder, nonlinearity=F.relu, dropout=0.1):
+    def __init__(self, pretrained_embeddings, padding_idx, dimen_hidden, dimen_out, sent_encoder, nonlinearity=F.relu, dropout=0.1, multitask='none'):
         """
         @param pretrained_embeddings - Already trained embeddings to initialize the embeddings layer
         @param dimen_sent_repr - Size of the learned representation of a single sentence
@@ -174,6 +174,7 @@ class EntailmentClassifier(nn.Module):
         
         super(EntailmentClassifier, self).__init__()
 
+        self.multitask = multitask
         self.dimen_hidden = dimen_hidden
         self.nonlinearity = nonlinearity                
         self.embeddings = nn.Embedding(pretrained_embeddings.shape[0], pretrained_embeddings.shape[1], padding_idx=padding_idx)
@@ -249,6 +250,20 @@ class EntailmentClassifier(nn.Module):
         # adjust embedding layer size
         self.embeddings = nn.Embedding(wv_combined.size()[0], wv_combined.size()[1])
         self.embeddings.weight.data.copy_(wv_combined)
+
+    def forward_sent(self, sent1):
+        batch_size = sent1.size()[1]
+        
+        # Map to embeddings
+        embedded1 = self.embeddings(sent1)
+        
+        # Get sentence representation
+        sent1_representation = self.sent_encoder(embedded1)
+        
+        # Max pooling
+        sent1_representation, idxs1 = torch.max(sent1_representation, dim=0)
+
+        return sent1_representation.view(batch_size, -1)
 
 
 class ModelTwister:

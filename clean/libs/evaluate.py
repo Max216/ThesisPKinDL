@@ -67,6 +67,23 @@ def eval_splits(classifier, data_splits, batch_size, padding_token, twister=None
 
     return correct / total
 
+def eval_simple_2(classifier, data_loader):
+    correct = 0
+    total = len(data)
+
+    for v1, v2, lbl_batch in data_loader:
+        prediction = classifier(
+            autograd.Variable(v1),
+            autograd.Variable(v2)#,
+            #twister=twister
+        ).data
+
+        # count corrects
+        _, predicted_idx = torch.max(prediction, dim=1)
+        correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+
+    return correct / total
+
 def eval(classifier, data, batch_size, padding_token, twister=None):
     '''
     Evaluate a model

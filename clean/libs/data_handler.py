@@ -71,6 +71,9 @@ class Datahandler:
         # sort by premise length
         self.samples = sorted(self.samples, key=lambda x: x[3])
 
+    def get_sentences(self):
+        return list(set([s1 for s1, s2, lbl, s1_len, s2_len in self.samples] + [s2 for s1, s2, lbl, s1_len, s2_len in self.samples]))
+
     def get_dataset_for_category(self, embedding_holder, category):
         curent_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
         return SentEncoderDataset(curent_samples, embedding_holder, self.tag_to_idx)

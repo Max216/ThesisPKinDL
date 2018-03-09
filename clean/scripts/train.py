@@ -6,6 +6,7 @@ from docopt import docopt
 from libs import model_tools, data_tools, train, data_handler
 from libs import model as m
 from libs import embeddingholder as eh
+from libs import multitask
 
 import torch
 import numpy as np
@@ -16,6 +17,7 @@ def main():
 
     Usage:
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
+        train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
 
     """)
 
@@ -60,6 +62,21 @@ def main():
         train_set = [datahandler_train.get_dataset(embedding_holder)]
         dev_set = datahandler_dev.get_dataset(embedding_holder)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
+
+    elif args['new_mt_sent']:
+        print('MultiTask Sentence training')
+        print('Create model ... ')
+        if encoding_dim != None:
+            encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
+        model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
+        print('Store result as', model_name)
+        train_set = [datahandler_train.get_dataset(embedding_holder)]
+        dev_set = datahandler_dev.get_dataset(embedding_holder)
+        mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder)
+        multitask_learner = multitask.MTNetwork(600 * 2 + embedding_holder.dim(), 2)
+        train.train_model_multitask_sent(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
+    elif args['new_mt_word']:
+        print('Multitask word leanring')
 
 if __name__ == '__main__':
     main()
