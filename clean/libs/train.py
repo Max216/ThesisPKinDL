@@ -23,6 +23,7 @@ DEFAULT_BATCH_SIZE = 32
 def train_model_multitask_sent(name, classifier, padding_token, train_set_splits, dev_set, multitask_learner, multitask_target, iterations=DEFAULT_ITERATIONS, lr=DEFAULT_LR, validate_after_vals=DEFAULT_VALIDATE_AFTER, batch_size=DEFAULT_BATCH_SIZE, validate_train=False):
     classifier.train()
     multitask_learner.train()
+    multitask_learner = m.cuda_wrap(multitask_learner)
     torch.manual_seed(6)
 
     # remember when to validate:
