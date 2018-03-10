@@ -265,6 +265,9 @@ class EntailmentClassifier(nn.Module):
 
         return sent1_representation.view(batch_size, -1)
 
+    def lookup_word(self, word):
+        return self.embeddings(word)
+
 
 class ModelTwister:
     '''
