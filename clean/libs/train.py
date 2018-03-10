@@ -130,7 +130,7 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
 
                 # predict
                 sent_var = autograd.Variable(sent_batch)
-                word_var = autograd.Variable(word_batch)
+                word_var = autograd.Variable(word_batch.view(1,-1))
                 lbl_var = autograd.Variable(lbl_batch)
 
                 print('sent:', sent_var.data.size())
