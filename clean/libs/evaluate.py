@@ -69,7 +69,7 @@ def eval_splits(classifier, data_splits, batch_size, padding_token, twister=None
 
 def eval_simple_2(classifier, data_loader):
     correct = 0
-    total = len(data)
+    total = 0
 
     for v1, v2, lbl_batch in data_loader:
         prediction = classifier(
@@ -81,6 +81,7 @@ def eval_simple_2(classifier, data_loader):
         # count corrects
         _, predicted_idx = torch.max(prediction, dim=1)
         correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+        total += predicted_idx.size()[0]
 
     return correct / total
 
