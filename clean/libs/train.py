@@ -15,7 +15,7 @@ from libs import model as m
 from libs import model_tools, evaluate, collatebatch, multitask
 
 
-DEFAULT_ITERATIONS = 10
+DEFAULT_ITERATIONS = 6
 DEFAULT_LR = 0.0002
 DEFAULT_VALIDATE_AFTER = [16000,2000]
 DEFAULT_BATCH_SIZE = 32
@@ -35,7 +35,7 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
     best_train_acc = -1
     best_model = None
 
-    mt_epochs = set([2,3,6])
+    mt_epochs = set([2,3])
     #multitask_learner = multitask.MTNetwork(classifier)
 
     # actual training
