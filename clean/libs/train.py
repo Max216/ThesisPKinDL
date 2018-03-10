@@ -126,8 +126,10 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
         
         if epoch in mt_epochs:
             # init optimizer
+            decay = epoch // 2
+            lr = start_lr / (2 ** decay) 
             optimizer_mt = optim.Adam(multitask_learner.parameters(), lr=lr)
-
+ 
             # MULTITASK LEARN 
             for i in range(MT_ITER):
                 for sent_batch, word_batch, lbl_batch in mt_loader_train:
@@ -164,15 +166,13 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
                 sys.stdout.flush()
 
             # reinit optimizer normal
-            optimizer = optim.Adam(classifier.parameters(), lr=lr)
+            optimizer = optim.Adam(classifier.parameters(), lr=start_lr)
 
 
         # Half decay lr
         decay = epoch // 2
         lr = start_lr / (2 ** decay)  
         for pg in optimizer.param_groups:
-            pg['lr'] = lr
-        for pg in optimizer_mt.param_groups:
             pg['lr'] = lr
             
         running_time = time.time() - start_time
