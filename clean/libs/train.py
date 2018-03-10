@@ -15,7 +15,7 @@ from libs import model as m
 from libs import model_tools, evaluate, collatebatch, multitask
 
 
-DEFAULT_ITERATIONS = 6
+DEFAULT_ITERATIONS = 5
 DEFAULT_LR = 0.0002
 DEFAULT_VALIDATE_AFTER = [16000,2000]
 DEFAULT_BATCH_SIZE = 32
