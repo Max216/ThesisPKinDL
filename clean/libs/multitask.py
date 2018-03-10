@@ -110,7 +110,8 @@ class MTNetwork(nn.Module):
 
     def forward(self, sent, target_word):
         sentence_representation = self.classifier.forward_sent(sent)
-        word_representation = self.classifier.lookup_word(target_word)
+        batch_size = sentence_representation.size()[0]
+        word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
 
         print('#sr',sentence_representation.size())
         print('##wr', word_representation.size())
