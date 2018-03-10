@@ -35,8 +35,8 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
     best_train_acc = -1
     best_model = None
 
-    mt_epochs = set([2])
-    MT_ITER = 2
+    mt_epochs = set([2,4,6])
+    MT_ITER = 1
     #multitask_learner = multitask.MTNetwork(classifier)
 
     # actual training
