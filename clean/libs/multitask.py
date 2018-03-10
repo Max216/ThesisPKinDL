@@ -110,7 +110,7 @@ class MTNetwork(nn.Module):
 
     def forward(self, sent, target_word):
         sentence_representation = self.classifier.forward_sent(sent)
-        print('#'sentence_representation.size())
-        print('##', target_word.size())
+        #print('#',sentence_representation.size())
+        #print('##', target_word.size())
         feed_forward_input = torch.cat((sentence_representation, target_word), 1)
         return F.softmax(self.layer(feed_forward_input))
