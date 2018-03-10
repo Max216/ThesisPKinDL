@@ -43,7 +43,8 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
 
 
     train_loader = [DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(padding_token)) for train_set in train_set_splits]
-    mt_loader = DataLoader(multitask_target, drop_last=False, batch_size=batch_size, shuffle=True)
+    mt_loader_train = DataLoader(multitask_target, drop_last=False, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchSentWord(padding_token))
+    mt_loader_eval = DataLoader(multitask_target, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchSentWord(padding_token))
 
     start_time = time.time()
     start_lr = lr

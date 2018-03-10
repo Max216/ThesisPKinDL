@@ -32,6 +32,31 @@ class CollateBatch(object):
         return p,h,l
 
 
+class CollateBatchSentWord(object):
+    '''
+    Applies padding to shorter sentences within a minibatch.
+    '''
+
+    def __init__(self, padding_token):
+        self.padding_token = padding_token
+        
+    def pad(self, tensor, length):
+        return torch.cat([tensor, tensor.new(length - tensor.size(0), *tensor.size()[1:]).fill_(self.padding_token)])
+                
+    def __call__(self, batch):
+
+        sent, word, label, sent_len = [list(a) for a in zip(*batch)]
+
+        max_sent_len = int(np.max(sent_len))
+
+
+        sents = torch.cat([self.pad(m.cuda_wrap(sent), max_sent_len).view(-1,1) for s in sent], dim=1)
+        w = m.cuda_wrap(torch.LongTensor(word))
+        l = m.cuda_wrap(torch.LongTensor(label))
+
+        return sents,w,l
+
+
 
         #sizes = torch.LongTensor([[len(premise), len(hypothesis)] for premise, hypothesis, _, _2, _3 in batch])
         #(max_length_premise, max_length_hypothesis), idxs = torch.max(sizes, dim=0)
