@@ -133,6 +133,9 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
                 word_var = autograd.Variable(word_batch)
                 lbl_var = autograd.Variable(lbl_batch)
 
+                print('sent:', sent_var.data.size())
+                print('words:', word_var.data.size())
+                print('labels:', lbl_var.data.size())
                 prediction = multitask_learner(sent_var, word_var)
                 loss = F.cross_entropy(prediction, lbl_var)
 
