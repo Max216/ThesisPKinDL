@@ -123,7 +123,7 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
                             model_tools.store(name, best_model, 'temp')
         else:
             # MULTITASK LEARN
-            for sent_batch, word_batch, lbl_batch in mt_loader:
+            for sent_batch, word_batch, lbl_batch in mt_loader_train:
                 # reset gradients
                 multitask_learner.zero_grad()
                 optimizer_mt.zero_grad()
@@ -144,7 +144,7 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
 
             # validate
             multitask_learner.eval()
-            acc_mt = evaluate.eval_simple_2(multitask_learner, mt_loader)
+            acc_mt = evaluate.eval_simple_2(multitask_learner, mt_loader_eval)
             multitask_learner.train()
 
             print('After seeing', samples_seen, 'samples:')
