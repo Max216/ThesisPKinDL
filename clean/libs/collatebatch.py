@@ -50,7 +50,8 @@ class CollateBatchSentWord(object):
         max_sent_len = int(np.max(sent_len))
 
 
-        sents = torch.cat([self.pad(m.cuda_wrap(sent), max_sent_len).view(-1,1) for s in sent], dim=1)
+        sents = torch.cat([self.pad(m.cuda_wrap(s), max_sent_len).view(-1,1) for s in sent], dim=1)
+        #sents = torch.cat([self.pad(m.cuda_wrap(sent), max_sent_len).view(-1,1) for s in sent], dim=1)
         w = m.cuda_wrap(torch.LongTensor(word))
         l = m.cuda_wrap(torch.LongTensor(label))
 
