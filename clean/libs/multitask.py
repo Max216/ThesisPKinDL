@@ -115,5 +115,6 @@ class MTNetwork(nn.Module):
 
         print('#sr',sentence_representation.size())
         print('##wr', word_representation.size())
-        feed_forward_input = torch.cat((sentence_representation, target_word), 1)
+        feed_forward_input = torch.cat((sentence_representation, target_word), 0)
+        print('ff input:', feed_forward_input.size())
         return F.softmax(self.layer(feed_forward_input))
