@@ -5,6 +5,9 @@ Store and manage word embeddings
 import numpy as np
 from libs import config
 
+START_SENT = '<START_SENT>'
+END_SENT = '<END_SENT>'
+
 class EmbeddingHolder:
     
     """
@@ -14,8 +17,10 @@ class EmbeddingHolder:
     
     OOV = '@@OOV@@'
     PADDING = '@@PADDING@@'
+
+
     
-    def __init__(self, path, include_oov_padding = True):
+    def __init__(self, path, include_oov_padding = True, include_start_end=True):
 
 
         # red previously stored binary word embeddings and vocab
@@ -28,13 +33,28 @@ class EmbeddingHolder:
         self.dimen = wv.shape[1]
         
         # Add OOV and PADDING
+        next_idx = amount
         if include_oov_padding:
-            words[self.OOV] = amount
-            self.oov_index = amount
-            words[self.PADDING] = amount+1
+            words[self.OOV] = next_idx
+            self.oov_index = next_idx
+            next_idx += 1
+
+            words[self.PADDING] = next_idx
+            next_idx += 1
             unk = np.random.random_sample((wv.shape[1],))
             padding = np.zeros(self.dimen)
             wv = np.vstack((wv, unk, padding))
+
+        if include_start_end:
+            words[START_SENT] = next_idx
+            next_idx += 1
+            words[END_SENT] = next_idx
+            next_idx += 1
+
+            start = np.random.random_sample((wv.shape[1]))
+            end = np.random.random_sample((wv.shape[1]))
+
+            wv = np.vstack((wv, start, end))
         
         self.words = words
         self.embeddings = wv

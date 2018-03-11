@@ -8,7 +8,7 @@ import torch
 import torch
 from torch.utils.data import Dataset
 
-from libs import config, data_tools
+from libs import config, data_tools, embeddingholder
 
 class SentEncoderDataset(Dataset):
     '''
@@ -42,7 +42,7 @@ class Datahandler:
     Loads data.
     '''
 
-    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS):
+    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS, include_start_end_token=True):
         '''
         Create a Datahandler for the data at the given path
 
@@ -66,6 +66,17 @@ class Datahandler:
                 1/0
 
         
+        if include_start_end_token:
+            print('Including start/stop symbols')
+            samples = []
+            for s in self.samples:
+                s[0] = [embeddingholder.START_SENT] + s[0] + [embeddingholder.END_SENT]
+                s[1] = [embeddingholder.START_SENT] + s[1] + [embeddingholder.END_SENT]
+                s[3] = s[3] + 2
+                s[4] = s[4] + 2
+                samples.append(s)
+
+            self.samples = samples
 
 
         # sort by premise length
