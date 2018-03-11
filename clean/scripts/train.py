@@ -21,9 +21,9 @@ def main():
 
     """)
 
-    torch.manual_seed(6)
-    np.random.seed(6)
-    random.seed(6)
+    torch.manual_seed(12)
+    np.random.seed(12)
+    random.seed(12)
 
     path_train  = args['--tdata']
     path_dev = args['--ddata']

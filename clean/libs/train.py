@@ -24,7 +24,7 @@ def train_model_multitask_sent(name, classifier, padding_token, train_set_splits
     classifier.train()
     multitask_learner.train()
     multitask_learner = m.cuda_wrap(multitask_learner)
-    torch.manual_seed(6)
+    #torch.manual_seed(6)
 
     # remember when to validate:
     until_validation = 0
@@ -192,7 +192,7 @@ def train_model(name, classifier, padding_token, train_set_splits, dev_set, iter
     '''
 
     classifier.train()
-    torch.manual_seed(6)
+    #torch.manual_seed(6)
 
     # remember when to validate:
     until_validation = 0
