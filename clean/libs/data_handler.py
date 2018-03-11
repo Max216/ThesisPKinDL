@@ -70,11 +70,11 @@ class Datahandler:
             print('Including start/stop symbols')
             samples = []
             for s in self.samples:
-                s[0] = [embeddingholder.START_SENT] + s[0] + [embeddingholder.END_SENT]
-                s[1] = [embeddingholder.START_SENT] + s[1] + [embeddingholder.END_SENT]
-                s[3] = s[3] + 2
-                s[4] = s[4] + 2
-                samples.append(s)
+                p = [embeddingholder.START_SENT] + s[0] + [embeddingholder.END_SENT]
+                h = [embeddingholder.START_SENT] + s[1] + [embeddingholder.END_SENT]
+                p_len = s[3] + 2
+                h_len = s[4] + 2
+                samples.append((p,h,s[2], p_len, h_len))
 
             self.samples = samples
 
