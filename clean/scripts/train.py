@@ -18,7 +18,7 @@ def main():
     Usage:
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
         train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
-
+        train.py new_mt_sent_simult [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
     """)
 
     torch.manual_seed(12)
@@ -78,8 +78,21 @@ def main():
         mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder, path_train).get_target_dataset()
         multitask_learner = multitask.MTNetwork(classifier, 600 * 2 + embedding_holder.dim(), 2)
         train.train_model_multitask_sent(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
-    elif args['new_mt_word']:
-        print('Multitask word leanring')
+    elif args['new_mt_sent_simult']:
+        print('MultiTask Sentence training')
+        print('Create model ... ')
+        if encoding_dim != None:
+            encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
+        model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
+        print('Store result as', model_name)
+        train_set = [datahandler_train.get_dataset(embedding_holder)]
+        dev_set = datahandler_dev.get_dataset(embedding_holder)
+
+        if path_train == None:
+            path_train = config.PATH_TRAIN_DATA
+        mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder, path_train).get_target_dataset()
+        multitask_learner = multitask.MTNetwork(classifier, 600 * 2 + embedding_holder.dim(), 2)
+        train.train_model_multitask_sent_simult(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
 
 if __name__ == '__main__':
     main()
