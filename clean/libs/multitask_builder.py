@@ -186,11 +186,11 @@ class MultitaskBuilder:
         samples = []
 
         def add(sent_repr, w_idx, lbl):
-            print('lookup word', w)
+            #print('lookup word', w)
             embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False)).view(-1)
-            print('embd word',embd.size())
-            print('repr dim', sent_repr.size())
-            print('concatenated', torch.cat((sent_repr, embd), 0).size())
+            #print('embd word',embd.size())
+            #print('repr dim', sent_repr.size())
+            #print('concatenated', torch.cat((sent_repr, embd), 0).size())
             samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
 
         for i in range(premise_var.size()[1]):
@@ -247,8 +247,9 @@ class MultitaskBuilder:
                 print(hyp_repr[i,:])
                 add(hyp_repr[i,:], w, 1)
 
-        print('samples')
-        print(samples)
+        #print('samples')
+        #print(samples)
+        print('# samples:', len(samples))
         return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, ), len(samples)
 
 
