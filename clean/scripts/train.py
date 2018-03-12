@@ -18,7 +18,7 @@ def main():
     Usage:
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
         train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
-        train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>]
+        train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>] [--tdata=<train_data>]
     """)
 
     torch.manual_seed(12)
@@ -100,7 +100,7 @@ def main():
         if path_train == None:
             path_train = config.PATH_TRAIN_DATA
 
-        multitask.train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, args['<multitask_type>'], args['<multitask_data>'])
+        multitask.train_simult(model_name, classifier, embedding_holder, train_set, dev_set, path_train, args['<multitask_type>'], args['<multitask_data>'])
 
     elif args['new_mt_sent_simult']:
         print('MultiTask Sentence training')
