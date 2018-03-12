@@ -161,7 +161,7 @@ class MultitaskBuilder:
                 if w_idx == self._stop_idx:
                     break
                 else:
-                    samples.add(w_idx)
+                    word_set.add(w_idx)
 
             entailing_words = set()
             contradicting_words = set()
