@@ -180,11 +180,18 @@ class MultitaskBuilder:
 
     def add_evaluation(self, premise_info, hypothesis_info):
         """ evaluate the samples and remember the results """
-        pass
+        eval_data, counts = self.get_all_multitask_samples(premise_info, hypothesis_info)
+        for samples, lbls in eval_data:
+            pred = self._multitask_network(samples)
+            _, predicted_idx = torch.max(pred.data, dim=1)
+            self._correct_multitask_samples += torch.sum(torch.eq(lbl_batch, predicted_idx))
+        self._total_count_multitask_samples += counts
 
     def print_evaluation(self):
         """ print evaluation """
-        pass
+        print(self._correct_multitask_samples / self._total_count_multitask_samples)
+        self._correct_multitask_samples = 0
+        self._total_count_multitask_samples = 0
 
     def loss(self, snli_loss, premise_info, hypothesis_info):
         """ Calculate the loss for thee gradient """
