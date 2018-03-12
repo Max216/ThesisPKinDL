@@ -3,6 +3,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.autograd as autograd
 import torch.nn as nn
+from torch.utils.data import Dataset
 
 
 import collections
@@ -15,26 +16,6 @@ def _zero_grad_nothing(dummy):
     pass
 def _zero_grad_obj(obj):
     obj.zero_grad()
-
-class CollateBatchSentWord(object):
-    '''
-    Applies padding to shorter sentences within a minibatch.
-    '''
-
-    def __init__(self):
-        pass
-        
-                
-    def __call__(self, batch):
-
-        sent, word, label, [list(a) for a in zip(*batch)]
-
-        sents = torch.cat([s.view(-1,1) for s in sent], dim=1)
-        #sents = torch.cat([self.pad(m.cuda_wrap(sent), max_sent_len).view(-1,1) for s in sent], dim=1)
-        w = m.cuda_wrap(torch.LongTensor(word)).view(-1)
-        l = m.cuda_wrap(torch.LongTensor(label)).view(-1)
-
-        return sents,w,l
 
 class SentMTDataset(Dataset):
     '''
@@ -258,6 +239,8 @@ class MultitaskBuilder:
             for w in entailing_words:
                 print(hyp_repr[i,:])
                 add(hyp_repr[i,:], w, 1)
+
+        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, ), len(samples)
 
 
 
