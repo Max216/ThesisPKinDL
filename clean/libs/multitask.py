@@ -13,138 +13,138 @@ from libs import data_handler, multitask_builder, collatebatch, model_tools
 import collections, time, sys, copy
 
 
-class TargetCreator:
-    """
-    To on the fly create target samples for the multi-task
-    """
+# class TargetCreator:
+#     """
+#     To on the fly create target samples for the multi-task
+#     """
 
-    def __init__(self, data_path, embedding_lookup):
-        self.lookup = embedding_lookup
+#     def __init__(self, data_path, embedding_lookup):
+#         self.lookup = embedding_lookup
 
-        with open(dataset_path) as f_in:
-            data = [line.strip().split('\t') for line in f_in.readlines()]
+#         with open(dataset_path) as f_in:
+#             data = [line.strip().split('\t') for line in f_in.readlines()]
 
-        contradictions = collections.defaultdict(lambda: set())
-        entailments = collections.defaultdict(lambda: set())
+#         contradictions = collections.defaultdict(lambda: set())
+#         entailments = collections.defaultdict(lambda: set())
 
-        for d in data:
-            if d[2] == 'contradiction':
-                contradictions[d[0]].add(d[1])
-            else:
-                entailments[d[0]].add(d[1])
-
-
-    def get_samples(self, sent_id, sent_repr):
-        pass
+#         for d in data:
+#             if d[2] == 'contradiction':
+#                 contradictions[d[0]].add(d[1])
+#             else:
+#                 entailments[d[0]].add(d[1])
 
 
+#     def get_samples(self, sent_id, sent_repr):
+#         pass
 
 
-class SentMTDataset(Dataset):
-    '''
-    Dataset format to give to classifier
-    '''
 
-    def __init__(self, samples, embedding_holder, tag_to_idx):
-        '''
-        Create a new dataset for the given samples
-        :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
-        :paraam embedding_holder    To map from word to number
-        :param tag_to_idx         dictionary mapping the string label to a number
-        '''
+
+# class SentMTDataset(Dataset):
+#     '''
+#     Dataset format to give to classifier
+#     '''
+
+#     def __init__(self, samples, embedding_holder, tag_to_idx):
+#         '''
+#         Create a new dataset for the given samples
+#         :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
+#         :paraam embedding_holder    To map from word to number
+#         :param tag_to_idx         dictionary mapping the string label to a number
+#         '''
         
-        self.converted_samples = [(
-            torch.LongTensor([embedding_holder.word_index(w_sent) for w_sent in sent]),
-            embedding_holder.word_index(w),
-            tag_to_idx[lbl],
-            len(sent)
-        ) for sent, w, lbl in samples]
+#         self.converted_samples = [(
+#             torch.LongTensor([embedding_holder.word_index(w_sent) for w_sent in sent]),
+#             embedding_holder.word_index(w),
+#             tag_to_idx[lbl],
+#             len(sent)
+#         ) for sent, w, lbl in samples]
 
-    def __len__(self):
-        return len(self.converted_samples)
+#     def __len__(self):
+#         return len(self.converted_samples)
 
-    def __getitem__(self, idx):
-        return self.converted_samples[idx]
+#     def __getitem__(self, idx):
+#         return self.converted_samples[idx]
 
-class SentenceInOutTarget:
-    """
-    Creates targets considering only "contradiction" and "entailment" to determine if a word is within a
-    sentence or not.
-    """
+# class SentenceInOutTarget:
+#     """
+#     Creates targets considering only "contradiction" and "entailment" to determine if a word is within a
+#     sentence or not.
+#     """
 
-    def __init__(self, data_path, embedding_holder, dataset_path):
-        """
-        data_path for target.tsv
-        dataset for snli.jsonl
-        """
+#     def __init__(self, data_path, embedding_holder, dataset_path):
+#         """
+#         data_path for target.tsv
+#         dataset for snli.jsonl
+#         """
 
-        self.embedding_holder = embedding_holder
-        self.labels = dict([('entailment', 0), ('contradiction', 1)])
+#         self.embedding_holder = embedding_holder
+#         self.labels = dict([('entailment', 0), ('contradiction', 1)])
 
-        with open(data_path) as f_in:
-            data = [line.strip().split('\t') for line in f_in.readlines()]
+#         with open(data_path) as f_in:
+#             data = [line.strip().split('\t') for line in f_in.readlines()]
 
-        sentence_dataset_handler = data_handler.Datahandler(dataset_path)
-        sentences = sentence_dataset_handler.get_sentences()
+#         sentence_dataset_handler = data_handler.Datahandler(dataset_path)
+#         sentences = sentence_dataset_handler.get_sentences()
 
-        knowledge_dict_ent = collections.defaultdict(lambda : set())
-        knowledge_dict_contr = collections.defaultdict(lambda : set())
-        for d in data:
-            if d[2] == 'entailment':
-                knowledge_dict_ent[d[0]].add(d[1])
-            elif d[2] == 'contradiction':
-                knowledge_dict_contr[d[0]].add(d[1])
-            else:
-                1/0
+#         knowledge_dict_ent = collections.defaultdict(lambda : set())
+#         knowledge_dict_contr = collections.defaultdict(lambda : set())
+#         for d in data:
+#             if d[2] == 'entailment':
+#                 knowledge_dict_ent[d[0]].add(d[1])
+#             elif d[2] == 'contradiction':
+#                 knowledge_dict_contr[d[0]].add(d[1])
+#             else:
+#                 1/0
 
-        samples = []
-        for sent in sentences:
-            sent_set = set(sent)
-            entailing_words = set()
-            for w in list(sent_set):
-                if w in knowledge_dict_ent:
-                    c_knowledge = list(knowledge_dict_ent[w])
-                    entailing_words.update(c_knowledge)
-                    samples.extend([(sent, w2, 'entailment') for w2 in c_knowledge])
+#         samples = []
+#         for sent in sentences:
+#             sent_set = set(sent)
+#             entailing_words = set()
+#             for w in list(sent_set):
+#                 if w in knowledge_dict_ent:
+#                     c_knowledge = list(knowledge_dict_ent[w])
+#                     entailing_words.update(c_knowledge)
+#                     samples.extend([(sent, w2, 'entailment') for w2 in c_knowledge])
 
-            for w in list(sent_set):
-                if w in knowledge_dict_contr:
-                    c_knowledge = list(knowledge_dict_contr[w])
-                    samples.extend([(sent, w2, 'contradiction') for w2 in c_knowledge if w2 not in entailing_words])
+#             for w in list(sent_set):
+#                 if w in knowledge_dict_contr:
+#                     c_knowledge = list(knowledge_dict_contr[w])
+#                     samples.extend([(sent, w2, 'contradiction') for w2 in c_knowledge if w2 not in entailing_words])
 
-        self.samples = samples
-
-
-    def get_target_dataset(self):
-        return SentMTDataset(self.samples, self.embedding_holder, self.labels)
+#         self.samples = samples
 
 
-class MTNetwork(nn.Module):
-    """
-    Map the embedding to a smaller represerntation
-    """
+#     def get_target_dataset(self):
+#         return SentMTDataset(self.samples, self.embedding_holder, self.labels)
 
-    def __init__(self, classifier, input_dim, output_dim):
-        """
-        Initialize a new network to create representations based on WordNet information.
-        :param pretrained_embeddings    pretrained embedding matrix
-        :param hidden_layer_dimension   amoount of hidden nodes
-        :param representations          size of the resulting representation
-        """
-        super(MTNetwork, self).__init__()
-        self.classifier = classifier
-        self.layer = nn.Linear(input_dim, output_dim)
 
-    def forward(self, sent, target_word):
-        sentence_representation = self.classifier.forward_sent(sent)
-        batch_size = sentence_representation.size()[0]
-        word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
+# class MTNetwork(nn.Module):
+#     """
+#     Map the embedding to a smaller represerntation
+#     """
 
-        print('#sr',sentence_representation.size())
-        print('##wr', word_representation.size())
-        feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
-        print('ff input:', feed_forward_input.size())
-        return F.softmax(self.layer(feed_forward_input))
+#     def __init__(self, classifier, input_dim, output_dim):
+#         """
+#         Initialize a new network to create representations based on WordNet information.
+#         :param pretrained_embeddings    pretrained embedding matrix
+#         :param hidden_layer_dimension   amoount of hidden nodes
+#         :param representations          size of the resulting representation
+#         """
+#         super(MTNetwork, self).__init__()
+#         self.classifier = classifier
+#         self.layer = nn.Linear(input_dim, output_dim)
+
+#     def forward(self, sent, target_word):
+#         sentence_representation = self.classifier.forward_sent(sent)
+#         batch_size = sentence_representation.size()[0]
+#         word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
+
+#         print('#sr',sentence_representation.size())
+#         print('##wr', word_representation.size())
+#         feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
+#         print('ff input:', feed_forward_input.size())
+#         return F.softmax(self.layer(feed_forward_input))
 
 
 DEFAULT_ITERATIONS = 10
@@ -203,6 +203,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             # Main task prediction and loss
             prediction, activation_indizes, sentence_representations = classifier(premise_var, hyp_var, output_sent_info=True)
             loss = F.cross_entropy(prediction, lbl_var)
+            print('loss size', loss.size(), loss)
 
             premise_info = (premise_var, sentence_representations[0])
             hypothesis_info = (hyp_var, sentence_representations[1])
