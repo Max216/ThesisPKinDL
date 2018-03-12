@@ -53,7 +53,7 @@ class MultitaskBuilder:
         if self._multitask_network != None:
             self._multitask_network.eval()
 
-    def add_evaluation(self):
+    def add_evaluation(self, premise_info, hypothesis_info):
         """ evaluate the samples and remember the results """
         pass
 
