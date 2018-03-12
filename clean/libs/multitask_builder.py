@@ -325,7 +325,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
         batch_factor = sample_factor * batch_size
 
         #words_var = autograd.Variable(batch_words, requires_grad=False)
-        lbl_var = autograd.Variable(batch_lbl)
+        lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
 
         predictions = builder.predict(batch_samples)
         print('predicted', predictions.size())
