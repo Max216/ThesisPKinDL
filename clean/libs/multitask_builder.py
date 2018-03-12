@@ -201,6 +201,7 @@ class MultitaskBuilder:
             entailing_words = list(entailing_words) 
 
             for w in contradicting_words:
+                print(hyp_repr[i,:])
                 samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
             for w in entailing_words:
                 samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
