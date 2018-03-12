@@ -253,6 +253,7 @@ class EntailmentClassifier(nn.Module):
 
     def forward_sent(self, sent1):
         batch_size = sent1.size()[1]
+        print('forward sent btch size', batch_size)
         
         # Map to embeddings
         embedded1 = self.embeddings(sent1)

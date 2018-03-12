@@ -159,7 +159,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     validate_after_vals = DEFAULT_VALIDATE_AFTER
     batch_size = DEFAULT_BATCH_SIZE
 
-    builder = multitask_builder.get_builder(classifier, multitask_type, multitask_data, start_lr)
+    builder = multitask_builder.get_builder(classifier, multitask_type, multitask_data, start_lr, embedding_holder)
 
     classifier.train()
     builder.train()
@@ -203,7 +203,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             # Main task prediction and loss
             prediction, activation_indizes, sentence_representations = classifier(premise_var, hyp_var, output_sent_info=True)
             loss = F.cross_entropy(prediction, lbl_var)
-            print('loss size', loss.size(), loss)
+            #print('loss size', loss.size(), loss)
 
             premise_info = (premise_var, sentence_representations[0])
             hypothesis_info = (hyp_var, sentence_representations[1])

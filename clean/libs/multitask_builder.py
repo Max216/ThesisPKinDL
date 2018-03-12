@@ -5,7 +5,7 @@ import torch.autograd as autograd
 import torch.nn as nn
 
 
-
+import collections
 
 from libs import model as m
 
@@ -73,7 +73,7 @@ class MultitaskBuilder:
     Create all things required for the multitask training
     """
 
-    def __init__(self, params, lr, multitask_data, classifier):
+    def __init__(self, params, lr, multitask_data, classifier, embedding_holder):
         self._multitask_network = params['multitask_network']
         self._optimizer = params['optimizer'](classifier, self._multitask_network, lr)
         self._loss_fn = params['loss_fn']
@@ -86,7 +86,17 @@ class MultitaskBuilder:
             self._zero_grad = _zero_grad_obj
 
         # create data
-        # TODO
+        with open(multitask_data) as f_in:
+            data = [line.strip().split('\t') for line in f_in.readlines()]
+        self._not_in_sent_samples = collections.defaultdict(list)
+        self._in_sent_samples = collections.defaultdict(list)
+        for d in data:
+            w1 = embedding_holder.word_index(d[0])
+            w2 = embedding_holder.word_index(d[1])
+            if d[2] == 'contradiction':
+                self._not_in_sent_samples[w1].append(torch.LongTensor([w2]))
+            elif d[2] == 'entailment':
+                self._in_sent_samples[w1].append(torch.LongTensor([w2]))
 
     def zero_grad_multitask(self):
         """ Reset gradients for multitask network and optimizer """
@@ -123,13 +133,26 @@ class MultitaskBuilder:
 
     def loss(self, snli_loss, premise_info, hypothesis_info):
         """ Calculate the loss for thee gradient """
-        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info)
+        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, self)
         return self._loss_fn(snli_loss, multitask_loss)
 
     def adjust_lr(self, new_lr):
         """ Adjust the learnrate """
         for pg in self._optimizer.param_groups:
             pg['lr'] = new_lr
+
+    def get_all_multitask_samples(self, premise_info, hypothesis_info):
+        """ Create a dataset based on wordnet and the given sentences """
+        premise_var, premise_repr = premise_info
+        hyp_var, hyp_repr = hypothesis_info
+
+        print('the premise: ', premise_var.data)
+
+    def predict(self, sent_reprs, words):
+        """
+        predict the samples
+        """
+        pass
 
 #
 # Dummys
@@ -167,10 +190,19 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
     samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info)
 
     loss = autograd.Variable(torch.FloatTensor([0]))
+    sample_factor = 1/sample_count
     for batch_sents, batch_words, batch_lbl in samples:
+        
+        batch_size = batch_sents.size()[0]
+        batch_factor = sample_factor * batch_size
+
         words_var = autograd.Variable(batch_words, requires_grad=False)
+        lbl_var = autograd.Variable(batch_lbl)
+
         predictions = builder.predict(batch_sents, words_var)
-        loss = 0
+        loss += batch_factor * F.cross_entropy(predictions, lbl_var)
+
+    return loss
 
 
 #
@@ -192,7 +224,7 @@ def get_multitask_nw(classifier, layers=1):
 #
 # Factory
 #
-def get_builder(classifier, mt_type, mt_data, lr):
+def get_builder(classifier, mt_type, mt_data, lr, embedding_holder):
     params = dict()
     if mt_type == 'test_snli':
         # ignore multitask, verify that SNLI training works
@@ -201,7 +233,7 @@ def get_builder(classifier, mt_type, mt_data, lr):
         params['loss_fn_multitask'] = nothing
         params['loss_fn'] = loss_snli_only
 
-        return MultitaskBuilder(params, lr, None, classifier)
+        return MultitaskBuilder(params, lr, None, classifier, embedding_holder)
 
     elif mt_type == 'test_mt':
         # ignore snli, verify that Multitask works
@@ -210,4 +242,4 @@ def get_builder(classifier, mt_type, mt_data, lr):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_multitask_only
 
-        return MultitaskBuilder(params, lr, mt_data, classifier)
+        return MultitaskBuilder(params, lr, mt_data, classifier, embedding_holder)
