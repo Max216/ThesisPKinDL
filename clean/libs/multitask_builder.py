@@ -204,6 +204,7 @@ class MultitaskBuilder:
                 print(hyp_repr[i,:])
                 samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
             for w in entailing_words:
+                print(hyp_repr[i,:])
                 samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
 
 
