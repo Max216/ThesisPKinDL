@@ -126,6 +126,7 @@ class MultitaskBuilder:
         self._loss_fn_multitask = params['loss_fn_multitask']
         self._stop_idx = embedding_holder.stop_idx()
         self._classifier = classifier
+        self._word_dict = embedding_holder.reverse()
 
         # helper functions
         if self._multitask_network == None:
@@ -183,9 +184,9 @@ class MultitaskBuilder:
 
     def loss(self, snli_loss, premise_info, hypothesis_info):
         """ Calculate the loss for thee gradient """
-        print('now create loss')
+        #print('now create loss')
         multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, self)
-        print('multitask loss', multitask_loss)
+        #print('multitask loss', multitask_loss)
         return self._loss_fn(snli_loss, multitask_loss)
 
     def adjust_lr(self, new_lr):
@@ -223,9 +224,13 @@ class MultitaskBuilder:
 
             entailing_words = set()
             contradicting_words = set()
+            print('# premise start')
             for w_idx in list(word_set):
                 entailing_words.update(self._in_sent_samples[w_idx])
-                contradicting_words.update(self._in_sent_samples[w_idx])
+                contradicting_words.update(self._not_in_sent_samples[w_idx])
+                print('word:', self._word_dict[w_idx], '-> (e)', self._in_sent_samples[w_idx])
+                print('word:', self._word_dict[w_idx], '-> (c)', self._not_in_sent_samples[w_idx])
+            print('# premise end')
             
             contradicting_words = list(contradicting_words - entailing_words)
             entailing_words = list(entailing_words) 
@@ -254,7 +259,7 @@ class MultitaskBuilder:
             contradicting_words = set()
             for w_idx in list(word_set):
                 entailing_words.update(self._in_sent_samples[w_idx])
-                contradicting_words.update(self._in_sent_samples[w_idx])
+                contradicting_words.update(self._not_in_sent_samples[w_idx])
             
             contradicting_words = list(contradicting_words - entailing_words)
             entailing_words = list(entailing_words) 
