@@ -185,7 +185,7 @@ class MultitaskBuilder:
     def loss(self, snli_loss, premise_info, hypothesis_info):
         """ Calculate the loss for thee gradient """
         #print('now create loss')
-        print(self._classifier.sent_encoder.lstm1)
+        print(self._classifier.sent_encoder.lstm1.data.weights)
         multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, self)
         #print('multitask loss', multitask_loss)
         return self._loss_fn(snli_loss, multitask_loss)
