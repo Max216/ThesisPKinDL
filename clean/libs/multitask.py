@@ -234,7 +234,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
                     correct_snli += torch.sum(torch.eq(lbl_batch, predicted_idx))
 
                     premise_info = (premise_var, sentence_representations[0])
-                    hypothesis_info = (hyp_var, sentence_representation[1])
+                    hypothesis_info = (hyp_var, sentence_representations[1])
                     builder.add_evaluation(premise_info, hypothesis_info)
 
 
