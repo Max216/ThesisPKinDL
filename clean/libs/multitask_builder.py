@@ -71,7 +71,7 @@ class MultitaskBuilder:
         for pg in self.optimizer.param_groups:
             pg['lr'] = new_lr
 
-def nothing(dummy1=none, dummy2=None):
+def nothing(dummy1=None, dummy2=None):
     return None
 
 def get_optimizer_snli_only(classifier, multitask_network, lr):
