@@ -378,7 +378,7 @@ def get_builder(classifier, mt_type, mt_data, lr, embedding_holder):
 
     elif mt_type == 'test_mt':
         # ignore snli, verify that Multitask works
-        params['multitask_network'] = get_multitask_nw(classifier, layers=1)
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_multitask_only
