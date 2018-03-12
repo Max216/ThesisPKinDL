@@ -300,7 +300,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
     for batch_samples, batch_lbl in samples:
         
         print('batch sample')
-        print(batch_samples)
+        #print(batch_samples)
         print(batch_samples.size())
 
         batch_size = batch_sents.size()[1]
