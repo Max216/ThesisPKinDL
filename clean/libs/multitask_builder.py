@@ -154,7 +154,7 @@ class MultitaskBuilder:
 
         samples = []
         for i in range(premise_var.size()[1]):
-            current_sent_indizes = premise_var.data[:,-1]
+            current_sent_indizes = premise_var.data[:,i]
             word_set = set()
             for j in range(current_sent_indizes.size()[0]):
                 w_idx = current_sent_indizes[j]
@@ -175,15 +175,37 @@ class MultitaskBuilder:
             for w in contradicting_words:
                 #print('premise size',premise_var.size())
                 #print('premise_var[i,:]',premise_var[:,i])
-                samples.append((premise_var[:,i], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+                samples.append((premise_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
             for w in entailing_words:
                 #print('premise size',premise_var.size())
                 #print('premise_var[i,:]',premise_var[:,i])
-                samples.append((premise_var[:,i], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
+                samples.append((premise_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
 
-        print('the premise: ', premise_var.data)
-        print('premise single sentence:', premise_var.data[:,-1])
-        print('premise single value:', premise_var.data[:,-1][2])
+        for i in range(hyp_var.size()[1]):
+            current_sent_indizes = hyp_var.data[:,i]
+            word_set = set()
+            for j in range(current_sent_indizes.size()[0]):
+                w_idx = current_sent_indizes[j]
+                if w_idx == self._stop_idx:
+                    break
+                else:
+                    word_set.add(w_idx)
+
+            entailing_words = set()
+            contradicting_words = set()
+            for w_idx in list(word_set):
+                entailing_words.update(self._in_sent_samples[w_idx])
+                contradicting_words.update(self._in_sent_samples[w_idx])
+            
+            contradicting_words = list(contradicting_words - entailing_words)
+            entailing_words = list(entailing_words) 
+
+            for w in contradicting_words:
+                samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+            for w in entailing_words:
+                samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
+
+
 
     def predict(self, sent_reprs, words):
         """
