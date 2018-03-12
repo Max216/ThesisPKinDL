@@ -57,7 +57,7 @@ class MultitaskBuilder:
         """ evaluate the samples and remember the results """
         pass
 
-    def print_evaluation(self, premise_info, hypothesis_info):
+    def print_evaluation(self):
         """ print evaluation """
         pass
 
