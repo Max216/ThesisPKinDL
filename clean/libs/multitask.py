@@ -225,7 +225,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
                 builder.new_evaluation()
 
-                for premise_batch, hyp_batch, lbl_batch in dev_set:
+                for premise_batch, hyp_batch, lbl_batch in dev_loader:
                     premise_var = autograd.Variable(premise_batch)
                     hyp_var = autograd.Variable(hyp_batch)
                     
