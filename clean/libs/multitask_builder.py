@@ -63,7 +63,7 @@ class MultitaskBuilder:
 
     def loss(self, snli_loss, premise_info, hypothesis_info):
         """ Calculate the loss for thee gradient """
-        multitask_loss = self.loss_fn_multitask(premise_info, hypothesis_info)
+        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info)
         return self._loss_fn(snli_loss, multitask_loss)
 
     def adjust_lr(self, new_lr):
