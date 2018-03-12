@@ -329,7 +329,9 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
 
         predictions = builder.predict(batch_samples)
         print('predicted', predictions.size())
-        loss += batch_factor * F.cross_entropy(predictions, lbl_var)
+        batch_loss = F.cross_entropy(predictions, lbl_var)
+        multiplicator_batch_factor = batch_loss.clone().fill_(batch_factor)
+        loss += batch_loss * multiplicator_batch_factor
 
     return loss
 
