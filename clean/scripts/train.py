@@ -95,7 +95,7 @@ def main():
         model_name += '.' + args['<multitask_type>']
 
         print('Store result as', model_name)
-        train_set = [datahandler_train.get_dataset(embedding_holder)]
+        train_set = datahandler_train.get_dataset(embedding_holder)
         dev_set = datahandler_dev.get_dataset(embedding_holder)
         if path_train == None:
             path_train = config.PATH_TRAIN_DATA
