@@ -244,7 +244,7 @@ class MultitaskBuilder:
             for w in contradicting_words:
                 add(hyp_repr[i,:], w, 0)
             for w in entailing_words:
-                print(hyp_repr[i,:])
+                #print(hyp_repr[i,:])
                 add(hyp_repr[i,:], w, 1)
 
         #print('samples')
