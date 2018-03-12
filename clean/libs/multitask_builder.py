@@ -148,6 +148,10 @@ class MultitaskBuilder:
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
 
+        print('premise repr',premise_repr.size())
+
+        samples = [()]
+
         print('the premise: ', premise_var.data)
         print('premise single sentence:', premise_var.data[:,1])
         print('premise single value:', premise_var.data[:,1][0])
