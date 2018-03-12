@@ -15,7 +15,7 @@ class MultitaskBuilder:
 
     def __init__(self, params, lr, multitask_data, classifier):
         self._multitask_network = params['multitask_network']()
-        self._optimizer = params['optimizer'](classifier, self.multitask_network, lr)
+        self._optimizer = params['optimizer'](classifier, self._multitask_network, lr)
         self._loss_fn = params['loss_fn']
         self._loss_fn_multitask = params['loss_fn_multitask']
 
