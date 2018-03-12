@@ -19,6 +19,24 @@ def _zero_grad_nothing(dummy):
 def _zero_grad_obj(obj):
     obj.zero_grad()
 
+class CollateBatchMultiTask(object):
+    '''
+    Applies padding to shorter sentences within a minibatch.
+    '''
+    
+    def __init__(self):
+        pass
+                
+    def __call__(self, batch):
+
+        data, lbl = [list(a) for a in zip(*batch)]
+
+        data = torch.cat(data, 1)
+        lbl = m.cuda_wrap(torch.LongTensor(lbl))
+
+
+        return data, lbl
+
 class SentMTDataset(Dataset):
     '''
     Dataset format to give to classifier
@@ -191,7 +209,7 @@ class MultitaskBuilder:
             #print('embd word',embd.size())
             #print('repr dim', sent_repr.size())
             #print('concatenated', torch.cat((sent_repr, embd), 0).size())
-            samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
+            samples.append((torch.cat((sent_repr, embd), 0), lbl))
 
         for i in range(premise_var.size()[1]):
             current_sent_indizes = premise_var.data[:,i]
@@ -250,7 +268,7 @@ class MultitaskBuilder:
         #print('samples')
         #print(samples)
         print('# samples:', len(samples))
-        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, ), len(samples)
+        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
 
 
 
