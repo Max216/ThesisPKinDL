@@ -195,6 +195,7 @@ class MultitaskBuilder:
             pg['lr'] = new_lr
 
     def get_all_multitask_samples(self, premise_info, hypothesis_info):
+        start = time.time()
         """ Create a dataset based on wordnet and the given sentences """
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
@@ -224,13 +225,13 @@ class MultitaskBuilder:
 
             entailing_words = set()
             contradicting_words = set()
-            print('# premise start')
+            #print('# premise start')
             for w_idx in list(word_set):
                 entailing_words.update(self._in_sent_samples[w_idx])
                 contradicting_words.update(self._not_in_sent_samples[w_idx])
-                print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www[0]] for www in self._in_sent_samples[w_idx]])
-                print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www[0]] for www in self._not_in_sent_samples[w_idx]])
-            print('# premise end')
+                #print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www[0]] for www in self._in_sent_samples[w_idx]])
+                #print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www[0]] for www in self._not_in_sent_samples[w_idx]])
+            #print('# premise end')
             
             contradicting_words = list(contradicting_words - entailing_words)
             entailing_words = list(entailing_words) 
@@ -273,6 +274,8 @@ class MultitaskBuilder:
         #print('samples')
         #print(samples)
         print('# samples:', len(samples))
+
+        print('time:', time.time() - start)
         return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
 
 
