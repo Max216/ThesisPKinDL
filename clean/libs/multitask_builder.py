@@ -4,6 +4,8 @@ import torch.nn.functional as F
 import torch.autograd as autograd
 import torch.nn as nn
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+
 
 
 import collections
@@ -298,6 +300,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
         
         print('batch sample')
         print(batch_samples)
+        print(batch_samples.size())
 
         batch_size = batch_sents.size()[1]
         batch_factor = sample_factor * batch_size
