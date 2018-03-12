@@ -16,6 +16,47 @@ def _zero_grad_nothing(dummy):
 def _zero_grad_obj(obj):
     obj.zero_grad()
 
+class CollateBatchSentWord(object):
+    '''
+    Applies padding to shorter sentences within a minibatch.
+    '''
+
+    def __init__(self):
+        pass
+        
+                
+    def __call__(self, batch):
+
+        sent, word, label, [list(a) for a in zip(*batch)]
+
+        sents = torch.cat([s.view(-1,1) for s in sent], dim=1)
+        #sents = torch.cat([self.pad(m.cuda_wrap(sent), max_sent_len).view(-1,1) for s in sent], dim=1)
+        w = m.cuda_wrap(torch.LongTensor(word)).view(-1)
+        l = m.cuda_wrap(torch.LongTensor(label)).view(-1)
+
+        return sents,w,l
+
+class SentMTDataset(Dataset):
+    '''
+    Dataset format to give to classifier
+    '''
+
+    def __init__(self, samples):
+        '''
+        Create a new dataset for the given samples
+        :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
+        :paraam embedding_holder    To map from word to number
+        :param tag_to_idx         dictionary mapping the string label to a number
+        '''
+        
+        self.converted_samples = samples
+
+    def __len__(self):
+        return len(self.converted_samples)
+
+    def __getitem__(self, idx):
+        return self.converted_samples[idx]
+
 class MTNetworkSingleLayer(nn.Module):
     """
     Map the embedding to a smaller represerntation
@@ -40,6 +81,11 @@ class MTNetworkSingleLayer(nn.Module):
         feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
         
         return F.softmax(self.layer(feed_forward_input))
+
+    def lookup_word(self, w_idx):
+        word = self.classifier.lookup_word(w_idx)
+        print('word', word)
+        return word
 
 class MTNetworkTwoLayer(nn.Module):
     """
@@ -79,6 +125,7 @@ class MultitaskBuilder:
         self._loss_fn = params['loss_fn']
         self._loss_fn_multitask = params['loss_fn_multitask']
         self._stop_idx = embedding_holder.stop_idx()
+        self._classifier = classifier
 
         # helper functions
         if self._multitask_network == None:
@@ -153,6 +200,11 @@ class MultitaskBuilder:
 
 
         samples = []
+
+        def add(sent_repr, w_idx, lbl):
+            embd = self._multitask_network.lookup_word(m.cuda_wrap(w))
+            samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
+
         for i in range(premise_var.size()[1]):
             current_sent_indizes = premise_var.data[:,i]
             word_set = set()
@@ -175,11 +227,12 @@ class MultitaskBuilder:
             for w in contradicting_words:
                 #print('premise size',premise_var.size())
                 #print('premise_var[i,:]',premise_var[:,i])
-                samples.append((premise_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+                
+                add(premise_repr[i,:], w, 0)
             for w in entailing_words:
                 #print('premise size',premise_var.size())
                 #print('premise_var[i,:]',premise_var[:,i])
-                samples.append((premise_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
+                add(premise_repr[i,:], w, 1)
 
         for i in range(hyp_var.size()[1]):
             current_sent_indizes = hyp_var.data[:,i]
@@ -201,11 +254,10 @@ class MultitaskBuilder:
             entailing_words = list(entailing_words) 
 
             for w in contradicting_words:
-                print(hyp_repr[i,:])
-                samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+                add(hyp_repr[i,:], w, 0)
             for w in entailing_words:
                 print(hyp_repr[i,:])
-                samples.append((hyp_repr[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
+                add(hyp_repr[i,:], w, 1)
 
 
 
