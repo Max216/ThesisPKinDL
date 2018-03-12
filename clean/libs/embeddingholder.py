@@ -59,6 +59,10 @@ class EmbeddingHolder:
         self.words = words
         self.embeddings = wv
 
+
+    def stop_idx(self):
+        return self.word_index(END_SENT)
+
     def concat(self, other):
         '''
         Concatenate each embedding with an additional vector. All unknowns will be set to zero.

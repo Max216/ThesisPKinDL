@@ -78,6 +78,7 @@ class MultitaskBuilder:
         self._optimizer = params['optimizer'](classifier, self._multitask_network, lr)
         self._loss_fn = params['loss_fn']
         self._loss_fn_multitask = params['loss_fn_multitask']
+        self._stop_idx = embedding_holder.stop_idx()
 
         # helper functions
         if self._multitask_network == None:
@@ -148,10 +149,33 @@ class MultitaskBuilder:
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
 
-        print('premise repr',premise_repr.size())
-        
+        #print('premise repr',premise_repr.size())
 
-        samples = [()]
+
+        samples = []
+        for i in range(premise_var.size()[1]):
+            current_sent_indizes = premise_var.data[:,-1]
+            word_set = set()
+            for j in range(current_sent_indizes.size()):
+                w_idx = current_sent_indizes[j]
+                if w_idx == self._stop_idx:
+                    break
+                else:
+                    samples.add(w_idx)
+
+            entailing_words = set()
+            contradicting_words = set()
+            for w_idx in list(word_set):
+                entailing_words.update(self._in_sent_samples[w_idx])
+                contradicting_words.update(self._in_sent_samples[w_idx])
+            
+            contradicting_words = list(contradicting_words - entailing_words)
+            entailing_words = list(entailing_words) 
+
+            for w in contradicting_words:
+                samples.append((premise_var[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+            for w in entailing_words:
+                samples.append((premise_var[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
 
         print('the premise: ', premise_var.data)
         print('premise single sentence:', premise_var.data[:,-1])
