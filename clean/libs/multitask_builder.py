@@ -68,7 +68,7 @@ class MultitaskBuilder:
 
     def adjust_lr(self, new_lr):
         """ Adjust the learnrate """
-        for pg in self.optimizer.param_groups:
+        for pg in self._optimizer.param_groups:
             pg['lr'] = new_lr
 
 def nothing(dummy1=None, dummy2=None):
