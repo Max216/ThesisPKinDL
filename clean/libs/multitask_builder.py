@@ -313,7 +313,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
     #hyp_var, hyp_repr = hypothesis_info
     samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info)
 
-    loss = autograd.Variable(torch.FloatTensor([0]))
+    loss = autograd.Variable(m.cuda_wrap(torch.FloatTensor([0])))
     sample_factor = 1/sample_count
     for batch_samples, batch_lbl in samples:
         
