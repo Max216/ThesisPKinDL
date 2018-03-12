@@ -321,7 +321,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
         #print(batch_samples)
         print(batch_samples.size())
 
-        batch_size = batch_sents.size()[1]
+        batch_size = batch_samples.size()[0]
         batch_factor = sample_factor * batch_size
 
         #words_var = autograd.Variable(batch_words, requires_grad=False)
