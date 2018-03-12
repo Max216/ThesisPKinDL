@@ -149,12 +149,13 @@ class MultitaskBuilder:
         hyp_var, hyp_repr = hypothesis_info
 
         print('premise repr',premise_repr.size())
+        
 
         samples = [()]
 
         print('the premise: ', premise_var.data)
-        print('premise single sentence:', premise_var.data[:,1])
-        print('premise single value:', premise_var.data[:,1][0])
+        print('premise single sentence:', premise_var.data[:,-1])
+        print('premise single value:', premise_var.data[:,-1][2])
 
     def predict(self, sent_reprs, words):
         """
@@ -201,7 +202,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
     sample_factor = 1/sample_count
     for batch_sents, batch_words, batch_lbl in samples:
         
-        batch_size = batch_sents.size()[0]
+        batch_size = batch_sents.size()[1]
         batch_factor = sample_factor * batch_size
 
         words_var = autograd.Variable(batch_words, requires_grad=False)
