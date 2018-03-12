@@ -264,7 +264,7 @@ class EntailmentClassifier(nn.Module):
         # Max pooling
         sent1_representation, idxs1 = torch.max(sent1_representation, dim=0)
 
-        return sent1_representation.view(batch_size, -1)
+        return sent1_representation.view(-1, batch_size)
 
     def lookup_word(self, word):
         return self.embeddings(word)
