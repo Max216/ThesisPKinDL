@@ -98,6 +98,8 @@ class MultitaskBuilder:
             elif d[2] == 'entailment':
                 self._in_sent_samples[w1].append(torch.LongTensor([w2]))
 
+        #self._res_word_vec_in_sent = m.cuda_wrap(torch.LongTensor([0 for i in]))
+
     def zero_grad_multitask(self):
         """ Reset gradients for multitask network and optimizer """
         self._optimizer.zero_grad()
@@ -147,6 +149,8 @@ class MultitaskBuilder:
         hyp_var, hyp_repr = hypothesis_info
 
         print('the premise: ', premise_var.data)
+        print('premise single sentence:', premise_var.data[:,1])
+        print('premise single value:', premise_var.data[:,1][0])
 
     def predict(self, sent_reprs, words):
         """
