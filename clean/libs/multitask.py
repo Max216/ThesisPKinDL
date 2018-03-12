@@ -185,6 +185,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
 
         for premise_batch, hypothesis_batch, lbl_batch in train_loader:
+            print('##')
             classifier.zero_grad()
             builder.zero_grad_multitask()
 
