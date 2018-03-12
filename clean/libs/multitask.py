@@ -197,7 +197,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             until_validation -= DEFAULT_BATCH_SIZE
 
             premise_var = autograd.Variable(premise_batch)
-            hyp_var = autograd.Variable(hyp_batch)
+            hyp_var = autograd.Variable(hypothesis_batch)
             lbl_var = autograd.Variable(lbl_batch)
 
             # Main task prediction and loss
