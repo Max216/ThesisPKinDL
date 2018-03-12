@@ -276,7 +276,7 @@ class MultitaskBuilder:
         print('# samples:', len(samples))
 
         print('time:', time.time() - start)
-        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
+        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
 
 
 
