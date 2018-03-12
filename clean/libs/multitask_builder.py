@@ -272,11 +272,11 @@ class MultitaskBuilder:
 
 
 
-    def predict(self, sent_reprs, words):
+    def predict(self, sent_reprs):
         """
         predict the samples
         """
-        pass
+        return self._multitask_network(sent_reprs)
 
 #
 # Dummys
@@ -324,10 +324,11 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
         batch_size = batch_sents.size()[1]
         batch_factor = sample_factor * batch_size
 
-        words_var = autograd.Variable(batch_words, requires_grad=False)
+        #words_var = autograd.Variable(batch_words, requires_grad=False)
         lbl_var = autograd.Variable(batch_lbl)
 
-        predictions = builder.predict(batch_sents, words_var)
+        predictions = builder.predict(batch_samples)
+        print('predicted', predictions.size())
         loss += batch_factor * F.cross_entropy(predictions, lbl_var)
 
     return loss
