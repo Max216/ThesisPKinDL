@@ -173,13 +173,13 @@ class MultitaskBuilder:
             entailing_words = list(entailing_words) 
 
             for w in contradicting_words:
-                print('premise size',premise_var.size())
-                print('premise_var[i,:]',premise_var[i,:])
-                samples.append((premise_var[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
+                #print('premise size',premise_var.size())
+                #print('premise_var[i,:]',premise_var[:,i])
+                samples.append((premise_var[:,i], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([0]))))
             for w in entailing_words:
-                print('premise size',premise_var.size())
-                print('premise_var[i,:]',premise_var[i,:])
-                samples.append((premise_var[i,:], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
+                #print('premise size',premise_var.size())
+                #print('premise_var[i,:]',premise_var[:,i])
+                samples.append((premise_var[:,i], m.cuda_wrap(w), m.cuda_wrap(torch.LongTensor([1]))))
 
         print('the premise: ', premise_var.data)
         print('premise single sentence:', premise_var.data[:,-1])
