@@ -358,7 +358,7 @@ def get_multitask_nw(classifier, layers=1):
     if layers == 1:
         mt_network = MTNetworkSingleLayer(classifier, dim_input, 2)
     else:
-        mt_network = MTNetworkSingleLayer(classifier, dim_input, 600, 2)
+        mt_network = MTNetworkTwoLayer(classifier, dim_input, 600, 2)
 
     return m.cuda_wrap(mt_network)
 
