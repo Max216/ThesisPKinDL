@@ -74,7 +74,11 @@ class Datahandler:
                 h = [embeddingholder.START_SENT] + s[1] + [embeddingholder.END_SENT]
                 p_len = s[3] + 2
                 h_len = s[4] + 2
-                samples.append((p,h,s[2], p_len, h_len))
+
+                if data_format != 'snli_adversarial':
+                    samples.append((p,h,s[2], p_len, h_len))
+                else:
+                    samples.append((p,h,s[2], p_len, h_len, s[5]))
 
             self.samples = samples
 

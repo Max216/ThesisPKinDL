@@ -13,6 +13,33 @@ from libs import data_handler
 import collections
 
 
+class TargetCreator:
+    """
+    To on the fly create target samples for the multi-task
+    """
+
+    def __init__(self, data_path, embedding_lookup):
+        self.lookup = embedding_lookup
+
+        with open(dataset_path) as f_in:
+            data = [line.strip().split('\t') for line in f_in.readlines()]
+
+        contradictions = collections.defaultdict(lambda: set())
+        entailments = collections.defaultdict(lambda: set())
+
+        for d in data:
+            if d[2] == 'contradiction':
+                contradictions[d[0]].add(d[1])
+            else:
+                entailments[d[0]].add(d[1])
+
+
+    def get_samples(self, sent_id, sent_repr):
+        pass
+
+
+
+
 class SentMTDataset(Dataset):
     '''
     Dataset format to give to classifier

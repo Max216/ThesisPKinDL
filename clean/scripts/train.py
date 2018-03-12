@@ -45,12 +45,12 @@ def main():
         embedding_holder = eh.create_embeddingholder()
 
     if embd1 != None:
-        embd1_holder = eh.EmbeddingHolder(embd1)
+        embd1_holder = eh.EmbeddingHolder(embd1, include_oov_padding = False, include_start_end=False)
         embedding_holder.concat(embd1_holder)
         # merge
 
     if embd2 != None:
-        embd2_holder = eh.EmbeddingHolder(embd2)
+        embd2_holder = eh.EmbeddingHolder(embd2, include_oov_padding = False, include_start_end=False)
         embedding_holder.concat(embd2_holder)
 
     if args['new']:
