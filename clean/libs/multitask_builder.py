@@ -185,7 +185,7 @@ class MultitaskBuilder:
 
         def add(sent_repr, w_idx, lbl):
             print('lookup word', w)
-            embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False))
+            embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False)).view(-1)
             print('embd word',embd.size())
             print('repr dim', sent_repr.size())
             print('concatenated', torch.cat((sent_repr, embd), 0).size())
