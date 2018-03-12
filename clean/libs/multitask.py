@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from libs import data_handler, multitask_builder, collatebatch
 
-import collections, time, sys
+import collections, time, sys, copy
 
 
 class TargetCreator:
