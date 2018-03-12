@@ -209,7 +209,7 @@ class MultitaskBuilder:
             #print('embd word',embd.size())
             #print('repr dim', sent_repr.size())
             #print('concatenated', torch.cat((sent_repr, embd), 0).size())
-            samples.append((torch.cat((sent_repr, embd).view(1,-1), 0), lbl))
+            samples.append((torch.cat((sent_repr, embd), 0).view(1,-1), lbl))
 
         for i in range(premise_var.size()[1]):
             current_sent_indizes = premise_var.data[:,i]
