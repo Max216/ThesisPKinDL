@@ -170,7 +170,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
     for batch_sents, batch_words, batch_lbl in samples:
         words_var = autograd.Variable(batch_words, requires_grad=False)
         predictions = builder.predict(batch_sents, words_var)
-        loss = 
+        loss = 0
 
 
 #
