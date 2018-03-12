@@ -185,6 +185,7 @@ class MultitaskBuilder:
         samples = []
 
         def add(sent_repr, w_idx, lbl):
+            print('lookup word', w)
             embd = self._multitask_network.lookup_word(m.cuda_wrap(w))
             samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
 
