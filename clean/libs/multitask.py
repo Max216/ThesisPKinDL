@@ -8,7 +8,7 @@ from collections import defaultdict
 from docopt import docopt
 from torch.utils.data import DataLoader, Dataset
 
-from libs import data_handler, multitask_builder, collatebatch
+from libs import data_handler, multitask_builder, collatebatch, model_tools
 
 import collections, time, sys, copy
 
