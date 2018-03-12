@@ -240,6 +240,8 @@ class MultitaskBuilder:
                 print(hyp_repr[i,:])
                 add(hyp_repr[i,:], w, 1)
 
+        print('samples')
+        print(samples)
         return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=32, shuffle=False, ), len(samples)
 
 
