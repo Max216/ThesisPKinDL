@@ -156,7 +156,7 @@ class MultitaskBuilder:
         for i in range(premise_var.size()[1]):
             current_sent_indizes = premise_var.data[:,-1]
             word_set = set()
-            for j in range(current_sent_indizes.size()):
+            for j in range(current_sent_indizes.size()[0]):
                 w_idx = current_sent_indizes[j]
                 if w_idx == self._stop_idx:
                     break
