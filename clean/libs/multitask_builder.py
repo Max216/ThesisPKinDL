@@ -184,7 +184,7 @@ class MultitaskBuilder:
         for samples, lbls in eval_data:
             pred = self._multitask_network(samples)
             _, predicted_idx = torch.max(pred.data, dim=1)
-            self._correct_multitask_samples += torch.sum(torch.eq(samples, predicted_idx))
+            self._correct_multitask_samples += torch.sum(torch.eq(predicted_idx, lbls))
         self._total_count_multitask_samples += counts
 
     def print_evaluation(self):
