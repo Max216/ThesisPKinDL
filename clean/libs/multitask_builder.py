@@ -228,8 +228,8 @@ class MultitaskBuilder:
             for w_idx in list(word_set):
                 entailing_words.update(self._in_sent_samples[w_idx])
                 contradicting_words.update(self._not_in_sent_samples[w_idx])
-                print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www] for www in self._in_sent_samples[w_idx]])
-                print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www] for www in self._not_in_sent_samples[w_idx]])
+                print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www[0]] for www in self._in_sent_samples[w_idx]])
+                print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www[0]] for www in self._not_in_sent_samples[w_idx]])
             print('# premise end')
             
             contradicting_words = list(contradicting_words - entailing_words)
