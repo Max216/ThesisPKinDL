@@ -18,7 +18,7 @@ def main():
     Usage:
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
         train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
-        train.py new_mt_sent_simult [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
+        train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>]
     """)
 
     torch.manual_seed(12)
@@ -78,6 +78,30 @@ def main():
         mt_target = multitask.SentenceInOutTarget(args['--mt1'], embedding_holder, path_train).get_target_dataset()
         multitask_learner = multitask.MTNetwork(classifier, 600 * 2 + embedding_holder.dim(), 2)
         train.train_model_multitask_sent(model_name, classifier, embedding_holder.padding(), train_set, dev_set,multitask_learner, mt_target)
+    
+    elif args['multitask']:
+        print('Multitask learning')
+
+
+        load_path = args['--load']
+
+        if load_path == None:
+            # None becuse of default settings
+            model_name, classifier, embedding_holder = model_tools.create_model(None, embedding_holder, None, opts=m_settings, hint=appendix)
+        else:
+            model_name, classifier, embedding_holder = model_tools.load(load_path, embedding_holder)
+            model_name += '.loaded'
+        
+        model_name += '.' + args['<multitask_type>']
+
+        print('Store result as', model_name)
+        train_set = [datahandler_train.get_dataset(embedding_holder)]
+        dev_set = datahandler_dev.get_dataset(embedding_holder)
+        if path_train == None:
+            path_train = config.PATH_TRAIN_DATA
+
+        multitask.train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, args['<multitask_type>'], args['<multitask_data>'])
+
     elif args['new_mt_sent_simult']:
         print('MultiTask Sentence training')
         print('Create model ... ')
@@ -87,6 +111,7 @@ def main():
         print('Store result as', model_name)
         train_set = [datahandler_train.get_dataset(embedding_holder)]
         dev_set = datahandler_dev.get_dataset(embedding_holder)
+
 
         if path_train == None:
             path_train = config.PATH_TRAIN_DATA

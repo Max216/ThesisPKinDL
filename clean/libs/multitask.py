@@ -8,9 +8,9 @@ from collections import defaultdict
 from docopt import docopt
 from torch.utils.data import DataLoader, Dataset
 
-from libs import data_handler
+from libs import data_handler, multitask_builder, collatebatch
 
-import collections
+import collections, time, sys
 
 
 class TargetCreator:
@@ -145,3 +145,117 @@ class MTNetwork(nn.Module):
         feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
         print('ff input:', feed_forward_input.size())
         return F.softmax(self.layer(feed_forward_input))
+
+
+DEFAULT_ITERATIONS = 10
+DEFAULT_LR = 0.0002
+DEFAULT_VALIDATE_AFTER = [16000,2000]
+DEFAULT_BATCH_SIZE = 32
+def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
+    
+    start_time = time.time()
+    start_lr = DEFAULT_LR
+    iterations = DEFAULT_ITERATIONS
+    validate_after_vals = DEFAULT_VALIDATE_AFTER
+    samples_seen = 0
+    batch_size = DEFAULT_BATCH_SIZE
+
+    builder = multitask_builder.get_builder(classifier, multitask_type, multitask_data, start_lr)
+
+    classifier.train()
+    builder.train()
+    train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(embedding_holder.padding_token()))
+    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding_token()))
+
+    best_dev_acc_snli = 0
+
+    for epoch in range(iterations):
+
+        # Output validation infos
+        print(validate_after_vals)
+        if len(validate_after_vals) > epoch:
+            print('use current')
+            validate_after = validate_after_vals[epoch]
+        else:
+            print('use last val')
+            validate_after = validate_after_vals[-1]
+
+        print('Train epoch', epoch + 1)
+        print('Validate after:', validate_after)
+
+
+        for premise_batch, hypothesis_batch, lbl_batch in train_loader:
+            classifier.zero_grad()
+            builder.zero_grad_multitask()
+
+            samples_seen += DEFAULT_BATCH_SIZE
+            until_validation -= DEFAULT_BATCH_SIZE
+
+            premise_var = autograd.Variable(premise_batch)
+            hyp_var = autograd.Variable(hyp_batch)
+            lbl_var = autograd.Variable(lbl_batch)
+
+            # Main task prediction and loss
+            prediction, activation_indizes, sentence_representations = classifier(premise_var, hyp_var, output_sent_info=True)
+            loss = F.cross_entropy(prediction, lbl_var)
+
+            premise_info = (premise_var, sentence_representations[0])
+            hypothesis_info = (hyp_var, sentence_representation[1])
+
+            backward_loss = builder.loss(loss, premise_info, hypothesis_info)
+            backward_loss.backward()
+
+            builder.optimizer_step()
+
+
+            # Check if validate
+            if until_validation <= 0:
+                until_validation = validate_after
+
+                classifier.eval()
+                builder.eval()
+
+                correct_snli = 0
+                total_snli = len(dev_set) 
+
+                builder.new_evaluation()
+
+                for premise_batch, hyp_batch, lbl_batch in dev_set:
+                    premise_var = autograd.Variable(premise_batch)
+                    hyp_var = autograd.Variable(hyp_batch)
+                    
+                    prediction, activation_indizes, sentence_representations = classifier(premise_var, hyp_var, output_sent_info=True)
+                    _, predicted_idx = torch.max(prediction.data, dim=1)
+                    correct_snli += torch.sum(torch.eq(lbl_batch, predicted_idx))
+
+                    premise_info = (premise_var, sentence_representations[0])
+                    hypothesis_info = (hyp_var, sentence_representation[1])
+                    builder.add_evaluation(premise_info, hypothesis_info)
+
+
+                print('Running time:', time.time() - start_time, 'seconds')
+                dev_acc = correct_snli / total_snli
+                print('After', samples_seen, 'samples: dev accuracy (SNLI):', dev_acc)
+                builder.print_evaluation()
+
+                if dev_acc > best_dev_acc_snli:
+                    best_model = copy.deepcopy(classifier.state_dict())
+                    best_dev_acc_snli = dev_acc
+                    model_tools.store(model_name, best_model, 'multitask')
+                    print('Saved as best model!')
+
+                sys.stdout.flush()
+                classifier.train()
+                builder.train()
+
+
+        # Half weight decay every 2 epochs
+        decay = epoch // 2
+        lr = start_lr / (2 ** decay)  
+        builder.adjust_lr(lr)
+        
+    print('Done.')
+    sys.stdout.flush()
+
+
+
