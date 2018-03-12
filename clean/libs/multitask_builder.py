@@ -186,7 +186,7 @@ class MultitaskBuilder:
 
         def add(sent_repr, w_idx, lbl):
             print('lookup word', w)
-            embd = self._multitask_network.lookup_word(m.cuda_wrap(w).view(1,1))
+            embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False))
             samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
 
         for i in range(premise_var.size()[1]):
@@ -292,8 +292,11 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
 
     loss = autograd.Variable(torch.FloatTensor([0]))
     sample_factor = 1/sample_count
-    for batch_sents, batch_words, batch_lbl in samples:
+    for batch_samples, batch_lbl in samples:
         
+        print('batch sample')
+        print(batch_samples)
+
         batch_size = batch_sents.size()[1]
         batch_factor = sample_factor * batch_size
 
