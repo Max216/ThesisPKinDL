@@ -74,14 +74,14 @@ class MTNetworkSingleLayer(nn.Module):
         self.classifier = classifier
         self.layer = nn.Linear(input_dim, output_dim)
 
-    def forward(self, sent, target_word):
-        sentence_representation = self.classifier.forward_sent(sent)
-        batch_size = sentence_representation.size()[0]
-        word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
+    def forward(self, samples):
+        #sentence_representation = self.classifier.forward_sent(sent)
+        #batch_size = sentence_representation.size()[0]
+        #word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
 
-        feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
+        #feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
         
-        return F.softmax(self.layer(feed_forward_input))
+        return F.softmax(self.layer(samples))
 
     def lookup_word(self, w_idx):
         word = self.classifier.lookup_word(w_idx)
@@ -104,14 +104,14 @@ class MTNetworkTwoLayer(nn.Module):
         self.layer1 = nn.Linear(input_dim, hidden_dim)
         self.layer2 = nn.Linear(hidden_dim, output_dim)
 
-    def forward(self, sent, target_word):
-        sentence_representation = self.classifier.forward_sent(sent)
-        batch_size = sentence_representation.size()[0]
-        word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
+    def forward(self, samples):
+        #sentence_representation = self.classifier.forward_sent(sent)
+        #batch_size = sentence_representation.size()[0]
+        #word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
 
-        feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
+        #feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
         
-        out1 = F.relu(self.layer1(feed_forward_input))
+        out1 = F.relu(self.layer1(samples))
         return F.softmax(self.layer2(out1))
 
 class MultitaskBuilder:
