@@ -205,7 +205,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             loss = F.cross_entropy(prediction, lbl_var)
 
             premise_info = (premise_var, sentence_representations[0])
-            hypothesis_info = (hyp_var, sentence_representation[1])
+            hypothesis_info = (hyp_var, sentence_representations[1])
 
             backward_loss = builder.loss(loss, premise_info, hypothesis_info)
             backward_loss.backward()
