@@ -234,7 +234,9 @@ class EntailmentClassifier(nn.Module):
         out = self.dropout1(out)
         return F.softmax(self.hidden2(out))
 
+        print('in correct model')
         if output_sent_info:
+            print('and return 3')
             return tag_scores, [idxs1, idxs2], [sent1_representation, sent2_representation]
 
         return tag_scores
