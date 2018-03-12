@@ -13,7 +13,7 @@ class MultitaskBuilder:
     Create all things required for the multitask training
     """
 
-    def __init__(self, params, lr, multitask_data):
+    def __init__(self, params, lr, multitask_data, classifier):
         self._multitask_network = params['multitask_network']()
         self._optimizer = params['optimizer'](classifier, self.multitask_network, lr)
         self._loss_fn = params['loss_fn']
@@ -89,7 +89,7 @@ def get_builder(classifier, mt_type, mt_data, lr):
         params['loss_fn_multitask'] = nothing
         params['loss_fn'] = loss_snli_only
 
-        return MultitaskBuilder(params, lr, mt_data)
+        return MultitaskBuilder(params, lr, mt_data, classifier)
 
     elif mt_type == 'test_mt':
         # ignore snli, verify that Multitask works
