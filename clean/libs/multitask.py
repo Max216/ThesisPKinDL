@@ -154,11 +154,9 @@ DEFAULT_VALIDATE_AFTER = [1000,200]
 DEFAULT_BATCH_SIZE = 32
 def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
     
-    start_time = time.time()
     start_lr = DEFAULT_LR
     iterations = DEFAULT_ITERATIONS
     validate_after_vals = DEFAULT_VALIDATE_AFTER
-    samples_seen = 0
     batch_size = DEFAULT_BATCH_SIZE
 
     builder = multitask_builder.get_builder(classifier, multitask_type, multitask_data, start_lr)
@@ -169,6 +167,11 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
 
     best_dev_acc_snli = 0
+    until_validation = 0
+    samples_seen = 0
+    start_time = time.time()
+
+
 
     for epoch in range(iterations):
 
