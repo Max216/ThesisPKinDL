@@ -114,6 +114,10 @@ class MTNetworkTwoLayer(nn.Module):
         out1 = F.relu(self.layer1(samples))
         return F.softmax(self.layer2(out1))
 
+    def lookup_word(self, w_idx):
+        word = self.classifier.lookup_word(w_idx)
+        return word
+
 class MultitaskBuilder:
     """
     Create all things required for the multitask training
