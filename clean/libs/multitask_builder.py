@@ -195,7 +195,7 @@ class MultitaskBuilder:
             pg['lr'] = new_lr
 
     def get_all_multitask_samples(self, premise_info, hypothesis_info):
-        start = time.time()
+        #start = time.time()
         """ Create a dataset based on wordnet and the given sentences """
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
@@ -273,9 +273,9 @@ class MultitaskBuilder:
 
         #print('samples')
         #print(samples)
-        print('# samples:', len(samples))
+        #print('# samples:', len(samples))
 
-        print('time:', time.time() - start)
+        #print('time:', time.time() - start)
         return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
 
 
@@ -308,6 +308,7 @@ def loss_snli_only(snli_loss, multitask_loss):
     return snli_loss
 
 def loss_multitask_only(snli_loss, multitask_loss):
+    print('multitask loss', multitask_loss)
     return multitask_loss
 
 
