@@ -65,7 +65,6 @@ class MTNetworkSingleLayer(nn.Module):
 
     def lookup_word(self, w_idx):
         word = self.classifier.lookup_word(w_idx)
-        print('word', word)
         return word
 
 class MTNetworkTwoLayer(nn.Module):
@@ -187,6 +186,9 @@ class MultitaskBuilder:
         def add(sent_repr, w_idx, lbl):
             print('lookup word', w)
             embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False))
+            print('embd word',embd.size())
+            print('repr dim', sent_repr.size())
+            print('concatenated', torch.cat((sent_repr, embd), 0).size())
             samples.append((torch.cat((sent_repr, embd), 0), m.cuda_wrap(torch.LongTensor([lbl]))))
 
         for i in range(premise_var.size()[1]):
