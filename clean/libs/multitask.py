@@ -224,10 +224,11 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
 
     classifier.train()
-    builder.train()
+    
     mt_target = MultiTaskTarget([train_set, dev_set], multitask_data, embedding_holder)
     builder = multitask_builder.get_builder(classifier, multitask_type, mt_target, start_lr, embedding_holder)
-
+    builder.train()
+    
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
     dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
