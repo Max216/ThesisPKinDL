@@ -402,4 +402,4 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn'] = loss_multitask_only
         #params['target'] = mt_target.get_targets()
 
-        return MultitaskBuilder(params, lr, mt_target, classifier, embedding_holder)
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
