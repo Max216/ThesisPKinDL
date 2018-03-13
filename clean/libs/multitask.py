@@ -176,6 +176,7 @@ class MultiTaskTarget:
             for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
                 for sent, sent_id in [(p, p_id), (h, h_id)]:
                     if len(targets[sent_id]) == 0:
+                        print('in it')
                         entailing_words = set()
                         contradicting_words = set()
                         for w in sent:
@@ -192,6 +193,7 @@ class MultiTaskTarget:
         #self.targets = targets
         print(targets)
         print('len targets:', len(targets))
+        1/0
         target_words = [[] for i in range(len(targets))]
         target_labels = [[] for i in range(len(targets))]
 
