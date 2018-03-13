@@ -167,7 +167,7 @@ class MultiTaskTarget:
             elif d[2] == 'entailment':
                 in_sent_samples[w1].append(torch.LongTensor([w2]))
 
-        max_id = max([_id for _id in [p_id, h_id for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]])
+        max_id = max([_id for _id in [(p_id, h_id) for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]])
         print('maxid', max_id)
         
         count = 0
