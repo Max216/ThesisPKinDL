@@ -390,9 +390,9 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['optimizer'] = get_optimizer_snli_only
         params['loss_fn_multitask'] = nothing
         params['loss_fn'] = loss_snli_only
-        params['target'] = mt_target.get_targets()
+        #params['target'] = mt_target.get_targets()
 
-        return MultitaskBuilder(params, lr, None, classifier, embedding_holder)
+        return MultitaskBuilder(params, lr, mt_target, classifier, embedding_holder)
 
     elif mt_type == 'test_mt':
         # ignore snli, verify that Multitask works
@@ -400,6 +400,6 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_multitask_only
-        params['target'] = mt_target.get_targets()
+        #params['target'] = mt_target.get_targets()
 
-        return MultitaskBuilder(params, lr, mt_data, classifier, embedding_holder)
+        return MultitaskBuilder(params, lr, mt_target, classifier, embedding_holder)
