@@ -149,7 +149,7 @@ import collections, time, sys, copy
 class MultiTaskTarget:
 
     def __init__(self, datasets, resource_data_path, embedding_holder):
-
+        print('init MultiTaskTarget')
         self.tag_to_idx = dict([('entailment', 1), ('contradiction', 0)])
 
         # create data
@@ -190,10 +190,11 @@ class MultiTaskTarget:
                         targets[sent_id] = samples
 
         #self.targets = targets
-       target_words = [[] for i in range(len(targets))]
-       target_labels = [[] for i in range(len(targets))]
+        print('len targets:', len(targets))
+        target_words = [[] for i in range(len(targets))]
+        target_labels = [[] for i in range(len(targets))]
 
-       for i in range(len(targets)):
+        for i in range(len(targets)):
             w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
             target_words[i] = w_indizes.view(-1,1)
             target_labels[i] = labels.view(-1)
