@@ -37,12 +37,43 @@ class SentEncoderDataset(Dataset):
     def __getitem__(self, idx):
         return self.converted_samples[idx]
 
+
+class SentEncoderIdDataset(Dataset):
+    '''
+    Dataset format to give to classifier
+    '''
+
+    def __init__(self, samples, embedding_holder, tag_to_idx):
+        '''
+        Create a new dataset for the given samples
+        :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
+        :paraam embedding_holder    To map from word to number
+        :param tag_to_idx         dictionary mapping the string label to a number
+        '''
+        
+        self.converted_samples = [(
+            torch.LongTensor([embedding_holder.word_index(w) for w in p]),
+            torch.LongTensor([embedding_holder.word_index(w) for w in h]),
+            tag_to_idx[lbl],
+            len_p,
+            len_h,
+            p_id,
+            h_id
+        ) for (p, h, lbl, len_p, len_h, p_id, h_id) in samples]
+
+    def __len__(self):
+        return len(self.converted_samples)
+
+    def __getitem__(self, idx):
+        return self.converted_samples[idx]
+
+
 class Datahandler:
     '''
     Loads data.
     '''
 
-    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS, include_start_end_token=True):
+    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS, include_start_end_token=True, lower=None):
         '''
         Create a Datahandler for the data at the given path
 
@@ -70,8 +101,17 @@ class Datahandler:
             print('Including start/stop symbols')
             samples = []
             for s in self.samples:
-                p = [embeddingholder.START_SENT] + s[0] + [embeddingholder.END_SENT]
-                h = [embeddingholder.START_SENT] + s[1] + [embeddingholder.END_SENT]
+
+                if lower == 'lower':
+                    use_p = [w.lower() for w in s[0]]
+                    use_h = [w.lower() for w in s[1]]
+                    print('lowerd h', use_h)
+                else:
+                    use_p = s[0]
+                    use_h = s[1]
+
+                p = [embeddingholder.START_SENT] + use_p + [embeddingholder.END_SENT]
+                h = [embeddingholder.START_SENT] + use_h + [embeddingholder.END_SENT]
                 p_len = s[3] + 2
                 h_len = s[4] + 2
 
@@ -120,6 +160,32 @@ class Datahandler:
         else:
             current_samples = self.samples
         return SentEncoderDataset(current_samples, embedding_holder, self.tag_to_idx)
+
+    def get_dataset_id(self, embedding_holder, start_id=0):
+        if len(self.samples[0]) != 5:
+            current_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples]
+        else:
+            current_samples = self.samples
+
+        id_samples = []
+        seen_sents = dict()
+
+        next_id = start_id
+        for p, h, lbl, p_len, h_len in current_samples:
+            p_key = '__'.join(p)
+            h_key = '__'.join(h)
+
+            if p_key not in seen_sents:
+                seen_sents[p_key] = next_id
+                next_id += 1
+            if h_key not in seen_sents:
+                seen_sents[h_key] = next_id
+                next_id += 1
+
+            id_samples.append((p, h, lbl, p_len, h_len, seen_sents[p_key], seen_sents[h_key]))
+
+        return SentEncoderIdDataset(current_samples, embedding_holder, self.tag_to_idx), next_id
+
 
     def get_dataset_splits(self, embedding_holder, split_size=16000):
         splits = []
@@ -189,16 +255,16 @@ class Datahandler:
 
 # External Helper functions
 
-def get_datahandler_train(path=None):
+def get_datahandler_train(path=None, lower=None):
     if path == None:
         path = config.PATH_TRAIN_DATA
     print('use the following training data:', path)
-    return Datahandler(path)
+    return Datahandler(path, lower)
 
-def get_datahandler_dev(path=None):
+def get_datahandler_dev(path=None, lower=None):
     if path == None:
         path = config.PATH_DEV_DATA
-    return Datahandler(path)
+    return Datahandler(path, lower)
 
 def get_dataset(samples, embedding_holder, tag_to_idx):
-    return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx)
+    return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx, lower)

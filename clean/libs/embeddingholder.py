@@ -5,8 +5,8 @@ Store and manage word embeddings
 import numpy as np
 from libs import config
 
-START_SENT = '<START_SENT>'
-END_SENT = '<END_SENT>'
+START_SENT = '<<start_sent>>'
+END_SENT = '<<end_sent>>'
 
 class EmbeddingHolder:
     
@@ -15,8 +15,8 @@ class EmbeddingHolder:
     Extra symbols are added for OOV and Padding.
     """
     
-    OOV = '@@OOV@@'
-    PADDING = '@@PADDING@@'
+    OOV = '@@oov@@'
+    PADDING = '@@padding@@'
 
 
     
@@ -150,8 +150,10 @@ class EmbeddingHolder:
 
         return wv
 
-def create_embeddingholder(path=None):
-    if path == None:
+def create_embeddingholder(path=None, lower=None):
+    if path == None and lower == 'lower':
+        path = config.PATH_WORD_EMBEDDINGS_LOWER
+    elif path == None:
         path = config.PATH_WORD_EMBEDDINGS
 
     return EmbeddingHolder(path)

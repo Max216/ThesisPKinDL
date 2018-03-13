@@ -146,6 +146,57 @@ import collections, time, sys, copy
 #         print('ff input:', feed_forward_input.size())
 #         return F.softmax(self.layer(feed_forward_input))
 
+class MultiTaskTarget:
+
+    def __init__(self, datasets, resource_data_path, embedding_holder):
+
+        self.tag_to_idx = dict([('entailment', 1), ('contradiction', 0)])
+
+        # create data
+        with open(resource_data_path) as f_in:
+            data = [line.strip().split('\t') for line in f_in.readlines()]
+        
+        not_in_sent_samples = collections.defaultdict(list) 
+        in_sent_samples = collections.defaultdict(list)
+
+        for d in data:
+            w1 = embedding_holder.word_index(d[0])
+            w2 = embedding_holder.word_index(d[1])
+            if d[2] == 'contradiction':
+                not_in_sent_samples[w1].append(torch.LongTensor([w2]))
+            elif d[2] == 'entailment':
+                in_sent_samples[w1].append(torch.LongTensor([w2]))
+
+        max_id = max([_id for _id in [p_id, h_id for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]])
+        print('maxid', max_id)
+        
+        count = 0
+        targets = [[] for i in range(max_id + 1)]
+        for dataset in datasets:
+            for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
+                for sent, sent_id in [(p, p_id), (h, h_id)]:
+                    if len(targets[sent_id]) == 0:
+                        entailing_words = set()
+                        contradicting_words = set()
+                        for w in sent:
+                            w_idx = embedding_holder.word_index(w)
+                            entailing_words.update(in_sent_samples[w_idx])
+                            contradicting_words.update(not_in_sent_samples[w_idx])
+
+                        contradicting_words = list(contradicting_words - entailing_words)
+                        entailing_words = list(entailing_words)
+
+                        samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
+                        targets[sent_id] = samples
+
+        self.targets = targets
+
+    def get_targets(self):
+        return self.targets
+
+
+
+
 
 DEFAULT_ITERATIONS = 10
 DEFAULT_LR = 0.0002
@@ -163,8 +214,8 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
     classifier.train()
     builder.train()
-    train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
-    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
+    train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
+    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
     best_dev_acc_snli = 0
     until_validation = 0
@@ -188,7 +239,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
         print('Validate after:', validate_after)
 
 
-        for premise_batch, hypothesis_batch, lbl_batch in train_loader:
+        for premise_batch, hypothesis_batch, lbl_batch, premise_ids, hyp_ids in train_loader:
             #print('##')
             classifier.zero_grad()
             builder.zero_grad_multitask()

@@ -16,7 +16,7 @@ def main():
     args = docopt("""Train a neural network.
 
     Usage:
-        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>]
+        train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--lower=<lower>]
         train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
         train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>] [--tdata=<train_data>]
     """)
@@ -39,10 +39,12 @@ def main():
     datahandler_train = data_handler.get_datahandler_train(path_train)
     datahandler_dev =  data_handler.get_datahandler_dev(path_dev)
 
+    is_lower = args['--lower']
+
     if embedding_path != None:
         embedding_holder = eh.EmbeddingHolder(embedding_path)
     else:
-        embedding_holder = eh.create_embeddingholder()
+        embedding_holder = eh.create_embeddingholder(lower=is_lower)
 
     if embd1 != None:
         embd1_holder = eh.EmbeddingHolder(embd1, include_oov_padding = False, include_start_end=False)
@@ -59,8 +61,8 @@ def main():
             encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
         model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
         print('Store result as', model_name)
-        train_set = [datahandler_train.get_dataset(embedding_holder)]
-        dev_set = datahandler_dev.get_dataset(embedding_holder)
+        train_set = [datahandler_train.get_dataset(embedding_holder, lower=is_lower)]
+        dev_set = datahandler_dev.get_dataset(embedding_holder, lower=is_lower)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
 
     elif args['new_mt_sent']:
@@ -95,8 +97,8 @@ def main():
         model_name += '.' + args['<multitask_type>']
 
         print('Store result as', model_name)
-        train_set = datahandler_train.get_dataset(embedding_holder)
-        dev_set = datahandler_dev.get_dataset(embedding_holder)
+        train_set, next_id = datahandler_train.get_dataset_id(embedding_holder, start_id=0)
+        dev_set, next_id = datahandler_dev.get_dataset_id(embedding_holder, start_id= next_id)
         if path_train == None:
             path_train = config.PATH_TRAIN_DATA
 

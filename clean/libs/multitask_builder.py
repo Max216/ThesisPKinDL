@@ -138,18 +138,7 @@ class MultitaskBuilder:
         else:
             self._zero_grad = _zero_grad_obj
 
-        # create data
-        with open(multitask_data) as f_in:
-            data = [line.strip().split('\t') for line in f_in.readlines()]
-        self._not_in_sent_samples = collections.defaultdict(list)
-        self._in_sent_samples = collections.defaultdict(list)
-        for d in data:
-            w1 = embedding_holder.word_index(d[0])
-            w2 = embedding_holder.word_index(d[1])
-            if d[2] == 'contradiction':
-                self._not_in_sent_samples[w1].append(torch.LongTensor([w2]))
-            elif d[2] == 'entailment':
-                self._in_sent_samples[w1].append(torch.LongTensor([w2]))
+        
 
         #self._res_word_vec_in_sent = m.cuda_wrap(torch.LongTensor([0 for i in]))
 
