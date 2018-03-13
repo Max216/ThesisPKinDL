@@ -36,10 +36,12 @@ def main():
     appendix = args['--appendix'] or ''
     m_settings = m.ModelSettings([('sent-rep', sent_fn)])
 
-    datahandler_train = data_handler.get_datahandler_train(path_train)
-    datahandler_dev =  data_handler.get_datahandler_dev(path_dev)
-
     is_lower = args['--lower']
+
+
+    datahandler_train = data_handler.get_datahandler_train(path_train, lower=is_lower)
+    datahandler_dev =  data_handler.get_datahandler_dev(path_dev, lower=is_lower)
+
 
     if embedding_path != None:
         embedding_holder = eh.EmbeddingHolder(embedding_path)
@@ -61,8 +63,8 @@ def main():
             encoding_dim = [int(encoding_dim), int(encoding_dim), int(encoding_dim)]
         model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, hidden_dim, opts=m_settings, hint=appendix)
         print('Store result as', model_name)
-        train_set = [datahandler_train.get_dataset(embedding_holder, lower=is_lower)]
-        dev_set = datahandler_dev.get_dataset(embedding_holder, lower=is_lower)
+        train_set = [datahandler_train.get_dataset(embedding_holder)]
+        dev_set = datahandler_dev.get_dataset(embedding_holder)
         train.train_model(model_name, classifier, embedding_holder.padding(), train_set, dev_set)
 
     elif args['new_mt_sent']:
