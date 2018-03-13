@@ -167,7 +167,7 @@ class MultiTaskTarget:
             elif d[2] == 'entailment':
                 in_sent_samples[w1].append(torch.LongTensor([w2]))
 
-        indizes = [(p_id, h_id) for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]
+        indizes = [(p_id, h_id) for ds in datasets for p,h,l,pl,hl,p_id,h_id in ds]
         max_id = max([_id1 for _id1, _id2 in indizes] + [_id2 for _id1, _id2 in indizes])
         print('maxid', max_id)
         count = 0
@@ -228,7 +228,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     mt_target = MultiTaskTarget([train_set, dev_set], multitask_data, embedding_holder)
     builder = multitask_builder.get_builder(classifier, multitask_type, mt_target, start_lr, embedding_holder)
     builder.train()
-    
+
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
     dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
