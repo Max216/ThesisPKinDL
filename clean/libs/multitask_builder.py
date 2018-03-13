@@ -186,11 +186,11 @@ class MultitaskBuilder:
         self._correct_multitask_samples = 0
         self._total_count_multitask_samples = 0
 
-    def loss(self, snli_loss, premise_info, hypothesis_info):
+    def loss(self, snli_loss, premise_info, hypothesis_info, premise_ids, hyp_ids):
         """ Calculate the loss for thee gradient """
         #print('now create loss')
         #print(list(self._classifier.sent_encoder.lstm1.parameters())[0])
-        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, self)
+        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, premise_ids, hyp_ids, self)
         #print('multitask loss', multitask_loss)
         return self._loss_fn(snli_loss, multitask_loss)
 
@@ -333,12 +333,12 @@ def loss_multitask_only(snli_loss, multitask_loss):
 #
 # Loss function for MultiTask
 #
-def loss_multitask_reweighted(premise_info, hypothesis_info, builder):
+def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
     """Average the loss over the batches of all samples created from these sentence pairs"""
 
     #premise_var, premise_repr = premise_info
     #hyp_var, hyp_repr = hypothesis_info
-    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info)
+    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
 
     loss = autograd.Variable(m.cuda_wrap(torch.FloatTensor([0])))
     sample_factor = 1/sample_count
