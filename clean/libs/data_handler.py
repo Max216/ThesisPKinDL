@@ -259,12 +259,12 @@ def get_datahandler_train(path=None, lower=None):
     if path == None:
         path = config.PATH_TRAIN_DATA
     print('use the following training data:', path)
-    return Datahandler(path, lower)
+    return Datahandler(path, lower=lower)
 
 def get_datahandler_dev(path=None, lower=None):
     if path == None:
         path = config.PATH_DEV_DATA
-    return Datahandler(path, lower)
+    return Datahandler(path, lower=lower)
 
 def get_dataset(samples, embedding_holder, tag_to_idx):
     return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx, lower)
