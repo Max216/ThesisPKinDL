@@ -123,7 +123,7 @@ class MultitaskBuilder:
     Create all things required for the multitask training
     """
 
-    def __init__(self, params, lr, multitask_data, classifier, embedding_holder):
+    def __init__(self, params, lr, multitask_targets, classifier, embedding_holder):
         self._multitask_network = params['multitask_network']
         self._optimizer = params['optimizer'](classifier, self._multitask_network, lr)
         self._loss_fn = params['loss_fn']
@@ -131,6 +131,10 @@ class MultitaskBuilder:
         self._stop_idx = embedding_holder.stop_idx()
         self._classifier = classifier
         self._word_dict = embedding_holder.reverse()
+        
+        target_words, target_labels = multitask_targets
+        self._target_words = multitask_targets
+        self._target_labels = target_labels
 
         # helper functions
         if self._multitask_network == None:
@@ -195,89 +199,102 @@ class MultitaskBuilder:
         for pg in self._optimizer.param_groups:
             pg['lr'] = new_lr
 
-    def get_all_multitask_samples(self, premise_info, hypothesis_info):
+    def get_all_multitask_samples(self, premise_info, hypothesis_info, premise_ids, hyp_ids):
         #start = time.time()
         """ Create a dataset based on wordnet and the given sentences """
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
 
         #print('premise repr',premise_repr.size())
-
-
         samples = []
-
-        def add(sent_repr, w_idx, lbl):
-            #print('lookup word', w)
-            embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False)).view(-1)
-            #print('embd word',embd.size())
-            #print('repr dim', sent_repr.size())
-            #print('concatenated', torch.cat((sent_repr, embd), 0).size())
-            samples.append((torch.cat((sent_repr, embd), 0).view(1,-1), lbl))
-
-        for i in range(premise_var.size()[1]):
-            current_sent_indizes = premise_var.data[:,i]
-            word_set = set()
-            for j in range(current_sent_indizes.size()[0]):
-                w_idx = current_sent_indizes[j]
-                if w_idx == self._stop_idx:
-                    break
-                else:
-                    word_set.add(w_idx)
-
-            entailing_words = set()
-            contradicting_words = set()
-            #print('# premise start')
-            for w_idx in list(word_set):
-                entailing_words.update(self._in_sent_samples[w_idx])
-                contradicting_words.update(self._not_in_sent_samples[w_idx])
-                #print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www[0]] for www in self._in_sent_samples[w_idx]])
-                #print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www[0]] for www in self._not_in_sent_samples[w_idx]])
-            #print('# premise end')
+        for i in range(len(premise_ids)):
             
-            contradicting_words = list(contradicting_words - entailing_words)
-            entailing_words = list(entailing_words) 
+            embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[i])))
+            print('embds.size()', embds.size())
+            single_repr = premise_repr[i,:]
+            print('single_repr.size()', single_repr.size())
 
-            for w in contradicting_words:
-                #print('premise size',premise_var.size())
-                #print('premise_var[i,:]',premise_var[:,i])
+            duplicated_repr = torch.cat([single_repr for i in range(embds.size()[1])], 1)
+            print('duplicated_repr.size()', duplicated_repr.size())
+
+            concatenated = torch.cat((duplicated_repr, embds), 0)
+            print('concatenated size()', concatenated.size())
+
+        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
+        # samples = []
+
+        # def add(sent_repr, w_idx, lbl):
+        #     #print('lookup word', w)
+        #     embd = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(w), requires_grad=False)).view(-1)
+        #     #print('embd word',embd.size())
+        #     #print('repr dim', sent_repr.size())
+        #     #print('concatenated', torch.cat((sent_repr, embd), 0).size())
+        #     samples.append((torch.cat((sent_repr, embd), 0).view(1,-1), lbl))
+
+        # for i in range(premise_var.size()[1]):
+        #     current_sent_indizes = premise_var.data[:,i]
+        #     word_set = set()
+        #     for j in range(current_sent_indizes.size()[0]):
+        #         w_idx = current_sent_indizes[j]
+        #         if w_idx == self._stop_idx:
+        #             break
+        #         else:
+        #             word_set.add(w_idx)
+
+        #     entailing_words = set()
+        #     contradicting_words = set()
+        #     #print('# premise start')
+        #     for w_idx in list(word_set):
+        #         entailing_words.update(self._in_sent_samples[w_idx])
+        #         contradicting_words.update(self._not_in_sent_samples[w_idx])
+        #         #print('word:', self._word_dict[w_idx], '-> (e)', [self._word_dict[www[0]] for www in self._in_sent_samples[w_idx]])
+        #         #print('word:', self._word_dict[w_idx], '-> (c)', [self._word_dict[www[0]] for www in self._not_in_sent_samples[w_idx]])
+        #     #print('# premise end')
+            
+        #     contradicting_words = list(contradicting_words - entailing_words)
+        #     entailing_words = list(entailing_words) 
+
+        #     for w in contradicting_words:
+        #         #print('premise size',premise_var.size())
+        #         #print('premise_var[i,:]',premise_var[:,i])
                 
-                add(premise_repr[i,:], w, 0)
-            for w in entailing_words:
-                #print('premise size',premise_var.size())
-                #print('premise_var[i,:]',premise_var[:,i])
-                add(premise_repr[i,:], w, 1)
+        #         add(premise_repr[i,:], w, 0)
+        #     for w in entailing_words:
+        #         #print('premise size',premise_var.size())
+        #         #print('premise_var[i,:]',premise_var[:,i])
+        #         add(premise_repr[i,:], w, 1)
 
-        for i in range(hyp_var.size()[1]):
-            current_sent_indizes = hyp_var.data[:,i]
-            word_set = set()
-            for j in range(current_sent_indizes.size()[0]):
-                w_idx = current_sent_indizes[j]
-                if w_idx == self._stop_idx:
-                    break
-                else:
-                    word_set.add(w_idx)
+        # for i in range(hyp_var.size()[1]):
+        #     current_sent_indizes = hyp_var.data[:,i]
+        #     word_set = set()
+        #     for j in range(current_sent_indizes.size()[0]):
+        #         w_idx = current_sent_indizes[j]
+        #         if w_idx == self._stop_idx:
+        #             break
+        #         else:
+        #             word_set.add(w_idx)
 
-            entailing_words = set()
-            contradicting_words = set()
-            for w_idx in list(word_set):
-                entailing_words.update(self._in_sent_samples[w_idx])
-                contradicting_words.update(self._not_in_sent_samples[w_idx])
+        #     entailing_words = set()
+        #     contradicting_words = set()
+        #     for w_idx in list(word_set):
+        #         entailing_words.update(self._in_sent_samples[w_idx])
+        #         contradicting_words.update(self._not_in_sent_samples[w_idx])
             
-            contradicting_words = list(contradicting_words - entailing_words)
-            entailing_words = list(entailing_words) 
+        #     contradicting_words = list(contradicting_words - entailing_words)
+        #     entailing_words = list(entailing_words) 
 
-            for w in contradicting_words:
-                add(hyp_repr[i,:], w, 0)
-            for w in entailing_words:
-                #print(hyp_repr[i,:])
-                add(hyp_repr[i,:], w, 1)
+        #     for w in contradicting_words:
+        #         add(hyp_repr[i,:], w, 0)
+        #     for w in entailing_words:
+        #         #print(hyp_repr[i,:])
+        #         add(hyp_repr[i,:], w, 1)
 
         #print('samples')
         #print(samples)
         #print('# samples:', len(samples))
 
         #print('time:', time.time() - start)
-        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
+        
 
 
 
@@ -365,7 +382,7 @@ def get_multitask_nw(classifier, layers=1):
 #
 # Factory
 #
-def get_builder(classifier, mt_type, mt_data, lr, embedding_holder):
+def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
     params = dict()
     if mt_type == 'test_snli':
         # ignore multitask, verify that SNLI training works
@@ -373,6 +390,7 @@ def get_builder(classifier, mt_type, mt_data, lr, embedding_holder):
         params['optimizer'] = get_optimizer_snli_only
         params['loss_fn_multitask'] = nothing
         params['loss_fn'] = loss_snli_only
+        params['target'] = mt_target.get_targets()
 
         return MultitaskBuilder(params, lr, None, classifier, embedding_holder)
 
@@ -382,5 +400,6 @@ def get_builder(classifier, mt_type, mt_data, lr, embedding_holder):
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_multitask_only
+        params['target'] = mt_target.get_targets()
 
         return MultitaskBuilder(params, lr, mt_data, classifier, embedding_holder)

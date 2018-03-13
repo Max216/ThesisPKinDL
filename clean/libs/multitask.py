@@ -167,9 +167,9 @@ class MultiTaskTarget:
             elif d[2] == 'entailment':
                 in_sent_samples[w1].append(torch.LongTensor([w2]))
 
-        max_id = max([_id for _id in [(p_id, h_id) for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]])
+        indizes = [(p_id, h_id) for p,h,l,pl,hl,p_id,h_id in ds for ds in datasets]
+        max_id = max([_id1 for _id1, _id2 in indizes] + [_id2 for _id1, _id2 in indizes])
         print('maxid', max_id)
-        
         count = 0
         targets = [[] for i in range(max_id + 1)]
         for dataset in datasets:
@@ -189,10 +189,21 @@ class MultiTaskTarget:
                         samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
                         targets[sent_id] = samples
 
-        self.targets = targets
+        #self.targets = targets
+       target_words = [[] for i in range(len(targets))]
+       target_labels = [[] for i in range(len(targets))]
+
+       for i in range(len(targets)):
+            w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
+            target_words[i] = w_indizes.view(-1,1)
+            target_labels[i] = labels.view(-1)
+
+        self._target_words = target_words
+        self._target_labels = target_labels
+
 
     def get_targets(self):
-        return self.targets
+        return self._target_words, self._target_labels
 
 
 
@@ -210,10 +221,12 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     validate_after_vals = DEFAULT_VALIDATE_AFTER
     batch_size = DEFAULT_BATCH_SIZE
 
-    builder = multitask_builder.get_builder(classifier, multitask_type, multitask_data, start_lr, embedding_holder)
 
     classifier.train()
     builder.train()
+    mt_target = MultiTaskTarget([train_set, dev_set], multitask_data, embedding_holder)
+    builder = multitask_builder.get_builder(classifier, multitask_type, mt_target, start_lr, embedding_holder)
+
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
     dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
