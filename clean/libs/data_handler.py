@@ -105,7 +105,7 @@ class Datahandler:
                 if lower == 'lower':
                     use_p = [w.lower() for w in s[0]]
                     use_h = [w.lower() for w in s[1]]
-                    print('lowerd h', use_h)
+                    #print('lowerd h', use_h)
                 else:
                     use_p = s[0]
                     use_h = s[1]
