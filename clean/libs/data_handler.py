@@ -167,6 +167,7 @@ class Datahandler:
         else:
             current_samples = self.samples
 
+        print('total samples:', len(current_samples))
         id_samples = []
         seen_sents = dict()
 
@@ -182,6 +183,7 @@ class Datahandler:
                 seen_sents[h_key] = next_id
                 next_id += 1
 
+            print('After next sample:', next_id)
             id_samples.append((p, h, lbl, p_len, h_len, seen_sents[p_key], seen_sents[h_key]))
 
         return SentEncoderIdDataset(id_samples, embedding_holder, self.tag_to_idx), next_id
