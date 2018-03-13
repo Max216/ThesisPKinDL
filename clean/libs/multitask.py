@@ -198,10 +198,12 @@ class MultiTaskTarget:
             if len(targets[i]) == 0:
                 target_words[i] = False
                 target_labels[i] = False
+                print('False adding')
             else:
                 w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
                 target_words[i] = w_indizes.view(-1,1)
                 target_labels[i] = labels.view(-1)
+                print('pos adding')
 
         self._target_words = target_words
         self._target_labels = target_labels
