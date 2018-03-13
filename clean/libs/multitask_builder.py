@@ -208,7 +208,8 @@ class MultitaskBuilder:
         #print('premise repr',premise_repr.size())
         samples = []
         for i in range(len(premise_ids)):
-            
+            print('##')
+            print(self._target_words[i])
             embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[i])))
             print('embds.size()', embds.size())
             single_repr = premise_repr[i,:]
