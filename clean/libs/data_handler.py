@@ -184,7 +184,7 @@ class Datahandler:
 
             id_samples.append((p, h, lbl, p_len, h_len, seen_sents[p_key], seen_sents[h_key]))
 
-        return SentEncoderIdDataset(current_samples, embedding_holder, self.tag_to_idx), next_id
+        return SentEncoderIdDataset(id_samples, embedding_holder, self.tag_to_idx), next_id
 
 
     def get_dataset_splits(self, embedding_holder, split_size=16000):
