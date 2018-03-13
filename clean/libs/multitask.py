@@ -181,13 +181,13 @@ class MultiTaskTarget:
                         #print('in it')
                         entailing_words = set()
                         contradicting_words = set()
-                        for w in sent:
-                            w_idx = embedding_holder.word_index(w)
-                            if w_idx in entailing_words:print('yay')
-                            #print('###', in_sent_samples[w_idx])
+                        for w_idx in sent:
+                            #w_idx = embedding_holder.word_index(w)
+                            #if w_idx in entailing_words:print('yay')
+                            print('###', in_sent_samples[w_idx])
                             entailing_words.update(in_sent_samples[w_idx])
                             contradicting_words.update(not_in_sent_samples[w_idx])
-                            #print('###',not_in_sent_samples[w_idx])
+                            print('###',not_in_sent_samples[w_idx])
 
                         contradicting_words = list(contradicting_words - entailing_words)
                         entailing_words = list(entailing_words)
