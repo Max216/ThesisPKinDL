@@ -164,8 +164,10 @@ class MultiTaskTarget:
             w2 = embedding_holder.word_index(d[1])
             if d[2] == 'contradiction':
                 not_in_sent_samples[w1].append(torch.LongTensor([w2]))
+                print(d[0],d[1], 'c')
             elif d[2] == 'entailment':
                 in_sent_samples[w1].append(torch.LongTensor([w2]))
+                print(d[0],d[1], 'e')
 
         indizes = [(p_id, h_id) for ds in datasets for p,h,l,pl,hl,p_id,h_id in ds]
         max_id = max([_id1 for _id1, _id2 in indizes] + [_id2 for _id1, _id2 in indizes])
@@ -176,15 +178,15 @@ class MultiTaskTarget:
             for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
                 for sent, sent_id in [(p, p_id), (h, h_id)]:
                     if len(targets[sent_id]) == 0:
-                        print('in it')
+                        #print('in it')
                         entailing_words = set()
                         contradicting_words = set()
                         for w in sent:
                             w_idx = embedding_holder.word_index(w)
-                            print(entailing_words.update(in_sent_samples[w_idx]))
+                            print('###', in_sent_samples[w_idx])
                             entailing_words.update(in_sent_samples[w_idx])
                             contradicting_words.update(not_in_sent_samples[w_idx])
-                            print(entailing_words.update(not_in_sent_samples[w_idx]))
+                            print('###',not_in_sent_samples[w_idx])
 
                         contradicting_words = list(contradicting_words - entailing_words)
                         entailing_words = list(entailing_words)
