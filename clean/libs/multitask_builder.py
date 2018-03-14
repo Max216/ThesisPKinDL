@@ -276,6 +276,10 @@ def loss_multitask_only(snli_loss, multitask_loss):
 #
 # Loss function for MultiTask
 #
+
+def test_loss(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
+
+
 def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
     """Average the loss over the batches of all samples created from these sentence pairs"""
 
@@ -298,10 +302,11 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
 
         predictions = builder.predict(batch_samples)
+        print('predictions', prediction)
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
         print(batch_loss)
-        return batch_loss
+        #return batch_loss
         #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
         #loss.append(batch_loss) #* multiplicator_batch_factor
         #batch_loss.backward()
