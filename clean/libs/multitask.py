@@ -200,11 +200,13 @@ class MultiTaskTarget:
         #print('len targets:', len(targets))
         target_words = [[] for i in range(len(targets))]
         target_labels = [[] for i in range(len(targets))]
+        target_has_content = [True for i in range(len(targets))]
 
         for i in range(len(targets)):
             if len(targets[i]) == 0:
                 target_words[i] = False#torch.LongTensor([])
-                target_labels[i] = False#torch.LongTensor([])
+                target_labels[i] = False#torch.LongTensor(-1)#torch.LongTensor([])
+                target_has_content[i] = False
                 #print('False adding')
             else:
                 #print('targets[i]', targets[i])
@@ -220,6 +222,7 @@ class MultiTaskTarget:
 
         self._target_words = target_words
         self._target_labels = target_labels
+        self._target_has_content = target_has_content
 
 
     def get_targets(self):

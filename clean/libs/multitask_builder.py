@@ -132,9 +132,10 @@ class MultitaskBuilder:
         self._classifier = classifier
         self._word_dict = embedding_holder.reverse()
         
-        target_words, target_labels = multitask_targets
+        target_words, target_labels, target_has_content = multitask_targets
         self._target_words = target_words
         self._target_labels = target_labels
+        self._has_content = target_has_content
 
         # helper functions
         if self._multitask_network == None:
@@ -212,7 +213,7 @@ class MultitaskBuilder:
             _id = premise_ids[i]
             print('_id',_id)
 
-            if self._target_words[_id] != False:
+            if self._has_content[_id]:
                 print('len target words:', len(self._target_words))
                 print('target_words[i].size()', self._target_words[_id].size())
                 embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
