@@ -304,7 +304,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
 
             # Check if validate
-            if until_validation <= 0:
+            if until_validation <= 0 and False:
                 until_validation = validate_after
 
                 classifier.eval()
