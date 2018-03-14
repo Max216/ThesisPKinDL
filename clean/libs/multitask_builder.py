@@ -347,7 +347,7 @@ def loss_snli_only(snli_loss, multitask_loss):
     return snli_loss
 
 def loss_multitask_only(snli_loss, multitask_loss):
-    #print('multitask loss', multitask_loss)
+    print('multitask loss', multitask_loss)
     return multitask_loss
 
 

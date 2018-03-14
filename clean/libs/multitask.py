@@ -236,7 +236,7 @@ DEFAULT_ITERATIONS = 10
 DEFAULT_LR = 0.02
 #DEFAULT_VALIDATE_AFTER = [16000,2000]
 DEFAULT_VALIDATE_AFTER = [1000, 1000]
-DEFAULT_BATCH_SIZE = 32
+DEFAULT_BATCH_SIZE = 1
 def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
     
     start_lr = DEFAULT_LR
