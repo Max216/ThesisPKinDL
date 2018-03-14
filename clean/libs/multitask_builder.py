@@ -199,7 +199,7 @@ class MultitaskBuilder:
         #print(list(self._classifier.sent_encoder.lstm1.parameters())[0])
         multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, premise_ids, hyp_ids, self)
         #print('multitask loss', multitask_loss)
-        return self._loss_fn(snli_loss, multitask_loss)
+        return self._loss_fn(snli_loss, multitask_loss, self)
 
     def adjust_lr(self, new_lr):
         """ Adjust the learnrate """
