@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from libs import data_handler, multitask_builder, collatebatch, model_tools
 
-import collections, time, sys, copy
+import collections, time, sys, copy, random
 
 
 # class TargetCreator:
@@ -146,9 +146,32 @@ import collections, time, sys, copy
 #         print('ff input:', feed_forward_input.size())
 #         return F.softmax(self.layer(feed_forward_input))
 
+
+def make_even(entailing_words, contradicting_words):
+
+    def fill_up(words, max_len):
+        # first repeat fulll list
+        w_copy = words[:]
+        w_len = len(w_copy)
+        while max_len - len(words) >= w_len:
+            words.extend(w_copy)
+
+        words.extend(random.sample(words, max_len - len(words)))
+
+    if len(entailing_words) == 0 or len(contradicting_words) == 0:
+        return (entailing_words, contradicting_words)
+    else:
+        if len(entailing_words) > len(contradicting_words):
+            contradicting_words = fill_up(contradicting_words, len(entailing_words))
+        else:
+            entailing_words = fill_up(entailing_words, len(contradicting_words))
+
+        return (entailing_words, contradicting_words)
+
 class MultiTaskTarget:
 
     def __init__(self, datasets, resource_data_path, embedding_holder):
+        #random.seed(7)
         print('init MultiTaskTarget')
         self.tag_to_idx = dict([('entailment', 1), ('contradiction', 0)])
 
@@ -190,7 +213,9 @@ class MultiTaskTarget:
                             #print('###',not_in_sent_samples[w_idx])
 
                         contradicting_words = list(contradicting_words - entailing_words)
-                        entailing_words = list(entailing_words)
+                        entailing_words = list(entailing_word) 
+
+                        entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
 
                         samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
                         targets[sent_id] = samples
