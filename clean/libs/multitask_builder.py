@@ -305,7 +305,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         predictions = builder.predict(batch_samples)
         print('predictions size', predictions.size())
         print('lbl size', lbl_var.size())
-        print('predictions', torch.cat((predictions, lbl_var.view(-1,1)),1))
+        print('predictions', torch.cat([predictions, lbl_var.view(-1,1)],0))
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
         loss.append(batch_loss)
