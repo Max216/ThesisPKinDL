@@ -163,10 +163,10 @@ class MultiTaskTarget:
             w1 = embedding_holder.word_index(d[0])
             w2 = embedding_holder.word_index(d[1])
             if d[2] == 'contradiction':
-                not_in_sent_samples[w1].append(torch.LongTensor([w2]))
+                not_in_sent_samples[w1].append(w2)
                 #print(d[0],d[1], 'c')
             elif d[2] == 'entailment':
-                in_sent_samples[w1].append(torch.LongTensor([w2]))
+                in_sent_samples[w1].append(w2)
                 #print(d[0],d[1], 'e')
 
         indizes = [(p_id, h_id) for ds in datasets for p,h,l,pl,hl,p_id,h_id in ds]
