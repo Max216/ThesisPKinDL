@@ -151,6 +151,7 @@ class MultitaskBuilder:
         """ Reset gradients for multitask network and optimizer """
         self._optimizer.zero_grad()
         self._zero_grad(self._multitask_network)
+        self._zero_grad(self._classifier)
 
 
     def optimizer_step(self):
@@ -240,6 +241,122 @@ class MultitaskBuilder:
 
             return samples, count
 
+    def predict(self, sent_reprs):
+        """
+        predict the samples
+        """
+        return self._multitask_network(sent_reprs)
+
+#
+# Dummys
+#
+def nothing(dummy1=None, dummy2=None, dummy3=None):
+    return None
+
+#
+# Optimizer creators
+#
+def get_optimizer_snli_only(classifier, multitask_network, lr):
+    return optim.Adam(classifier.parameters(), lr=lr)
+
+def get_optimizer_multitask_only(classifier, multitask_network, lr):
+    return optim.Adam(list(set(list(multitask_network.parameters()) + list(classifier.parameters()))), lr=lr) 
+
+#
+# Combining Loss functions
+#
+def loss_snli_only(snli_loss, multitask_loss):
+    return snli_loss
+
+def loss_multitask_only(snli_loss, multitask_loss):
+    print('multitask loss', multitask_loss)
+    return multitask_loss
+
+
+#
+# Loss function for MultiTask
+#
+def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
+    """Average the loss over the batches of all samples created from these sentence pairs"""
+
+    #premise_var, premise_repr = premise_info
+    #hyp_var, hyp_repr = hypothesis_info
+    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
+
+    loss = []#autograd.Variable(m.cuda_wrap(torch.FloatTensor([0])))
+    sample_factor = 1/sample_count
+    for batch_samples, batch_lbl in samples:
+        
+        #print('batch sample')
+        #print(batch_samples)
+        #print(batch_samples.size())
+
+        #batch_size = batch_samples.size()[0]
+        #batch_factor = sample_factor * batch_size
+
+        #words_var = autograd.Variable(batch_words, requires_grad=False)
+        lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
+
+        predictions = builder.predict(batch_samples)
+        #print('predicted', predictions.size())
+        batch_loss = F.cross_entropy(predictions, lbl_var)
+        print(batch_loss)
+        #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
+        #loss.append(batch_loss) #* multiplicator_batch_factor
+        batch_loss.backward()
+        builder._optimizer.step()
+        builder.zero_grad_multitask()
+
+    #return torch.sum(torch.cat((loss), 0))
+
+
+#
+# Multitask network factories
+#
+def get_multitask_nw(classifier, layers=1):
+    dim_sent = 1200
+    dim_word = 300
+
+    dim_input = dim_word + dim_sent
+
+    if layers == 1:
+        mt_network = MTNetworkSingleLayer(classifier, dim_input, 2)
+    else:
+        mt_network = MTNetworkTwoLayer(classifier, dim_input, 600, 2)
+
+    return m.cuda_wrap(mt_network)
+
+#
+# Factory
+#
+def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
+    params = dict()
+    if mt_type == 'test_snli':
+        # ignore multitask, verify that SNLI training works
+        params['multitask_network'] = None
+        params['optimizer'] = get_optimizer_snli_only
+        params['loss_fn_multitask'] = nothing
+        params['loss_fn'] = loss_snli_only
+        #params['target'] = mt_target.get_targets()
+
+        return MultitaskBuilder(params, lr, mt_target, classifier, embedding_holder)
+
+    elif mt_type == 'test_mt':
+        # ignore snli, verify that Multitask works
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_multitask_only
+        #params['target'] = mt_target.get_targets()
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+
+
+
+
+
+
 
         #return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
         # samples = []
@@ -315,115 +432,3 @@ class MultitaskBuilder:
         #print('# samples:', len(samples))
 
         #print('time:', time.time() - start)
-        
-
-
-
-    def predict(self, sent_reprs):
-        """
-        predict the samples
-        """
-        return self._multitask_network(sent_reprs)
-
-#
-# Dummys
-#
-def nothing(dummy1=None, dummy2=None, dummy3=None):
-    return None
-
-#
-# Optimizer creators
-#
-def get_optimizer_snli_only(classifier, multitask_network, lr):
-    return optim.Adam(classifier.parameters(), lr=lr)
-
-def get_optimizer_multitask_only(classifier, multitask_network, lr):
-    return optim.Adam(list(set(list(multitask_network.parameters()) + list(classifier.parameters()))), lr=lr) 
-
-#
-# Combining Loss functions
-#
-def loss_snli_only(snli_loss, multitask_loss):
-    return snli_loss
-
-def loss_multitask_only(snli_loss, multitask_loss):
-    print('multitask loss', multitask_loss)
-    return multitask_loss
-
-
-#
-# Loss function for MultiTask
-#
-def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
-    """Average the loss over the batches of all samples created from these sentence pairs"""
-
-    #premise_var, premise_repr = premise_info
-    #hyp_var, hyp_repr = hypothesis_info
-    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
-
-    loss = []#autograd.Variable(m.cuda_wrap(torch.FloatTensor([0])))
-    sample_factor = 1/sample_count
-    for batch_samples, batch_lbl in samples:
-        
-        #print('batch sample')
-        #print(batch_samples)
-        #print(batch_samples.size())
-
-        #batch_size = batch_samples.size()[0]
-        #batch_factor = sample_factor * batch_size
-
-        #words_var = autograd.Variable(batch_words, requires_grad=False)
-        lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
-
-        predictions = builder.predict(batch_samples)
-        #print('predicted', predictions.size())
-        batch_loss = F.cross_entropy(predictions, lbl_var)
-        print(batch_loss)
-        #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
-        #loss.append(batch_loss) #* multiplicator_batch_factor
-        batch_loss.backward()
-        builder._optimizer.step()
-
-    #return torch.sum(torch.cat((loss), 0))
-
-
-#
-# Multitask network factories
-#
-def get_multitask_nw(classifier, layers=1):
-    dim_sent = 1200
-    dim_word = 300
-
-    dim_input = dim_word + dim_sent
-
-    if layers == 1:
-        mt_network = MTNetworkSingleLayer(classifier, dim_input, 2)
-    else:
-        mt_network = MTNetworkTwoLayer(classifier, dim_input, 600, 2)
-
-    return m.cuda_wrap(mt_network)
-
-#
-# Factory
-#
-def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
-    params = dict()
-    if mt_type == 'test_snli':
-        # ignore multitask, verify that SNLI training works
-        params['multitask_network'] = None
-        params['optimizer'] = get_optimizer_snli_only
-        params['loss_fn_multitask'] = nothing
-        params['loss_fn'] = loss_snli_only
-        #params['target'] = mt_target.get_targets()
-
-        return MultitaskBuilder(params, lr, mt_target, classifier, embedding_holder)
-
-    elif mt_type == 'test_mt':
-        # ignore snli, verify that Multitask works
-        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
-        params['optimizer'] = get_optimizer_multitask_only
-        params['loss_fn_multitask'] = loss_multitask_reweighted
-        params['loss_fn'] = loss_multitask_only
-        #params['target'] = mt_target.get_targets()
-
-        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
