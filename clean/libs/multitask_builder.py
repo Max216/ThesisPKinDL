@@ -303,7 +303,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
 
         predictions = builder.predict(batch_samples)
-        print('predictions', prediction)
+        print('predictions', predictions)
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
         print(batch_loss)
