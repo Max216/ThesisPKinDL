@@ -237,6 +237,35 @@ class MultitaskBuilder:
                 #print('Skipping one')
                 pass
 
+        for i in range(len(hyp_ids)):
+            #print('##')
+            _id = hyp_ids[i]
+            #print('_id',_id)
+
+            if self._has_content[_id]:
+                #print('len target words:', len(self._target_words))
+                #print('target_words[i].size()', self._target_words[_id].size())
+                embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                embds = embds.view(embds.size()[0], -1)
+                #print('embds.size()', embds.size())
+                single_repr = hyp_repr[i,:].view(1,-1)
+                #print('single_repr.size()', single_repr.size())
+
+                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                #print(duplicated_repr)
+                #print('duplicated_repr.size()', duplicated_repr.size())
+
+                concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                #print('concatenated_input size()', concatenated_input.size())
+                labels = self._target_labels[_id]
+                #print('labels.size()', labels.size())
+
+                samples.append((concatenated_input, labels))
+                count += labels.size()[0]
+            else:
+                #print('Skipping one')
+                pass
+
             return samples, count
 
     def predict(self, sent_reprs):

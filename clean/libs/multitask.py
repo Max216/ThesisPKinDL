@@ -263,7 +263,7 @@ DEFAULT_ITERATIONS = 10
 DEFAULT_LR = 0.0002
 #DEFAULT_VALIDATE_AFTER = [16000,2000]
 DEFAULT_VALIDATE_AFTER = [1000, 1000]
-DEFAULT_BATCH_SIZE = 1
+DEFAULT_BATCH_SIZE = 32
 def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
     
     start_lr = DEFAULT_LR
@@ -279,7 +279,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     builder.train()
 
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
-    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=32, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
+    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
     best_dev_acc_snli = 0
     until_validation = 0
@@ -331,7 +331,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
 
             # Check if validate
-            if until_validation <= 0 and False:
+            if until_validation <= 0:
                 until_validation = validate_after
 
                 classifier.eval()
