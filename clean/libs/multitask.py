@@ -158,6 +158,8 @@ def make_even(entailing_words, contradicting_words):
 
         words.extend(random.sample(words, max_len - len(words)))
 
+        return words
+
     if len(entailing_words) == 0 or len(contradicting_words) == 0:
         return (entailing_words, contradicting_words)
     else:
