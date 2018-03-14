@@ -216,7 +216,7 @@ class MultiTaskTarget:
                 target_labels[i] = labels.view(-1)
                 #print('pos adding')
 
-            print('added', target_words[i].size())
+            #print('added', target_words[i].size())
 
         self._target_words = target_words
         self._target_labels = target_labels
