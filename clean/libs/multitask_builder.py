@@ -369,8 +369,8 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         #print(batch_samples)
         #print(batch_samples.size())
 
-        batch_size = batch_samples.size()[0]
-        batch_factor = sample_factor * batch_size
+        #batch_size = batch_samples.size()[0]
+        #batch_factor = sample_factor * batch_size
 
         #words_var = autograd.Variable(batch_words, requires_grad=False)
         lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
@@ -378,8 +378,8 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         predictions = builder.predict(batch_samples)
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
-        multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
-        loss += batch_loss * multiplicator_batch_factor
+        #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
+        loss += batch_loss #* multiplicator_batch_factor
 
     return loss
 
