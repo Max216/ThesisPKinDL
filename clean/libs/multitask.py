@@ -203,8 +203,8 @@ class MultiTaskTarget:
 
         for i in range(len(targets)):
             if len(targets[i]) == 0:
-                target_words[i] = torch.LongTensor([])
-                target_labels[i] = torch.LongTensor([])
+                target_words[i] = False#torch.LongTensor([])
+                target_labels[i] = False#torch.LongTensor([])
                 #print('False adding')
             else:
                 #print('targets[i]', targets[i])

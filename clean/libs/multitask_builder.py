@@ -211,18 +211,22 @@ class MultitaskBuilder:
             print('##')
             _id = premise_ids[i]
             print('_id',_id)
-            print('len target words:', len(self._target_words))
-            print('target_words[i].size()', self._target_words[_id].size())
-            embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
-            print('embds.size()', embds.size())
-            single_repr = premise_repr[i,:]
-            print('single_repr.size()', single_repr.size())
 
-            duplicated_repr = torch.cat([single_repr for i in range(embds.size()[1])], 1)
-            print('duplicated_repr.size()', duplicated_repr.size())
+            if self._target_words[_id] != False:
+                print('len target words:', len(self._target_words))
+                print('target_words[i].size()', self._target_words[_id].size())
+                embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                print('embds.size()', embds.size())
+                single_repr = premise_repr[i,:]
+                print('single_repr.size()', single_repr.size())
 
-            concatenated = torch.cat((duplicated_repr, embds), 0)
-            print('concatenated size()', concatenated.size())
+                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[1])], 1)
+                print('duplicated_repr.size()', duplicated_repr.size())
+
+                concatenated = torch.cat((duplicated_repr, embds), 0)
+                print('concatenated size()', concatenated.size())
+            else:
+                print('Skipping one')
 
         return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
         # samples = []
