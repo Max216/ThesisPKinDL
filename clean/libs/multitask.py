@@ -213,7 +213,7 @@ class MultiTaskTarget:
                             #print('###',not_in_sent_samples[w_idx])
 
                         contradicting_words = list(contradicting_words - entailing_words)
-                        entailing_words = list(entailing_word) 
+                        entailing_words = list(entailing_words) 
 
                         entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
 
