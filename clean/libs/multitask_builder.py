@@ -338,7 +338,7 @@ def get_optimizer_snli_only(classifier, multitask_network, lr):
     return optim.Adam(classifier.parameters(), lr=lr)
 
 def get_optimizer_multitask_only(classifier, multitask_network, lr):
-    return optim.Adam(multitask_network.parameters(), lr=lr) 
+    return optim.Adam(list(set(list(multitask_network.parameters()) + list(classifier.parameters()))), lr=lr) 
 
 #
 # Combining Loss functions
@@ -347,7 +347,7 @@ def loss_snli_only(snli_loss, multitask_loss):
     return snli_loss
 
 def loss_multitask_only(snli_loss, multitask_loss):
-    print('multitask loss', multitask_loss)
+    #print('multitask loss', multitask_loss)
     return multitask_loss
 
 
