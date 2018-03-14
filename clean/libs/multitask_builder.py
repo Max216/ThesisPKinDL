@@ -222,7 +222,7 @@ class MultitaskBuilder:
                 single_repr = premise_repr[i,:].view(1,-1)
                 print('single_repr.size()', single_repr.size())
 
-                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 1)
                 print(duplicated_repr)
                 print('duplicated_repr.size()', duplicated_repr.size())
 
