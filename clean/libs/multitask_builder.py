@@ -296,7 +296,7 @@ def loss_snli_only(snli_loss, multitask_loss):
     return snli_loss
 
 def loss_multitask_only(snli_loss, multitask_loss):
-    print('multitask loss', multitask_loss)
+    print('multitask loss', multitask_loss.data[0])
     return multitask_loss
 
 
@@ -323,8 +323,8 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         #print(batch_samples)
         #print(batch_samples.size())
 
-        #batch_size = batch_samples.size()[0]
-        #batch_factor = sample_factor * batch_size
+        batch_size = batch_samples.size()[0]
+        batch_factor = sample_factor * batch_size
 
         #words_var = autograd.Variable(batch_words, requires_grad=False)
         lbl_var = autograd.Variable(m.cuda_wrap(batch_lbl))
@@ -337,8 +337,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         batch_loss = F.cross_entropy(predictions, lbl_var)
         loss.append(batch_loss)
         #return batch_loss
-        #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
-        #loss.append(batch_loss) #* multiplicator_batch_factor
+        loss.append(batch_loss * batch_factor) #* multiplicator_batch_factor
         #batch_loss.backward()
         #builder._optimizer.step()
 
