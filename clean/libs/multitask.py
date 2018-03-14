@@ -297,7 +297,8 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             hypothesis_info = (hyp_var, sentence_representations[1])
 
             backward_loss = builder.loss(loss, premise_info, hypothesis_info, premise_ids, hyp_ids)
-            torch.autograd.backward(backward_loss)#.backward()
+            backward_loss.backward()
+            #torch.autograd.backward(backward_loss)#.backward()
 
             builder.optimizer_step()
 
