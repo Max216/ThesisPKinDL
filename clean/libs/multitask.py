@@ -324,7 +324,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
                     premise_info = (premise_var, sentence_representations[0])
                     hypothesis_info = (hyp_var, sentence_representations[1])
-                    builder.add_evaluation(premise_info, hypothesis_info)
+                    builder.add_evaluation(premise_info, hypothesis_info, premise_ids, hyp_ids)
 
 
                 print('Running time:', time.time() - start_time, 'seconds')

@@ -172,9 +172,9 @@ class MultitaskBuilder:
         if self._multitask_network != None:
             self._multitask_network.eval()
 
-    def add_evaluation(self, premise_info, hypothesis_info):
+    def add_evaluation(self, premise_info, hypothesis_info, premise_ids, hyp_ids):
         """ evaluate the samples and remember the results """
-        eval_data, counts = self.get_all_multitask_samples(premise_info, hypothesis_info)
+        eval_data, counts = self.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
         for samples, lbls in eval_data:
             pred = self._multitask_network(samples)
             _, predicted_idx = torch.max(pred.data, dim=1)
