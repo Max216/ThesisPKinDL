@@ -210,9 +210,9 @@ class MultitaskBuilder:
         samples = []
         count = 0
         for i in range(len(premise_ids)):
-            print('##')
+            #print('##')
             _id = premise_ids[i]
-            print('_id',_id)
+            #print('_id',_id)
 
             if self._has_content[_id]:
                 #print('len target words:', len(self._target_words))
