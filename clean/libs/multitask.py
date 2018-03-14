@@ -196,9 +196,8 @@ class MultiTaskTarget:
                         targets[sent_id] = samples
 
         #self.targets = targets
-        print(targets)
-        print('len targets:', len(targets))
-        1/0
+        #print(targets)
+        #print('len targets:', len(targets))
         target_words = [[] for i in range(len(targets))]
         target_labels = [[] for i in range(len(targets))]
 
