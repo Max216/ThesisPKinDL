@@ -226,12 +226,15 @@ class MultitaskBuilder:
                 #print(duplicated_repr)
                 print('duplicated_repr.size()', duplicated_repr.size())
 
-                concatenated = torch.cat((duplicated_repr, embds), 1)
-                print('concatenated size()', concatenated.size())
+                concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                print('concatenated_input size()', concatenated_input.size())
+                labels = self._target_labels
+                print('labels.size()', labels.size())
             else:
                 print('Skipping one')
 
-        return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
+
+        #return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
         # samples = []
 
         # def add(sent_repr, w_idx, lbl):
