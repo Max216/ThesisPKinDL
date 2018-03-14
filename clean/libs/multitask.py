@@ -252,7 +252,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
     builder.train()
 
     train_loader = DataLoader(train_set, drop_last=True, batch_size=batch_size, shuffle=True, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
-    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
+    dev_loader = DataLoader(dev_set, drop_last=False, batch_size=32, shuffle=False, collate_fn=collatebatch.CollateBatchId(embedding_holder.padding()))
 
     best_dev_acc_snli = 0
     until_validation = 0
@@ -297,9 +297,9 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             hypothesis_info = (hyp_var, sentence_representations[1])
 
             backward_loss = builder.loss(loss, premise_info, hypothesis_info, premise_ids, hyp_ids)
-            backward_loss.backward()
+            #backward_loss.backward()
 
-            builder.optimizer_step()
+            #builder.optimizer_step()
 
 
             # Check if validate
