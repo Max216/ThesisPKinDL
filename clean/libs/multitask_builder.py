@@ -278,6 +278,7 @@ def loss_multitask_only(snli_loss, multitask_loss):
 #
 
 def test_loss(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
+    pass
 
 
 def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
