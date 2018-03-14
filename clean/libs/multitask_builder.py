@@ -133,6 +133,7 @@ class MultitaskBuilder:
         self._word_dict = embedding_holder.reverse()
         
         target_words, target_labels = multitask_targets
+        print('init:', len(target_words), len(target_labels))
         self._target_words = multitask_targets
         self._target_labels = target_labels
 
