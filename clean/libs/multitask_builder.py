@@ -299,14 +299,13 @@ def loss_multitask_only(snli_loss, multitask_loss):
     #print('multitask loss', multitask_loss.data[0])
     return multitask_loss
 
+def loss_equal_both(snli_loss, multitask_loss):
+    return (snli_loss + multitask_loss) / 2
+
 
 #
 # Loss function for MultiTask
 #
-
-def test_loss(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
-    pass
-
 
 def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
     """Average the loss over the batches of all samples created from these sentence pairs"""
@@ -383,6 +382,16 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_multitask_only
+        #params['target'] = mt_target.get_targets()
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'equal_snli_mt':
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
         #params['target'] = mt_target.get_targets()
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)

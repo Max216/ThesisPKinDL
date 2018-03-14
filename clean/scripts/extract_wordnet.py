@@ -72,9 +72,9 @@ def merge_labels1(data_path, out_path):
     new_data = []
     for d in data:
         if d[2] == 'cohyponym' or d[2] == 'antonym':
-            new_data.append((d[0], d[1], 'other'))
+            new_data.append((d[0], d[1], 'contradiction'))
         elif d[2] == 'synonym' or d[2] == 'hypernym':
-            new_data.append((d[0], d[1], 'same'))
+            new_data.append((d[0], d[1], 'entailment'))
         elif d[2] == 'hyponym':
             pass
         else:
