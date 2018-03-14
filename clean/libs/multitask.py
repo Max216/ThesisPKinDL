@@ -289,6 +289,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
 
     for epoch in range(iterations):
+        builder.next_epoch(epoch)
 
         # Output validation infos
         print(validate_after_vals)
