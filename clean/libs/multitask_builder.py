@@ -12,8 +12,6 @@ import collections
 
 from libs import model as m
 
-DEFAULT_LR = 0.0002
-
 def _zero_grad_nothing(dummy):
     pass
 def _zero_grad_obj(obj):
