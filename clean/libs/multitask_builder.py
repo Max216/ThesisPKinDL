@@ -136,6 +136,7 @@ class MultitaskBuilder:
         print('init:', len(target_words), len(target_labels))
         self._target_words = multitask_targets
         self._target_labels = target_labels
+        1/0
 
         # helper functions
         if self._multitask_network == None:
