@@ -383,7 +383,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         batch_loss.backward()
         builder._optimizer.step()
 
-    return torch.sum(torch.cat((loss), 0))
+    #return torch.sum(torch.cat((loss), 0))
 
 
 #
