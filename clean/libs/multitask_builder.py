@@ -378,6 +378,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         predictions = builder.predict(batch_samples)
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
+        print(batch_loss)
         #multiplicator_batch_factor = autograd.Variable(batch_loss.data.clone().fill_(batch_factor))
         #loss.append(batch_loss) #* multiplicator_batch_factor
         batch_loss.backward()
