@@ -226,7 +226,7 @@ class MultiTaskTarget:
 
 
     def get_targets(self):
-        return self._target_words, self._target_labels
+        return self._target_words, self._target_labels, self._target_has_content
 
 
 
