@@ -217,8 +217,9 @@ class MultitaskBuilder:
                 print('len target words:', len(self._target_words))
                 print('target_words[i].size()', self._target_words[_id].size())
                 embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                embds = embds.view(embds.size()[0], -1)
                 print('embds.size()', embds.size())
-                single_repr = premise_repr[i,:]
+                single_repr = premise_repr[i,:].view(-1,1)
                 print('single_repr.size()', single_repr.size())
 
                 duplicated_repr = torch.cat([single_repr for i in range(embds.size()[1])], 1)
