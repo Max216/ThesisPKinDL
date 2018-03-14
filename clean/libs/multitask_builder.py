@@ -228,7 +228,7 @@ class MultitaskBuilder:
 
                 concatenated_input = torch.cat((duplicated_repr, embds), 1)
                 print('concatenated_input size()', concatenated_input.size())
-                labels = self._target_labels
+                labels = self._target_labels[_id]
                 print('labels.size()', labels.size())
             else:
                 print('Skipping one')
