@@ -295,6 +295,7 @@ def create_data_using_first_synset(vocab_path, out_path):
             current = data[w1]
             for w2 in current:
                 cnt_final += 1
+                print('\t'.join([w1, w2, current[w2]]))
                 f_out.write('\t'.join([w1, w2, current[w2]]) + '\n')
 
     print('Wrote out:', cnt_final)

@@ -159,6 +159,9 @@ class MultitaskBuilder:
         self.reg_snli = reg_snli
         self.reg_mt = reg_mt
 
+        print('Regularization for multitask:', self.reg_mt)
+        print('Regularization for SNLI:', self.reg_snli)
+
     def optimizer_step(self):
         """ Train step based on optimizer function """
         self._optimizer.step()
