@@ -64,6 +64,9 @@ def extract_adv(data_file, out_file):
     final_data = []
     for (w1, w2) in wp_dict:
         lbl, cnt = collections.Counter(wp_dict[(w1, w2)]).most_common()[0]
+
+        if lbl == 'neutral':
+            lbl = 'contradiction'
         final_data.append([w1, w2, lbl])
 
     with open(out_file, 'w') as f_out:
