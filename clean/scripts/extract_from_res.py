@@ -8,7 +8,7 @@ def main():
 
     Usage:
         extract_from_res.py bless <vocab_file> <data_file> <out_file> 
-        extract_from_res.py adv <data_file>
+        extract_from_res.py adv <data_file> <out_file> 
     """)
 
     vocab_file = args['<vocab_file>']
