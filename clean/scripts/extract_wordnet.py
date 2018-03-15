@@ -200,15 +200,17 @@ def lemma_in_vocab(syns, vocab_set):
     return list(set(syns.lemma_names()) & vocab_set)
 
 def update_stopwords():
-    not_stopwords = ['whole', 'somehow', 'two', 'enough', 'always', 'never', 'eight', 'alone', 'below', beforehand', 'much', 'less', 'nothing', 'same', 'say', 'more', 'above', 'besides', 'against', 'least', 'name',  'most', 'well', 'anyone', 'became', 'noone', 'part','front', 'keep', 'none','see', 'first', 'perhaps', 'anywhere', 'everywhere', 'used', 'several', 'after', 'mostly', 'eleven', 'down', 'done', 'often', 'meanwhile', 'around', 'behind', 'now', 'others', 'until', 'back', 'another', 'third', 'beside', 'become', 'someone', 'hundred', 'using', 'four', 'something', 'very', 'some', 'during', 'under', 'twenty', 'three', 'anything', 'between', 'over', 'amount', 'nine', 'fifty', 'other', 'move', 'cannot', 'next', 'nowhere', 'within', 'give', 'various', 'no', 'go', 'before', 'somewhere', 'serious', 'amongst', 'both', 'last', 'together', 'without', 'once', 'one', 'few', r', 'himself', 'six', 'all', 'almost', 'take', 'fifteen', 'forty', 'full', 'nobody', 'beyond', 'twelve', 'each', 'show', 'former', 'sometime', 'top', 'becomes', 'across',  'five', 'every', 'out', 'everything', 'call', 'ten', 'bottom', 'many', 'sixty', 'afterwards', 'latterly', 'empty', 'everyone']
+    not_stopwords = ['whole', 'somehow', 'two', 'enough', 'always', 'never', 'eight', 'alone', 'below', 'beforehand', 'much', 'less', 'nothing', 'same', 'say', 'more', 'above', 'besides', 'against', 'least', 'name',  'most', 'well', 'anyone', 'became', 'noone', 'part','front', 'keep', 'none','see', 'first', 'perhaps', 'anywhere', 'everywhere', 'used', 'several', 'after', 'mostly', 'eleven', 'down', 'done', 'often', 'meanwhile', 'around', 'behind', 'now', 'others', 'until', 'back', 'another', 'third', 'beside', 'become', 'someone', 'hundred', 'using', 'four', 'something', 'very', 'some', 'during', 'under', 'twenty', 'three', 'anything', 'between', 'over', 'amount', 'nine', 'fifty', 'other', 'move', 'cannot', 'next', 'nowhere', 'within', 'give', 'various', 'no', 'go', 'before', 'somewhere', 'serious', 'amongst', 'both', 'last', 'together', 'without', 'once', 'one', 'few', 'himself', 'six', 'all', 'almost', 'take', 'fifteen', 'forty', 'full', 'nobody', 'beyond', 'twelve', 'each', 'show', 'former', 'sometime', 'top', 'becomes', 'across',  'five', 'every', 'out', 'everything', 'call', 'ten', 'bottom', 'many', 'sixty', 'afterwards', 'latterly', 'empty', 'everyone']
     for w in not_stopwords:
         spacy.en.language_data.STOP_WORDS.add(w)
 
 
 def create_data_using_first_synset(vocab_path, out_path):
 
-    MIN_DIST_TO_TOP_COHYPO = 3
-    MIN_DIST_TO_TOP_HYPER = 3
+    MIN_DIST_TO_TOP_COHYPO = 4
+    MIN_DIST_TO_TOP_HYPER = 6
+
+    update_stopwords()
 
     with open(vocab_path) as f_in:
         vocab = [line.strip() for line in f_in.readlines()]
