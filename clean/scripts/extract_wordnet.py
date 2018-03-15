@@ -200,6 +200,10 @@ def lemma_in_vocab(syns, vocab_set):
     return list(set(syns.lemma_names()) & vocab_set)
 
 def create_data_using_first_synset(vocab_path, out_path):
+
+    MIN_DIST_TO_TOP_COHYPO = 5
+    MIN_DIST_TO_TOP_HYPER = 4
+
     with open(vocab_path) as f_in:
         vocab = [line.strip() for line in f_in.readlines()]
         vocab = [w for w in vocab if w not in spacy.en.language_data.STOP_WORDS and w.lower() not in spacy.en.language_data.STOP_WORDS]
@@ -218,7 +222,7 @@ def create_data_using_first_synset(vocab_path, out_path):
 
             # get hypernyms/hyponyms
             #hyper, found_hyper = closest_hypernym(syns, vocab_set)
-            hyper, found_hyper, hyper_lemmas = first_hypernym(syns, vocab_set)
+            hyper, found_hyper, hyper_lemmas = first_hypernym(syns, vocab_set, min_dist_to_top=MIN_DIST_TO_TOP_HYPER)
             if found_hyper:
                 #hyper_lemmas = lemma_in_vocab(hyper, vocab_set)
                 for lemma in hyper_lemmas:
@@ -254,7 +258,7 @@ def create_data_using_first_synset(vocab_path, out_path):
                     result.append((anto, lemma_name, 'antonym'))
 
             # get cohyponyms
-            hyper, found_hyper = first_hypernym(syns, min_dist_to_top=6)#closest_hypernym(syns)
+            hyper, found_hyper = first_hypernym(syns, min_dist_to_top=MIN_DIST_TO_TOP_COHYPO)#closest_hypernym(syns)
             if found_hyper:
                 hyponyms = get_hyponyms_excluding_syns(hyper, syns)
                 hyponym_names = []
