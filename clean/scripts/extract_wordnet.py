@@ -201,8 +201,8 @@ def lemma_in_vocab(syns, vocab_set):
 
 def create_data_using_first_synset(vocab_path, out_path):
 
-    MIN_DIST_TO_TOP_COHYPO = 5
-    MIN_DIST_TO_TOP_HYPER = 4
+    MIN_DIST_TO_TOP_COHYPO = 3
+    MIN_DIST_TO_TOP_HYPER = 3
 
     with open(vocab_path) as f_in:
         vocab = [line.strip() for line in f_in.readlines()]
