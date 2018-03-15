@@ -379,6 +379,24 @@ def decrease_strong_mt_it10(epoch, regularization):
     factor_multitask = (9 - epoch) / 9
     return (1 - factor_multitask, 1 - factor_multitask, factor_multitask)
 
+def train_tailvtail_shape_it10(epoch, regularization):
+    # first 3 iterations for good sentence representation, last 3 epochs for fine tuning SNLI
+    if epoch < 3 or epoch >= 7:
+        return (1.0,1.0,0.0)
+
+    # remaining iterations: 3,4,5,6
+    factor_multitask = 0.0
+    if epoch == 3:
+        factor_multitask = 0.5
+    elif epoch == 4:
+        factor_multitask = 1.0
+    elif epoch == 5:
+        factor_multitask = 0.75
+    else:
+        factor_multitask = 0.5
+
+    return (1.0, 1 - factor_multitask, factor_multitask)
+
 #
 # Multitask network factories
 #
@@ -450,6 +468,17 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_on_regularization
         params['regularization_update'] = decrease_strong_mt_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'tail_v_tail10':
+        print('tail_v_tail10')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = train_tailvtail_shape_it10
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 

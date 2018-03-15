@@ -264,6 +264,7 @@ DEFAULT_LR = 0.0002
 DEFAULT_VALIDATE_AFTER = [16000,2000]
 #DEFAULT_VALIDATE_AFTER = [1000, 1000]
 DEFAULT_BATCH_SIZE = 32
+VALIDATE_AFTER_MT = 64000
 def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
     
     start_lr = DEFAULT_LR
@@ -283,6 +284,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
     best_dev_acc_snli = 0
     until_validation = 0
+    until_validation_mt = 0
     samples_seen = 0
     start_time = time.time()
 
@@ -311,6 +313,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
             samples_seen += DEFAULT_BATCH_SIZE
             until_validation -= DEFAULT_BATCH_SIZE
+            until_validation_mt -= DEFAULT_BATCH_SIZE
 
             premise_var = autograd.Variable(premise_batch)
             hyp_var = autograd.Variable(hypothesis_batch)
@@ -335,13 +338,18 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             if until_validation <= 0:
                 until_validation = validate_after
 
+                if until_validation_mt <= 0:
+                    until_validation_mt = VALIDATE_AFTER_MT
+                    validate_mt = True
+                    builder.new_evaluation()
+                else:
+                    validate_mt = False
+
                 classifier.eval()
                 builder.eval()
 
                 correct_snli = 0
                 total_snli = len(dev_set) 
-
-                builder.new_evaluation()
 
                 for premise_batch, hyp_batch, lbl_batch, premise_ids, hyp_ids in dev_loader:
                     premise_var = autograd.Variable(premise_batch)
@@ -353,13 +361,17 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
 
                     premise_info = (premise_var, sentence_representations[0])
                     hypothesis_info = (hyp_var, sentence_representations[1])
-                    builder.add_evaluation(premise_info, hypothesis_info, premise_ids, hyp_ids)
+
+                    if validate_mt:
+                        builder.add_evaluation(premise_info, hypothesis_info, premise_ids, hyp_ids)
 
 
                 print('Running time:', time.time() - start_time, 'seconds')
                 dev_acc = correct_snli / total_snli
                 print('After', samples_seen, 'samples: dev accuracy (SNLI):', dev_acc)
-                builder.print_evaluation()
+                
+                if validate_mt:
+                    builder.print_evaluation()
 
                 if dev_acc > best_dev_acc_snli:
                     best_model = copy.deepcopy(classifier.state_dict())
