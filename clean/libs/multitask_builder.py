@@ -406,14 +406,14 @@ def train_tailvtail_shape_it10(epoch, regularization):
 def get_multitask_nw(classifier, layers=1, mlp=600):
     dim_sent = 1200
     dim_word = 300
-    dim nw = mlp
+    dim_nw = mlp
 
     dim_input = dim_word + dim_sent
 
     if layers == 1:
         mt_network = MTNetworkSingleLayer(classifier, dim_input, 2)
     else:
-        mt_network = MTNetworkTwoLayer(classifier, dim_input, nw, 2)
+        mt_network = MTNetworkTwoLayer(classifier, dim_input, dim_nw, 2)
 
     return m.cuda_wrap(mt_network)
 
