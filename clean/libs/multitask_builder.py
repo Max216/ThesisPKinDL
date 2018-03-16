@@ -454,8 +454,19 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
     
+    elif mt_type == 'equal_snli_mt_2layer_10':
+        print('equal_snli_mt_2layer_10')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=10)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
     elif mt_type == 'equal_snli_mt_2layer_50':
-        print('equal_snli_mt')
+        print('equal_snli_mt_2layer_50')
         # weight both results the same, all the time
         params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=50)
         params['optimizer'] = get_optimizer_multitask_only
@@ -466,7 +477,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
     elif mt_type == 'equal_snli_mt_2layer_100':
-        print('equal_snli_mt')
+        print('equal_snli_mt_2layer_100')
         # weight both results the same, all the time
         params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=100)
         params['optimizer'] = get_optimizer_multitask_only
@@ -477,7 +488,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
     elif mt_type == 'equal_snli_mt_1layer':
-        print('equal_snli_mt')
+        print('equal_snli_mt_1layer')
         # weight both results the same, all the time
         params['multitask_network'] = get_multitask_nw(classifier, layers=1)
         params['optimizer'] = get_optimizer_multitask_only
