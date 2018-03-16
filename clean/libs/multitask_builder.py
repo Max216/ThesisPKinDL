@@ -403,16 +403,17 @@ def train_tailvtail_shape_it10(epoch, regularization):
 #
 # Multitask network factories
 #
-def get_multitask_nw(classifier, layers=1):
+def get_multitask_nw(classifier, layers=1, mlp=600):
     dim_sent = 1200
     dim_word = 300
+    dim nw = mlp
 
     dim_input = dim_word + dim_sent
 
     if layers == 1:
         mt_network = MTNetworkSingleLayer(classifier, dim_input, 2)
     else:
-        mt_network = MTNetworkTwoLayer(classifier, dim_input, 600, 2)
+        mt_network = MTNetworkTwoLayer(classifier, dim_input, nw, 2)
 
     return m.cuda_wrap(mt_network)
 
@@ -452,6 +453,40 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    
+    elif mt_type == 'equal_snli_mt_2layer_50':
+        print('equal_snli_mt')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=50)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'equal_snli_mt_2layer_100':
+        print('equal_snli_mt')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=100)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'equal_snli_mt_1layer':
+        print('equal_snli_mt')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=1)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
     elif mt_type == 'mt_both_snli':
         print('mt_both_snli')
         # weight both results the same, all the time
@@ -462,6 +497,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['regularization_update'] = first_mt_then_all_then_snli_it10
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
 
     elif mt_type == 'mt_strong_decrease':
         print('mt_strong_decrease')
