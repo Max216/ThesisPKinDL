@@ -89,9 +89,14 @@ def main():
 
         load_path = args['--load']
 
+        if args['s1'] and args['s2'] and args['s3']:
+            encoding_dim = [int(args['s1']), int(args['s2']), int(args['s3'])]
+        else:
+            encoding_dim = None
+
         if load_path == None:
             # None becuse of default settings
-            model_name, classifier, embedding_holder = model_tools.create_model(None, embedding_holder, None, opts=m_settings, hint=appendix)
+            model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix)
         else:
             model_name, classifier, embedding_holder = model_tools.load(load_path, embedding_holder)
             model_name += '.loaded'
