@@ -81,6 +81,86 @@ class ModelSettings:
             1/0
 
 
+class SentenceEncoderMLP(nn.Module):
+    """
+    Encodes a sentence. This is later used to compare different sentences. This implementation uses an MLP on top of the last LSTM representaion
+    """
+    
+    def __init__(self, embedding_dim, dimen1, dimen2, dimen3, dimen_out, options=ModelSettings()):
+        """
+        Encode a sentence of variable length into a fixed length representation.
+        
+        @param embedding_dim - size of pretrained embeddings
+        @param dimen_out - size of the resulting vector
+        """
+        super(SentenceEncoder, self).__init__()
+        
+        self.directions = 2  # bidirectional
+        self.dimen_out = dimen_out
+        self.dimen1 = dimen1
+        self.dimen2 = dimen2
+        self.dimen3 = dimen3
+        self.layers = 1      # number of lstm layers        
+        self.input_dim_2 = embedding_dim + dimen1 * self.directions
+        self.input_dim_3 = self.input_dim_2
+        self.embedding_dim = embedding_dim
+        
+        # Encode via LSTM
+        bidirectional = self.directions == 2
+        self.lstm1 = nn.LSTM(embedding_dim, dimen1, bidirectional=bidirectional)
+        self.lstm2 = nn.LSTM(self.input_dim_2, dimen2, bidirectional=bidirectional)
+        self.lstm3 = nn.LSTM(self.input_dim_3, dimen3, bidirectional=bidirectional)
+
+        # options
+        self.sent_rep_fn = options.get_fn('sent-rep')
+
+        self.base_tensor_type = cuda_wrap(torch.FloatTensor([0.0]))
+
+        self.linear = nn.Linear(self.dimen3 * self.directions, self.dimen_out)
+        
+    def init_hidden(self, batch_size):
+
+        # (num_layers*directions, minibatch_size, hidden_dim)
+        self.hidden_state1 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen1).zero_())
+        self.cell_state1 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen1).zero_())
+        self.hidden_state2 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen2).zero_())
+        self.cell_state2 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen2).zero_())
+        self.hidden_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen_out).zero_())
+        self.cell_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen_out).zero_())
+
+        #self.hidden_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
+        #self.cell_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
+        #self.hidden_state2 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen2)))
+        #self.cell_state2 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen2)))
+        #self.hidden_state3 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out)))
+        #self.cell_state3 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen_out)))
+    
+    def forward(self, sents):
+        # init for current batch size
+        self.init_hidden(sents.size()[1])
+        
+        output1, (h_n1, c_n1) = self.lstm1(sents, (self.hidden_state1, self.cell_state1))
+        
+        # residual of hidden state to word embeddings. here concat
+        input_lstm2 = torch.cat((sents, output1), dim=2)
+        output2, (h_n2, c_n2) = self.lstm2(input_lstm2, (self.hidden_state2, self.cell_state2))
+
+        # here add
+        # use initial embeddings, add lstm outputs
+        additional = output1 + output2
+        input_lstm3 = torch.cat((sents, additional), dim=2)
+        output3, (h_n3, c_n3) = self.lstm3(input_lstm3, (self.hidden_state3, self.cell_state3))
+        lstm_out = self.sent_rep_fn(output3)
+
+        return F.relu(self.linear(lstm_out))
+
+    def sent_dim(self):
+        '''
+        :return the dimension of the resulting sentence represenations
+        '''
+        return self.dimen_out# * self.directions
+
+
 class SentenceEncoder(nn.Module):
     """
     Encodes a sentence. This is later used to compare different sentences.

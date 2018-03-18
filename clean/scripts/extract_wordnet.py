@@ -206,8 +206,8 @@ def legal_stopwords():
 
 def create_data_using_first_synset(vocab_path, out_path):
 
-    MIN_DIST_TO_TOP_COHYPO = 4
-    MIN_DIST_TO_TOP_HYPER = 6
+    MIN_DIST_TO_TOP_COHYPO = 3
+    MIN_DIST_TO_TOP_HYPER = 5
 
     allowed_stopwords = legal_stopwords()
 
