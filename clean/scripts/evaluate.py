@@ -18,7 +18,7 @@ def main():
 
     Usage:
         evaluate.py eval <model> <data> [<embeddings>] [--embd1=<embd1>] [--embd2=<embd2>]
-        evaluate.py ea <model> <data> 
+        evaluate.py ea <model>
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
