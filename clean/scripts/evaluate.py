@@ -62,7 +62,7 @@ def main():
         categories = dataholder.get_categories()
         print('New dataset:')
         print('Accuracy over all data ->', ev.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
-        for category in categories:
+        for category in sorted(categories):
             data = dataholder.get_dataset_for_category(embedding_holder, category)
             accuracy = ev.eval(classifier, data, 1, embedding_holder.padding())
             print('Accuracy on', category, '->', accuracy)

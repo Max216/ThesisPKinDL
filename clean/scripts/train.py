@@ -18,7 +18,7 @@ def main():
     Usage:
         train.py new [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--lower=<lower>]
         train.py new_mt_sent [--tdata=<train_data>] [--ddata=<dev_data>] [--encoding=<encoding_dim>] [--hidden=<hidden_dim>] [--embeddings=<embedding_path>] [--sentfn=<sent_fn>] [--appendix=<appendix>] [--embd1=<embd1>] [--embd2=<embd2>] [--mt1=<mt1>]
-        train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>] [--tdata=<train_data>]
+        train.py multitask <multitask_type> <multitask_data> [--embeddings=<embedding_path>] [--load=<model_path>] [--tdata=<train_data>] [--s1=<sent1_dim>] [--s2=<sent2_dim>] [--s3=<sent3_dim>]
     """)
 
     torch.manual_seed(12)
