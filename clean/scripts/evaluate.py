@@ -48,7 +48,7 @@ def main():
 
     elif args['ea']:
         print('Evaluate all')
-        embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
         _,classifier, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
         classifier = m.cuda_wrap(classifier)
 
