@@ -18,6 +18,7 @@ def main():
 
     Usage:
         evaluate.py eval <model> <data> [<embeddings>] [--embd1=<embd1>] [--embd2=<embd2>]
+        evaluate.py ea <model> <data> 
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
@@ -29,6 +30,7 @@ def main():
     embeddings_path = args['<embeddings>']
     embd1 = args['--embd1']
     embd2 = args['--embd2']
+
 
 
     if args['eval']:
@@ -43,6 +45,30 @@ def main():
         if embd2:
             embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
         evaluate(model_path, data_path, embedding_holder, embeddings_diff=embeddings_diff)
+
+    elif args['ea']:
+        print('Evaluate all')
+        embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+        _,classifier, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
+        classifier = m.cuda_wrap(classifier)
+
+        for name, dp in [('train data', config.PATH_TRAIN_DATA), ('dev data', config.PATH_DEV_DATA), ('test data',config.PATH_TEST_DATA)]:
+            data = data_handler.Datahandler(dp).get_dataset(embedding_holder)
+            classifier.eval()
+            print('Accuracy on', name, ':', ev.eval(classifier, data, 32, embedding_holder.padding()))
+
+        # Adversarial
+        dataholder = data_handler.Datahandler(config.PATH_ADV_DATA, data_format='snli_adversarial')
+        categories = dataholder.get_categories()
+        print('New dataset:')
+        print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
+        for category in categories:
+            data = dataholder.get_dataset_for_category(embedding_holder, category)
+            accuracy = ev.eval(classifier, data, 1, embedding_holder.padding())
+            print('Accuracy on', category, '->', accuracy)
+
+        
+
 
 
 def evaluate(model_path, data_path, embedding_holder, twister=None, embeddings_diff=False):
