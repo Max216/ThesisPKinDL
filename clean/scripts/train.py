@@ -89,8 +89,8 @@ def main():
 
         load_path = args['--load']
 
-        if args['s1'] and args['s2'] and args['s3']:
-            encoding_dim = [int(args['s1']), int(args['s2']), int(args['s3'])]
+        if args['--s1'] and args['--s2'] and args['--s3']:
+            encoding_dim = [int(args['--s1']), int(args['--s2']), int(args['--s3'])]
         else:
             encoding_dim = None
 
