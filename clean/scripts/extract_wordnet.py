@@ -83,7 +83,7 @@ def create_location_data(out_path, vocab_path):
     countries2 = [(lemmas, syn) for lemmas, syn in countries2 if len(lemmas) > 0]
     
 
-    all_countries = list(set(countries1 + countries2))
+    all_countries = countries1 + countries2
 
 
     # Add countries to samples
