@@ -109,7 +109,7 @@ def create_location_data(out_path, vocab_path):
     # add part meronyms
     all_part_meronyms = []
     for country_lemmas, country in all_countries:
-        for pm in part_meronyms:
+        for pm in country.part_meronyms():
             extracted_lemmas = extract_syns_words(pm, vocab)
             if len(extracted_lemmas) > 0:
                 all_part_meronyms.append((extracted_lemmas, pm))
