@@ -26,6 +26,7 @@ def main():
         extract_wordnet.py finalize_data <data_path> <out_path>
         extract_wordnet.py merge_labels1 <data_path> <out_path>
         extract_wordnet.py merge_labels <data_path> <lbl_same> <lbl_different> <out_path>
+        extract_wordnet.py locations <out_path> <vocab>
     """)
 
     if args['count_hyper']:
@@ -46,6 +47,27 @@ def main():
         merge_labels1(args['<data_path>'], args['<out_path>'])
     elif args['merge_labels']:
         merge_labels_general(args['<data_path>'],args['<lbl_same>'], args['<lbl_different>'], args['<out_path>'])
+    elif args['locations']:
+        create_location_data(args['<out_path>'], args['<vocab>'])
+
+def extract_syns_words(syns, vocab):
+    return [lemma for lemma in syns.lemma_names() if len(lemma.split(' ')) == 1 and lemma in vocab]
+
+def create_location_data(out_path, vocab_path):
+
+    with open(vocab_path) as f_in:
+        vocab = [line.strip() for line in f_in.readlines()]
+
+    country_syns = wn.synset('country.n.02')
+
+    # all instance hyponyms are countries
+    countries1 = country_syns.instance_hyponyms()
+    countries1 = [(extract_syns_words(s), s) for s in countries1]
+    countries1 = [(lemmas, syn) for lemmas, syns in countries1 if len(lemmas) > 0]
+    print('Countries so far:', countries1)
+
+
+
 
 def merge_labels_general(data_path, lbl_same, lbl_different, out_path):
     with open(data_path) as f_in:
