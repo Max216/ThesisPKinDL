@@ -145,7 +145,10 @@ def create_location_data(out_path, vocab_path):
     print('contradiction:', len(samples_contradiction))
 
     random.shuffle(samples_contradiction)
-    print(samples_contradiction[:200])
+    random.shuffle(samples_entailment)
+    print(samples_contradiction[:400])
+    print('----')
+    print(samples_entailment[:300])
 
 
 
