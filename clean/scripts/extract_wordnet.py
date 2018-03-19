@@ -27,6 +27,7 @@ def main():
         extract_wordnet.py merge_labels1 <data_path> <out_path>
         extract_wordnet.py merge_labels <data_path> <lbl_same> <lbl_different> <out_path>
         extract_wordnet.py locations <out_path> <vocab>
+        extract_wordnet.py combine <out_path> (-f <file>)...
     """)
 
     if args['count_hyper']:
@@ -49,6 +50,34 @@ def main():
         merge_labels_general(args['<data_path>'],args['<lbl_same>'], args['<lbl_different>'], args['<out_path>'])
     elif args['locations']:
         create_location_data(args['<out_path>'], args['<vocab>'])
+    elif args['combine']:
+        combine_data(args['out_path'], args['-f'])
+
+def combine_data(out_path, file_paths):
+    samples_entailment = []
+    samples_contradiction = []
+
+    for fp in file_paths:
+        with open(fp) as f_in:
+            print('read', fp)
+            data = [line.strip().split('\t') for line in f_in.readlines()]
+            samples_e = [(d[0], d[1]) for d in data if d[2] == 'entailment']
+            samples_c = [(d[0], d[1]) for d in data if d[2] == 'contradiction']
+            print('Samples:', len(data), 'e:', len(samples_e), 'c:', len(samples_c))
+            samples_entailment.extend(samples_e)
+            samples_contradiction.extend(samples_c)
+
+    samples_entailment = set(samples_entailment)
+    samples_contradiction = set(samples_contradiction)
+    samples_contradiction = list(samples_contradiction - samples_entailment)
+    samples_entailment = list(samples_entailment)
+
+    print('Final: e:', len(samples_entailment), 'c:', len(samples_contradiction))
+    with open(out_path, 'w') as f_out:
+        for lbl, samples in [('entailment', samples_entailment), ('contradiction', samples_contradiction)]:
+            for w1, w2 in samples:
+                f_out.write('\t'.join([w1, w2, lbl]) + '\n')
+
 
 def extract_syns_words(syns, vocab):
     return [lemma for lemma in syns.lemma_names() if len(lemma.split(' ')) == 1 and lemma in vocab]
