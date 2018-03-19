@@ -69,12 +69,16 @@ def create_location_data(out_path, vocab_path):
 
     # other countries: hyponyms with upper case letters
 
-    print('all country hyponyms')
     countries2_hyper = [hypo for hypo in country_syns.hyponyms()]
-    print(countries2_hyper)
-    print('filtered:')
     countries2_hyper = [h for h in countries2_hyper if h.lemma_names()[0][0].isupper()]
-    print(countries2_hyper)
+    countries2_hypo = []
+    for h in countries2_hyper:
+        countries2_hypo.extend(h.instance_hyponyms() + h.hyponyms())
+
+    countries2_hypo = list(set(countries2_hypo))
+    print('Countries final')
+    print(countries2_hypo)
+
 
 
 
