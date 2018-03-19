@@ -116,7 +116,7 @@ def create_location_data(out_path, vocab_path):
                 
                 for pm_lemma in extracted_lemmas:
                     for country_lemma in country_lemmas:
-                        samples_entailment.append((country_lemma, pm_lemma))
+                        samples_entailment.append((pm_lemma, country_lemma))
                     for pm_lemma2 in extracted_lemmas:
                         samples_entailment.append((pm_lemma, pm_lemma2))
 
