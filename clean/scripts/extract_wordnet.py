@@ -69,7 +69,7 @@ def create_location_data(out_path, vocab_path):
 
     # other countries: hyponyms that have no other hyponyms (except for instance hyponyms)
 
-    countries2_hyper = [hypo for hypo in country_syns.hyponyms() if len(hypo.hyponyms()) == 0]
+    countries2_hyper = [hypo for hypo in country_syns.hyponyms() if hypo.lemma_names()[0][0].isupper()]
     print(countries2_hyper)
 
 
