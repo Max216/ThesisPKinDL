@@ -364,6 +364,12 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
 def dummy_regularization(epoch, regularization):
     return (1,2,3)
 
+def mt_both_finetune_200_it10(epoch, regularization):
+    vals = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0,0,0,0]
+
+    factor_multitask = vals[epoch]
+    return (1, 1 - factor_multitask, factor_multitask)
+
 def first_mt_then_all_then_snli_it10(epoch, regularization):
     # general, snli, mt
     if epoch == 0:
@@ -404,7 +410,7 @@ def train_tailvtail_shape_it10(epoch, regularization):
 # Multitask network factories
 #
 def get_multitask_nw(classifier, layers=1, mlp=600):
-    dim_sent = 1200
+    dim_sent = classifier.sent_encoder.sent_dim()
     dim_word = 300
     dim_nw = mlp
 
@@ -509,6 +515,16 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_finetune_200':
+        print('mt_strong_decrease')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=200)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = mt_both_finetune_200_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
     elif mt_type == 'mt_strong_decrease':
         print('mt_strong_decrease')

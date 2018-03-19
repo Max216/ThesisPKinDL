@@ -56,7 +56,7 @@ def params_from_model_name(name):
 
     return result
 
-def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings(), hint=None):
+def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, num_classes=None, opts=m.ModelSettings(), hint=None, mlpsent=None):
     '''
     Create a model from parameters
 
