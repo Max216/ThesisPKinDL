@@ -106,6 +106,32 @@ def create_location_data(out_path, vocab_path):
                     for l2 in lemmas2:
                         samples_contradiction.append((l, l2))
 
+    # add part meronyms
+    all_part_meronyms = []
+    for country_lemmas, country in all_countries:
+        for pm in part_meronyms:
+            extracted_lemmas = extract_syns_words(pm, vocab)
+            if len(extracted_lemmas) > 0:
+                all_part_meronyms.append((extracted_lemmas, pm))
+                
+                for pm_lemma in extracted_lemmas:
+                    for country_lemma in country_lemmas:
+                        samples_entailment.append((country_lemma, pm_lemma))
+                    for pm_lemma2 in extracted_lemmas:
+                        samples_entailment.append((pm_lemma, pm_lemma2))
+
+    # add contradicting
+    for pm1_lemmas, pm1 in all_part_meronyms:
+        for pm2_lemmas, pm2 in all_part_meronyms:
+            if pm1 != pm2:
+                for l1 in pm1_lemmas:
+                    for l2 in pm2_lemmas:
+                        samples_contradiction.append((l1, l2))
+
+
+
+
+
     # remove conflicts and duplicates
     samples_entailment = set(samples_entailment)
     samples_contradiction = set(samples_contradiction)
