@@ -417,6 +417,9 @@ def first_mt_then_all_then_snli_it10(epoch, regularization):
     factor_multitask = 1 - regularization
     return (regularization, 1 - factor_multitask, factor_multitask)
 
+def constant_25_percent(epoch, regularization):
+    return (1.0, 0.75, 0.25) 
+
 def decrease_strong_mt_it10(epoch, regularization):
     factor_multitask = (9 - epoch) / 9
     return (1 - factor_multitask, 1 - factor_multitask, factor_multitask)
@@ -555,8 +558,41 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_snli_ddropout_600':
+        print('mt_both_snli_ddropout_600')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=600)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = first_mt_then_all_then_snli_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'mt_both_snli_ddropout_300':
+        print('mt_both_snli_ddropout_300')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = first_mt_then_all_then_snli_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'mt_25_snli_ddropout_300':
+        print('mt_both_snli_ddropout_300')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
     elif mt_type == 'mt_both_finetune_200':
-        print('mt_strong_decrease')
+        print('mt_both_finetune_200')
         # weight both results the same, all the time
         params['multitask_network'] = get_multitask_nw(classifier, layers=2, mlp=200)
         params['optimizer'] = get_optimizer_multitask_only
