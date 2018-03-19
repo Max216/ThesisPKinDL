@@ -27,7 +27,7 @@ def main():
         extract_wordnet.py merge_labels1 <data_path> <out_path>
         extract_wordnet.py merge_labels <data_path> <lbl_same> <lbl_different> <out_path>
         extract_wordnet.py locations <out_path> <vocab>
-        extract_wordnet.py combine <out_path> (-f <file>)...
+        extract_wordnet.py combine <out_path> (-f <files>)...
     """)
 
     if args['count_hyper']:
@@ -51,7 +51,7 @@ def main():
     elif args['locations']:
         create_location_data(args['<out_path>'], args['<vocab>'])
     elif args['combine']:
-        combine_data(args['<out_path>'], args['<file>'])
+        combine_data(args['<out_path>'], args['<files>'])
 
 def combine_data(out_path, file_paths):
     samples_entailment = []
