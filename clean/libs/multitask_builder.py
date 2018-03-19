@@ -128,7 +128,7 @@ class MTNetworkTwoLayerDoubleDropout(nn.Module):
         :param hidden_layer_dimension   amoount of hidden nodes
         :param representations          size of the resulting representation
         """
-        super(MTNetworkTwoLayer, self).__init__()
+        super(MTNetworkTwoLayerDoubleDropout, self).__init__()
         self.classifier = classifier
         self.layer1 = nn.Linear(input_dim, hidden_dim)
         self.layer2 = nn.Linear(hidden_dim, output_dim)
