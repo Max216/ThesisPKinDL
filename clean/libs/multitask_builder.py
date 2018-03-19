@@ -547,16 +547,16 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
-    elif mt_type == 'mt_both_snli':
-        print('mt_both_snli')
-        # weight both results the same, all the time
-        params['multitask_network'] = get_multitask_nw(classifier, layers=2)
-        params['optimizer'] = get_optimizer_multitask_only
-        params['loss_fn_multitask'] = loss_multitask_reweighted
-        params['loss_fn'] = loss_on_regularization
-        params['regularization_update'] = first_mt_then_all_then_snli_it10
+    #elif mt_type == 'mt_both_snli':
+    #    print('mt_both_snli')
+    # #   # weight both results the same, all the time
+    #    params['multitask_network'] = get_multitask_nw(classifier, layers=2)
+    #    params['optimizer'] = get_optimizer_multitask_only
+    #    params['loss_fn_multitask'] = loss_multitask_reweighted
+    #    params['loss_fn'] = loss_equal_both
+    #    params['regularization_update'] = dummy_regularization
 
-        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+    #    return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
     elif mt_type == 'mt_both_snli_ddropout_600':
         print('mt_both_snli_ddropout_600')
@@ -564,8 +564,8 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=600)
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
-        params['loss_fn'] = loss_on_regularization
-        params['regularization_update'] = first_mt_then_all_then_snli_it10
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
@@ -575,8 +575,8 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
-        params['loss_fn'] = loss_on_regularization
-        params['regularization_update'] = first_mt_then_all_then_snli_it10
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
