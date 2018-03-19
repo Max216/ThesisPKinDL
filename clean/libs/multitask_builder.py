@@ -365,7 +365,7 @@ def dummy_regularization(epoch, regularization):
     return (1,2,3)
 
 def mt_both_finetune_200_it10(epoch, regularization):
-    vals = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0,0,0,0]
+    vals = [0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0,0,0,0]
 
     factor_multitask = vals[epoch]
     return (1, 1 - factor_multitask, factor_multitask)

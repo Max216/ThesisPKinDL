@@ -55,13 +55,15 @@ def extract_syns_words(syns, vocab):
 
 def create_location_data(out_path, vocab_path):
 
+    samples_contradiction = []
+    samples_entailment = []
+
     with open(vocab_path) as f_in:
         vocab = set([line.strip() for line in f_in.readlines()])
 
     country_syns = wn.synset('country.n.02')
 
     # all instance hyponyms are countries
-    # TODO also lower case
     countries1 = country_syns.instance_hyponyms()
     countries1 = [(extract_syns_words(s, vocab), s) for s in countries1]
     countries1 = [(lemmas, syn) for lemmas, syn in countries1 if len(lemmas) > 0]
@@ -79,7 +81,42 @@ def create_location_data(out_path, vocab_path):
 
     countries2 = [(extract_syns_words(syn, vocab), syn) for syn in countries2_hypo]
     countries2 = [(lemmas, syn) for lemmas, syn in countries2 if len(lemmas) > 0]
-    print('use countries:', countries2)
+    
+
+    all_countries = list(set(countries1 + countries2))
+
+
+    # Add countries to samples
+
+    # lowercase lemma names for countries
+    all_countries = [(lemmas + [l.lower() for l in lemmas], syn) for lemmas, syn in all_countries]
+
+    for lemmas, syns in all_countries:
+
+        #synonyms
+        for l in lemmas:
+            for l2 in lemmas:
+                samples_entailment.append((l, l2))
+
+        # contradiction
+        for lemmas2, syns2 in all_countries:
+            if syns != syns2:
+                for l in lemmas:
+                    for l2 in lemmas2:
+                        samples_contradiction.append((l, l2))
+
+    # remove conflicts and duplicates
+    samples_entailment = set(samples_entailment)
+    samples_contradiction = set(samples_contradiction)
+
+    samples_contradiction = samples_contradiction - samples_entailment
+
+    samples_entailment = list(samples_entailment)
+    samples_contradiction = list(samples_contradiction)
+
+    print('Entailment', samples_entailment)
+    print('contradiction:', samples_contradiction)
+
 
 
 
