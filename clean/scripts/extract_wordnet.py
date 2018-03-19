@@ -63,7 +63,7 @@ def create_location_data(out_path, vocab_path):
     # all instance hyponyms are countries
     countries1 = country_syns.instance_hyponyms()
     countries1 = [(extract_syns_words(s, vocab), s) for s in countries1]
-    countries1 = [(lemmas, syn) for lemmas, syns in countries1 if len(lemmas) > 0]
+    countries1 = [(lemmas, syn) for lemmas, syn in countries1 if len(lemmas) > 0]
     print('Countries so far:', countries1)
 
 
