@@ -51,7 +51,7 @@ def main():
     elif args['locations']:
         create_location_data(args['<out_path>'], args['<vocab>'])
     elif args['combine']:
-        combine_data(args['out_path'], args['-f'])
+        combine_data(args['<out_path>'], args['-f'])
 
 def combine_data(out_path, file_paths):
     samples_entailment = []
