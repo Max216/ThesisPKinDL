@@ -67,10 +67,16 @@ def create_location_data(out_path, vocab_path):
     countries1 = [(lemmas, syn) for lemmas, syn in countries1 if len(lemmas) > 0]
     print('Countries so far:', countries1)
 
-    # other countries: hyponyms that have no other hyponyms (except for instance hyponyms)
+    # other countries: hyponyms with upper case letters
 
-    countries2_hyper = [hypo for hypo in country_syns.hyponyms() if hypo.lemma_names()[0][0].isupper()]
+    print('all country hyponyms')
+    countries2_hyper = [hypo for hypo in country_syns.hyponyms()]
     print(countries2_hyper)
+    print('filtered:')
+    countries2_hyper = [h for h in countries2_hyper if h.lemma_names()[0][0].isupper()]
+    print(countries2_hyper)
+
+
 
 
 
