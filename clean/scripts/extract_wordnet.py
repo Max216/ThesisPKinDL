@@ -90,6 +90,7 @@ def create_location_data(out_path, vocab_path):
 
     # lowercase lemma names for countries
     all_countries = [(lemmas + [l.lower() for l in lemmas], syn) for lemmas, syn in all_countries]
+    all_countries = [([l for l in lemmas if l in vocab], syn) for lemmas, syn in all_countries]
 
     for lemmas, syns in all_countries:
 
@@ -114,8 +115,8 @@ def create_location_data(out_path, vocab_path):
     samples_entailment = list(samples_entailment)
     samples_contradiction = list(samples_contradiction)
 
-    print('Entailment', samples_entailment)
-    print('contradiction:', samples_contradiction)
+    print('Entailment', len(samples_entailment))
+    print('contradiction:', len(samples_contradiction))
 
 
 
