@@ -150,6 +150,12 @@ def create_location_data(out_path, vocab_path):
     print('----')
     print(samples_entailment[:300])
 
+    with open(out_path, 'w') as f_out:
+        for w1, w2 in samples_entailment:
+            f_out.write('\t'.join([w1, w2, 'entailment']) + '\n')
+        for w1, w2 in samples_contradiction:
+            f_out.write('\t'.join([w1, w2, 'contradiction']) + '\n')
+
 
 
 
