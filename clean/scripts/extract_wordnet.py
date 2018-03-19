@@ -76,8 +76,10 @@ def create_location_data(out_path, vocab_path):
         countries2_hypo.extend(h.instance_hyponyms() + h.hyponyms())
 
     countries2_hypo = list(set(countries2_hypo))
-    print('Countries final')
-    print(countries2_hypo)
+
+    countries2 = [extract_syns_words(syn, vocab) for syn in countries2_hypo]
+    countries2 = [(lemmas, syn) for lemmas, syn in countries2 if len(lemmas) > 0]
+    print('use countries:', countries2)
 
 
 
