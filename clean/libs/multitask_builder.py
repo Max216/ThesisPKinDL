@@ -380,7 +380,7 @@ def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_id
         #print('#####')
         #print('predicted', predictions.size())
         batch_loss = F.cross_entropy(predictions, lbl_var)
-        print('Batch loss:', batch_loss)
+        #print('Batch loss:', batch_loss)
         loss.append(batch_loss)
         #return batch_loss
         loss.append(batch_loss * batch_factor) #* multiplicator_batch_factor
