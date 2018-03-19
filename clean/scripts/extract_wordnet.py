@@ -61,10 +61,16 @@ def create_location_data(out_path, vocab_path):
     country_syns = wn.synset('country.n.02')
 
     # all instance hyponyms are countries
+    # TODO also lower case
     countries1 = country_syns.instance_hyponyms()
     countries1 = [(extract_syns_words(s, vocab), s) for s in countries1]
     countries1 = [(lemmas, syn) for lemmas, syn in countries1 if len(lemmas) > 0]
     print('Countries so far:', countries1)
+
+    # other countries: hyponyms that have no other hyponyms (except for instance hyponyms)
+
+    countries2_hyper = [hypo for hypo in country_syns.hyponyms() if len(hypo.hyponyms()) == 0]
+    print(countries2_hyper)
 
 
 
