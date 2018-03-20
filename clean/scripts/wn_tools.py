@@ -30,6 +30,7 @@ def spacy_lesk(sent, w):
         result = '-'
     else:
         result = result.name()
+    return result
 
 def simple_lesk(sent_nltk, sent_spacy, w):
     pass
