@@ -51,7 +51,7 @@ def wsd_snli(data_path, out_path):
 
             print(p_tokenized)
             print(synsets_p)
-            print([syn.definition() for syn in synsets_p if syn != None])
+            print([syn.definition() if syn != None else 'None' for syn in synsets_p])
 
 
 
