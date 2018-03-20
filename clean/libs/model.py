@@ -136,8 +136,8 @@ class SentenceEncoderMLP(nn.Module):
         self.cell_state1 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen1).zero_())
         self.hidden_state2 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen2).zero_())
         self.cell_state2 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen2).zero_())
-        self.hidden_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen_out).zero_())
-        self.cell_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen_out).zero_())
+        self.hidden_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen3).zero_())
+        self.cell_state3 = autograd.Variable(self.base_tensor_type.new(self.layers * self.directions, batch_size, self.dimen3).zero_())
 
         #self.hidden_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
         #self.cell_state1 = autograd.Variable(cuda_wrap(torch.zeros(self.layers * self.directions, batch_size, self.dimen1)))
