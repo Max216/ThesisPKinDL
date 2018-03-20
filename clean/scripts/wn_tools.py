@@ -10,6 +10,8 @@ from docopt import docopt
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk
+from nltk.corpus import stopwords
+sw = set(stopwords.words('english'))
 
 def main():
 
@@ -25,6 +27,8 @@ def main():
         wsd_snli(args['<data_path>'], args['<out_path>'])
 
 def spacy_lesk(sent, w):
+    if w in sw:
+        return '-'
     result = lesk(sent, w)
     if result is None:
         result = '-'
