@@ -85,6 +85,36 @@ class MTNetworkSingleLayer(nn.Module):
         word = self.classifier.lookup_word(w_idx)
         return word
 
+class MTNetworkSingleLayerDropout(nn.Module):
+    """
+    Map the embedding to a smaller represerntation
+    """
+
+    def __init__(self, classifier, input_dim, output_dim):
+        """
+        Initialize a new network to create representations based on WordNet information.
+        :param pretrained_embeddings    pretrained embedding matrix
+        :param hidden_layer_dimension   amoount of hidden nodes
+        :param representations          size of the resulting representation
+        """
+        super(MTNetworkSingleLayerDropout, self).__init__()
+        self.classifier = classifier
+        self.layer = nn.Linear(input_dim, output_dim)
+        self.dropout1 = nn.Dropout(p=0.1)
+
+    def forward(self, samples):
+        #sentence_representation = self.classifier.forward_sent(sent)
+        #batch_size = sentence_representation.size()[0]
+        #word_representation = self.classifier.lookup_word(target_word).view(batch_size, -1)
+
+        #feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
+        
+        return F.softmax(self.layer(self.dropout1(samples)))
+
+    def lookup_word(self, w_idx):
+        word = self.classifier.lookup_word(w_idx)
+        return word
+
 class MTNetworkTwoLayer(nn.Module):
     """
     Map the embedding to a smaller represerntation
@@ -466,6 +496,10 @@ def get_multitask_nw_dropout(classifier, mlp=600):
 
     return m.cuda_wrap(MTNetworkTwoLayerDoubleDropout(classifier, dim_word + dim_sent, dim_nw, 2))
 
+def get_multitask_nw_dropout_1layer(classifier):
+    dim_sent = classifier.sent_encoder.sent_dim()
+    dim_word = 300
+    return m.cuda_wrap(MTNetworkSingleLayerDropout(classifier, dim_word + dim_sent, 2))
 #
 # Factory
 #
@@ -632,6 +666,17 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_on_regularization
         params['regularization_update'] = train_tailvtail_shape_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'mt_both_mlpsent_800_d':
+        print('mt_both_mlpsent_800_d')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout_1layer(classifier)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 

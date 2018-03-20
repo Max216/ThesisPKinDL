@@ -95,8 +95,16 @@ def main():
             encoding_dim = None
 
         if load_path == None:
+
+            mlp_sent_dict = dict()
+            mlp_sent_dict['mt_both_mlpsent_800_d'] = 800
+
             # None becuse of default settings
-            model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix)
+            if args['<multitask_type>'] in mlp_sent_dict:
+                mlpsent = args['<multitask_type>']
+                model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix, mlpsent=mlpsent)
+            else:
+                model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix)
         else:
             model_name, classifier, embedding_holder = model_tools.load(load_path, embedding_holder)
             model_name += '.loaded'

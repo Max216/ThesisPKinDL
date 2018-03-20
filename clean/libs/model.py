@@ -97,6 +97,8 @@ class SentenceEncoderMLP(nn.Module):
         @param dimen_out - size of the resulting vector
         """
         super(SentenceEncoderMLP, self).__init__()
+
+        print('Create mlpsent encoder')
         
         self.directions = 2  # bidirectional
         self.dimen_out = dimen_out
