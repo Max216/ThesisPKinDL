@@ -23,13 +23,20 @@ def create_model_name(classifier, version=1, hint='', opts=m.ModelSettings()):
     '''
 
     sent_encoder = classifier.sent_encoder
+
+    sent_encoder_type, dim = sent_encoder.type()
+    if sent_encoder_type == 'mlp-sent-encoder':
+        last_dim = str(sent_encoder.dimen3)
+    else:
+        last_dim = str(sent_encoder.dimen_out)
+
+
     dim_details = '_'.join([
         str(classifier.dimen_hidden),
-        str(sent_encoder.dimen1), str(sent_encoder.dimen2), str(sent_encoder.dimen3),
+        str(sent_encoder.dimen1), str(sent_encoder.dimen2), last_dim,
         hint
     ])
 
-    sent_encoder_type, dim = sent_encoder.type()
     opts.add_val(sent_encoder_type, str(dim))
 
     opts_details = '_'.join([setting + '=' + opts.get_val(setting) for setting in opts.all_keys()])
