@@ -49,7 +49,9 @@ def wsd_snli(data_path, out_path):
             synsets_p = [spacy_lesk(p_tokenized, w) for w in p_tokenized]
             synsets_h = [spacy_lesk(h_tokenized, w) for w in h_tokenized]
 
+            print(p_tokenized)
             print(synsets_p)
+            print(syn.definition() for syn in synsets_p if syn != None)
 
 
 
