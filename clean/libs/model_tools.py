@@ -25,14 +25,14 @@ def create_model_name(classifier, version=1, hint='', opts=m.ModelSettings()):
     sent_encoder = classifier.sent_encoder
     dim_details = '_'.join([
         str(classifier.dimen_hidden),
-        str(sent_encoder.dimen1), str(sent_encoder.dimen2), str(sent_encoder.dimen_out),
+        str(sent_encoder.dimen1), str(sent_encoder.dimen2), str(sent_encoder.dimen3),
         hint
     ])
 
     sent_encoder_type, dim = sent_encoder.type()
     opts.add_val(sent_encoder_type, str(dim))
 
-    opts_details = '_'.join([setting + '=' + opts.get_val(setting) for setting in opts.settings])
+    opts_details = '_'.join([setting + '=' + opts.get_val(setting) for setting in opts.all_keys()])
 
     time = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
 

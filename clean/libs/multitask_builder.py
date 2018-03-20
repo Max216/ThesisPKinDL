@@ -17,6 +17,11 @@ def _zero_grad_nothing(dummy):
 def _zero_grad_obj(obj):
     obj.zero_grad()
 
+
+def freeze_layer(layer):
+    for param in layer.parameters():
+        param.requires_grad = False
+
 class CollateBatchMultiTask(object):
     '''
     Applies padding to shorter sentences within a minibatch.

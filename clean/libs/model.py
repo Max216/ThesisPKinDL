@@ -52,6 +52,9 @@ class ModelSettings:
     def get_val(self, setting):
         return self.opts_dict[setting]
 
+    def all_keys(self):
+        return list(set(list(self.opts_dict.keys()) + self.settings))
+
     def add_val(self, k, v):
         self.opts_dict[k] = v
 
