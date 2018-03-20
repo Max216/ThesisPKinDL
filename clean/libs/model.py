@@ -175,7 +175,7 @@ class SentenceEncoderMLP(nn.Module):
         return self.dimen_out# * self.directions
 
     def type(self):
-        return ('mlp_sent_encoder', self.dimen_out)
+        return ('mlp-sent-encoder', self.dimen_out)
 
 
 class SentenceEncoder(nn.Module):
@@ -253,7 +253,7 @@ class SentenceEncoder(nn.Module):
         return self.dimen_out * self.directions
 
     def type(self):
-        return ('lstm_only', 0)
+        return ('lstm-only', 0)
 
 class EntailmentClassifier(nn.Module):
     """

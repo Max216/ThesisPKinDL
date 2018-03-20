@@ -146,7 +146,7 @@ def load(path, embedding_holder=None):
 
     opts = params['opts']
 
-    if opts['mlp_sent_encoder']:
+    if opts['mlp-sent-encoder']:
         sent_encoder = m.SentenceEncoderMLP(
             embedding_dim=embedding_holder.dim(), 
             dimen1=params['dim_encoder_1'],
