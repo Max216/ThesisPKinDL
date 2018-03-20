@@ -56,7 +56,8 @@ def wsd_snli(data_path, out_path):
                 if syn == None:
                     defs.append('none')
                 else:
-                    defs.append(syn.definition())
+                    print('##', syn)
+                    defs.append(wn.synset(syn.name()).definition())
 
             print(defs)
 
