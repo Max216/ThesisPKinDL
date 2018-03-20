@@ -639,7 +639,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
     elif mt_type == 'mt_both_finetune_300_dd':
         print('mt_both_finetune_300_dd')
         # weight both results the same, all the time
-        params['multitask_network'] = get_multitask_nw_dropout(classifier, layers=2, mlp=300)
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
         params['optimizer'] = get_optimizer_multitask_only
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_on_regularization
