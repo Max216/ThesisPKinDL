@@ -25,7 +25,11 @@ def main():
         wsd_snli(args['<data_path>'], args['<out_path>'])
 
 def spacy_lesk(sent, w):
-    return lesk(sent, w)
+    result = lesk(sent, w)
+    if result is None:
+        result = '-'
+    else:
+        result = result.name()
 
 def simple_lesk(sent_nltk, sent_spacy, w):
     pass
@@ -51,16 +55,6 @@ def wsd_snli(data_path, out_path):
 
             print(p_tokenized)
             print(synsets_p)
-            defs = []
-            for syn in synsets_p:
-                #print('##', syn)
-
-                if syn is  None:
-                    defs.append('none')
-                else:
-                    defs.append(wn.synset(syn.name()).definition())
-
-            print(defs)
 
 
 
