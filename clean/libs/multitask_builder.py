@@ -714,6 +714,17 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_strong_decrease_300_d':
+        print('mt_strong_decrease_300_d')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout1(classifier, layers=2, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = decrease_strong_mt_it10
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
     elif mt_type == 'tail_v_tail10':
         print('tail_v_tail10')
         # weight both results the same, all the time
