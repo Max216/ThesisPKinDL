@@ -490,6 +490,7 @@ def constant_25_percent(epoch, regularization):
 
 def decrease_strong_mt_it10(epoch, regularization):
     vals = [0.75, 0.75, 0.5, 0.5, 0.125, 0.125, 0,0,0,0]
+    factor_multitask = vals[epoch]
     return (1 - factor_multitask, 1 - factor_multitask, factor_multitask)
 
 def train_tailvtail_shape_it10(epoch, regularization):
