@@ -105,6 +105,12 @@ class SentenceEncoderMLP(nn.Module):
         self.dimen1 = dimen1
         self.dimen2 = dimen2
         self.dimen3 = dimen3
+
+        print('dimen1', dimen1)
+        print('dimen2', dimen2)
+        print('dimen3', dimen3)
+        print('dimen out', dimen_out)
+
         self.layers = 1      # number of lstm layers        
         self.input_dim_2 = embedding_dim + dimen1 * self.directions
         self.input_dim_3 = self.input_dim_2
