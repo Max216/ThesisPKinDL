@@ -53,9 +53,9 @@ def wsd_snli(data_path, out_path):
             print(synsets_p)
             defs = []
             for syn in synsets_p:
-                print('##', syn)
+                #print('##', syn)
 
-                if syn == None:
+                if syn is  None:
                     defs.append('none')
                 else:
                     defs.append(wn.synset(syn.name()).definition())
