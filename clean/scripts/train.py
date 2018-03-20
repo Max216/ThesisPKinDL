@@ -101,7 +101,7 @@ def main():
 
             # None becuse of default settings
             if args['<multitask_type>'] in mlp_sent_dict:
-                mlpsent = args['<multitask_type>']
+                mlpsent = mlp_sent_dict[args['<multitask_type>']]
                 model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix, mlpsent=mlpsent)
             else:
                 model_name, classifier, embedding_holder = model_tools.create_model(encoding_dim, embedding_holder, None, opts=m_settings, hint=appendix)
