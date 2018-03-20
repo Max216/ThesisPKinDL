@@ -52,6 +52,9 @@ class ModelSettings:
     def get_val(self, setting):
         return self.opts_dict[setting]
 
+    def add_val(self, k, v):
+        self.opts_dict[k] = v
+
     def get_fn(self, key):
         '''
         Get the function assoziated with the given option
@@ -93,7 +96,7 @@ class SentenceEncoderMLP(nn.Module):
         @param embedding_dim - size of pretrained embeddings
         @param dimen_out - size of the resulting vector
         """
-        super(SentenceEncoder, self).__init__()
+        super(SentenceEncoderMLP, self).__init__()
         
         self.directions = 2  # bidirectional
         self.dimen_out = dimen_out
@@ -159,6 +162,9 @@ class SentenceEncoderMLP(nn.Module):
         :return the dimension of the resulting sentence represenations
         '''
         return self.dimen_out# * self.directions
+
+    def type(self):
+        return ('mlp_sent_encoder', self.dimen_out)
 
 
 class SentenceEncoder(nn.Module):
@@ -234,6 +240,9 @@ class SentenceEncoder(nn.Module):
         :return the dimension of the resulting sentence represenations
         '''
         return self.dimen_out * self.directions
+
+    def type(self):
+        return ('lstm_only', 0)
 
 class EntailmentClassifier(nn.Module):
     """

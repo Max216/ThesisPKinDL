@@ -29,6 +29,9 @@ def create_model_name(classifier, version=1, hint='', opts=m.ModelSettings()):
         hint
     ])
 
+    sent_encoder_type, dim = sent_encoder.type()
+    opts.add_val(sent_encoder_type, str(dim))
+
     opts_details = '_'.join([setting + '=' + opts.get_val(setting) for setting in opts.settings])
 
     time = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
@@ -85,13 +88,25 @@ def create_model(sent_encoding_dims=None, embedding_holder=None, mlp_dim=None, n
 
     print('Create model:')
     print('sent encoder:', sent_lstm_dim_1, sent_lstm_dim_2, sent_lstm_dim_3)
-    sent_encoder = m.SentenceEncoder(
-        embedding_dim=embedding_dim, 
-        dimen1=sent_lstm_dim_1,
-        dimen2=sent_lstm_dim_2,
-        dimen_out=sent_lstm_dim_3,
-        options=opts
-    )
+
+    if  mlpsent == None:
+        sent_encoder = m.SentenceEncoder(
+            embedding_dim=embedding_dim, 
+            dimen1=sent_lstm_dim_1,
+            dimen2=sent_lstm_dim_2,
+            dimen_out=sent_lstm_dim_3,
+            options=opts
+        )   
+    else:
+        print('Create MLP sent encoder:', mlpsent)
+        sent_encoder = m.SentenceEncoderMLP(
+            embedding_dim=embedding_dim, 
+            dimen1=sent_lstm_dim_1,
+            dimen2=sent_lstm_dim_2,
+            dimen3=sent_lstm_dim_3,
+            dimen_out=mlpsent,
+            options=opts
+        ) 
 
     # Create model
     hidden_dim = mlp_dim or DEFAULT_HIDDEN_DIM
@@ -129,13 +144,25 @@ def load(path, embedding_holder=None):
     if embedding_holder == None:
         embedding_holder = eh.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
 
-    sent_encoder = m.SentenceEncoder(
-        embedding_dim=embedding_holder.dim(), 
-        dimen1=params['dim_encoder_1'],
-        dimen2=params['dim_encoder_2'],
-        dimen_out=params['dim_encoder_3'],
-        options=params['opts']
-    )
+    opts = params['opts']
+
+    if opts['mlp_sent_encoder']:
+        sent_encoder = m.SentenceEncoderMLP(
+            embedding_dim=embedding_holder.dim(), 
+            dimen1=params['dim_encoder_1'],
+            dimen2=params['dim_encoder_2'],
+            dimen3=params['dim_encoder_3'],
+            dimen_out=int(opts['mlp_sent_encoder']),
+            options=params['opts']
+        )
+    else:
+        sent_encoder = m.SentenceEncoder(
+            embedding_dim=embedding_holder.dim(), 
+            dimen1=params['dim_encoder_1'],
+            dimen2=params['dim_encoder_2'],
+            dimen_out=params['dim_encoder_3'],
+            options=params['opts']
+        )
 
     classifier = m.cuda_wrap(m.EntailmentClassifier(
         pretrained_embeddings=embedding_holder.embedding_matrix(),
