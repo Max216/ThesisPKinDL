@@ -748,6 +748,39 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_mlpsent_600_d':
+        print('mt_both_mlpsent_600_d')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout_1layer(classifier)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'mt_both_mlpsent_600_d_25':
+        print('mt_both_mlpsent_600_d_25')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout_1layer(classifier)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
+    elif mt_type == 'mt_both_mlpsent_400_d':
+        print('mt_both_mlpsent_400_d')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout_1layer(classifier)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
 
 
 
