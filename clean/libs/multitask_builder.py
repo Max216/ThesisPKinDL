@@ -211,7 +211,7 @@ class MTNetworkTwoLayerSingleDropout(nn.Module):
         #feed_forward_input = torch.cat((sentence_representation, word_representation), 1)
         
         out1 = F.relu(self.layer1(samples))
-        return F.softmax(self.layer2(self.dropout2(out1)))
+        return F.softmax(self.layer2(self.dropout1(out1)))
 
     def lookup_word(self, w_idx):
         word = self.classifier.lookup_word(w_idx)
