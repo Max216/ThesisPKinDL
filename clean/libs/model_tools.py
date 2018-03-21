@@ -152,6 +152,7 @@ def load(path, embedding_holder=None):
         embedding_holder = eh.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
 
     opts = params['opts']
+    print(opts)
 
     if opts['mlp-sent-encoder']:
         sent_encoder = m.SentenceEncoderMLP(
