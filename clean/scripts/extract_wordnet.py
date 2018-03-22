@@ -28,6 +28,7 @@ def main():
         extract_wordnet.py merge_labels <data_path> <lbl_same> <lbl_different> <out_path>
         extract_wordnet.py locations <out_path> <vocab>
         extract_wordnet.py combine <out_path> (-f <files>)...
+        extract_wordnet.py adv <data_path> <out_path>
     """)
 
     if args['count_hyper']:
@@ -52,6 +53,8 @@ def main():
         create_location_data(args['<out_path>'], args['<vocab>'])
     elif args['combine']:
         combine_data(args['<out_path>'], args['<files>'])
+    elif args['adv']:
+        create_from_adv(args['<data_path>'], args['<out_path>'])
 
 def combine_data(out_path, file_paths):
     samples_entailment = []
@@ -78,9 +81,32 @@ def combine_data(out_path, file_paths):
             for w1, w2 in samples:
                 f_out.write('\t'.join([w1, w2, lbl]) + '\n')
 
-
 def extract_syns_words(syns, vocab):
     return [lemma for lemma in syns.lemma_names() if len(lemma.split(' ')) == 1 and lemma in vocab]
+
+def create_from_adv(data_path, out_path):
+    with open(data_path) as f_in:
+        data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    wp_dict = collections.defaultdict(lambda: collections.defaultdict(list))
+
+    for d in data:
+        if d['gold_label'] != 'neutral':
+            w1 = d['replaced1']
+            w2 = d['replaced2']
+
+            if len(w1.split(' ')) == 1 and len(w2.split(' ')) == 1:
+                wp_dict[w1][w2].append(d['gold_label'])
+
+    result = []
+    for w1 in wp_dict:
+        for w2 in wp_dict[w1]:
+            label, count = collections.Counter(wp_dict[w1][w2]).most_common()[0]
+            result.append('\t'.join([w1, w2, label]) + '\n')
+
+    with open(out_path, 'w') as f_out:
+        for line in result:
+            f_out.write(line)
 
 def create_location_data(out_path, vocab_path):
 
