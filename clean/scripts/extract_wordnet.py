@@ -91,12 +91,24 @@ def create_from_adv(data_path, out_path):
     wp_dict = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for d in data:
-        if d['gold_label'] != 'neutral':
+        label = d['gold_label']
+        if label != 'neutral':
             w1 = d['replaced1']
             w2 = d['replaced2']
 
             if len(w1.split(' ')) == 1 and len(w2.split(' ')) == 1:
-                wp_dict[w1][w2].append(d['gold_label'])
+                wp_dict[w1][w2].append(label)
+                if label == 'entailment' and d['category'] == 'synonyms':
+                    wp_dict[w2][w1].append(label)
+                if label == 'contradiction':
+                    wp_dict[w2][w1].append(label)
+
+    vocab = list(wp_dict.keys())
+    for k in vocab[:]:
+        vocab.extend(list(wp_dict[k].keys()))
+    vocab = list(set(vocab))
+    for w in vocab:
+        wp_dict[w][w].append('entailment')
 
     result = []
     for w1 in wp_dict:
