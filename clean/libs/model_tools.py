@@ -62,6 +62,7 @@ def params_from_model_name(name):
     # parse category2
     cat2 = categories[1].split('_')
     opts = [(splitted[0], splitted[1]) for splitted in [s.split('=') for s in cat2]]
+    print('opts', opts)
     result['opts'] = m.ModelSettings(opts)
 
     return result
