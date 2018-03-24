@@ -160,7 +160,7 @@ def load(path, embedding_holder=None):
             dimen1=params['dim_encoder_1'],
             dimen2=params['dim_encoder_2'],
             dimen3=params['dim_encoder_3'],
-            dimen_out=int(opts.settings['mlp_sent_encoder']),
+            dimen_out=int(opts.opts_dict['mlp_sent_encoder']),
             options=params['opts']
         )
     else:
