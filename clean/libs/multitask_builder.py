@@ -90,6 +90,9 @@ class MTNetworkSingleLayer(nn.Module):
         word = self.classifier.lookup_word(w_idx)
         return word
 
+    def layers(self):
+        return [self.layer]
+
 class MTNetworkSingleLayerDropout(nn.Module):
     """
     Map the embedding to a smaller represerntation
@@ -119,6 +122,9 @@ class MTNetworkSingleLayerDropout(nn.Module):
     def lookup_word(self, w_idx):
         word = self.classifier.lookup_word(w_idx)
         return word
+
+    def layers(self):
+        return [self.layer]
 
 class MTNetworkTwoLayer(nn.Module):
     """
@@ -150,6 +156,9 @@ class MTNetworkTwoLayer(nn.Module):
     def lookup_word(self, w_idx):
         word = self.classifier.lookup_word(w_idx)
         return word
+
+    def layers(self):
+        return [self.layer1, self.layer2]
 
 class MTNetworkTwoLayerDoubleDropout(nn.Module):
     """
@@ -184,6 +193,9 @@ class MTNetworkTwoLayerDoubleDropout(nn.Module):
         word = self.classifier.lookup_word(w_idx)
         return word
 
+    def layers(self):
+        return [self.layer1, self.layer2]
+
 
 class MTNetworkTwoLayerSingleDropout(nn.Module):
     """
@@ -217,6 +229,9 @@ class MTNetworkTwoLayerSingleDropout(nn.Module):
         word = self.classifier.lookup_word(w_idx)
         return word
 
+    def layers(self):
+        return [self.layer1, self.layer2]
+
 class MultitaskBuilder:
     """
     Create all things required for the multitask training
@@ -232,6 +247,10 @@ class MultitaskBuilder:
         self._word_dict = embedding_holder.reverse()
         self._regularization = 1
         self._regularization_update = params['regularization_update']
+        if 'after_epoch' in params:
+            self._after_epoch = params['after_epoch']
+        else:
+            self._after_epoch = None
         
         target_words, target_labels, target_has_content = multitask_targets
         self._target_words = target_words
@@ -262,6 +281,10 @@ class MultitaskBuilder:
 
         print('Regularization for multitask:', self.reg_mt)
         print('Regularization for SNLI:', self.reg_snli)
+
+        if self._after_epoch is not None:
+            print('After epoch!')
+            self._after_epoch(self, epoch)
 
     def optimizer_step(self):
         """ Train step based on optimizer function """
@@ -546,6 +569,12 @@ def get_multitask_nw_dropout_1layer(classifier):
     dim_sent = classifier.sent_encoder.sent_dim()
     dim_word = 300
     return m.cuda_wrap(MTNetworkSingleLayerDropout(classifier, dim_word + dim_sent, 2))
+
+def freeze_after_first_epoch(epoch, classifier):
+    if epoch == 1:
+        for layer in classifier.layers():
+            freeze_layer(layer)
+
 #
 # Factory
 #
@@ -800,6 +829,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_equal_both
         params['regularization_update'] = dummy_regularization
+        params['after_epoch'] = freeze_after_first_epoch
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
 
@@ -811,6 +841,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_on_regularization
         params['regularization_update'] = constant_25_percent
+        params['after_epoch'] = freeze_after_first_epoch
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
 
@@ -822,6 +853,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['loss_fn_multitask'] = loss_multitask_reweighted
         params['loss_fn'] = loss_on_regularization
         params['regularization_update'] = constant_25_percent
+        params['after_epoch'] = freeze_after_first_epoch
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
 
