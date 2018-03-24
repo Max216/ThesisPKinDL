@@ -176,17 +176,25 @@ class MultiTaskTarget:
         #random.seed(7)
         print('init MultiTaskTarget')
         self.tag_to_idx = dict([('entailment', 1), ('contradiction', 0)])
+        self.datasets = datasets
+        self.resource_data_path = resource_data_path
+        self.embedding_holder = embedding_holder
+
+        
+
+
+    def get_targets(self, make_even_dist=True):
 
         # create data
-        with open(resource_data_path) as f_in:
+        with open(self.resource_data_path) as f_in:
             data = [line.strip().split('\t') for line in f_in.readlines()]
         
         not_in_sent_samples = collections.defaultdict(list) 
         in_sent_samples = collections.defaultdict(list)
 
         for d in data:
-            w1 = embedding_holder.word_index(d[0])
-            w2 = embedding_holder.word_index(d[1])
+            w1 = self.embedding_holder.word_index(d[0])
+            w2 = self.embedding_holder.word_index(d[1])
             if d[2] == 'contradiction':
                 not_in_sent_samples[w1].append(w2)
                 #print(d[0],d[1], 'c')
@@ -194,12 +202,12 @@ class MultiTaskTarget:
                 in_sent_samples[w1].append(w2)
                 #print(d[0],d[1], 'e')
 
-        indizes = [(p_id, h_id) for ds in datasets for p,h,l,pl,hl,p_id,h_id in ds]
+        indizes = [(p_id, h_id) for ds in self.datasets for p,h,l,pl,hl,p_id,h_id in ds]
         max_id = max([_id1 for _id1, _id2 in indizes] + [_id2 for _id1, _id2 in indizes])
         print('maxid', max_id)
         count = 0
         targets = [[] for i in range(max_id + 1)]
-        for dataset in datasets:
+        for dataset in self.datasets:
             for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
                 for sent, sent_id in [(p, p_id), (h, h_id)]:
                     if len(targets[sent_id]) == 0:
@@ -217,8 +225,11 @@ class MultiTaskTarget:
                         contradicting_words = list(contradicting_words - entailing_words)
                         entailing_words = list(entailing_words) 
 
-                        entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
-
+                        if make_even_dist:
+                            print('Make even dist')
+                            entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
+                        else:
+                            print('Not make even dist')
                         samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
                         targets[sent_id] = samples
 
@@ -250,9 +261,6 @@ class MultiTaskTarget:
         self._target_words = target_words
         self._target_labels = target_labels
         self._target_has_content = target_has_content
-
-
-    def get_targets(self):
         return self._target_words, self._target_labels, self._target_has_content
 
 
@@ -265,7 +273,7 @@ DEFAULT_VALIDATE_AFTER = [16000,16000, 8000,8000,2000]
 #DEFAULT_VALIDATE_AFTER = [1000, 1000]
 DEFAULT_BATCH_SIZE = 32
 VALIDATE_AFTER_MT = 64000
-def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data):
+def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, train_path, multitask_type, multitask_data, make_even_dist=True):
     
     start_lr = DEFAULT_LR
     iterations = DEFAULT_ITERATIONS

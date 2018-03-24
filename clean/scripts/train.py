@@ -101,6 +101,7 @@ def main():
             mlp_sent_dict['mt_both_mlpsent_600_d'] = 600
             mlp_sent_dict['mt_both_mlpsent_600_d_25'] = 600
             mlp_sent_dict['mt_both_mlpsent_400_d'] = 400
+            mlp_sent_dict['mt_both_mlpsent_1200_d'] = 1200
 
             # None becuse of default settings
             if args['<multitask_type>'] in mlp_sent_dict:

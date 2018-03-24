@@ -759,6 +759,17 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_mlpsent_1200_d':
+        print('mt_both_mlpsent_1200_d')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout_1layer(classifier)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+
     elif mt_type == 'mt_both_mlpsent_600_d_25':
         print('mt_both_mlpsent_600_d_25')
         # weight both results the same, all the time
@@ -781,13 +792,73 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_freeze1_300':
+        print('mt_freeze1_300')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
+
+    elif mt_type == 'mt_freeze1_300_25':
+        print('mt_freeze1_300_25')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
+
+    elif mt_type == 'mt_freeze1_600_25':
+        print('mt_freeze1_600')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw(classifier, mlp=600)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=True), classifier, embedding_holder)
 
 
+    elif mt_type == 'mt_25_snli_ddropout_300_noteven':
+        print('mt_25_snli_ddropout_300_noteven')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=False), classifier, embedding_holder)
 
 
+    elif mt_type == 'mt_both_snli_ddropout_600_noteven':
+        print('mt_both_snli_ddropout_600_noteven')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=600)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
 
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=False), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_snli_ddropout_300_noteven':
+        print('mt_both_snli_ddropout_300_noteven')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_equal_both
+        params['regularization_update'] = dummy_regularization
 
+        return MultitaskBuilder(params, lr, mt_target.get_targets(make_even_dist=False), classifier, embedding_holder)
         #return DataLoader(SentMTDataset(samples), drop_last=False, batch_size=512, shuffle=False, collate_fn=CollateBatchMultiTask()), len(samples)
         # samples = []
 
