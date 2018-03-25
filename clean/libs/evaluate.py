@@ -106,16 +106,16 @@ def eval_merge_contr_neutr(classifier, data, batch_size, padding_token, tag_to_i
         ).data
 
         # count corrects
-        print(tag_to_idx)
+        #print(tag_to_idx)
         _, predicted_idx = torch.max(prediction, dim=1)
         merge_neutr_contr_vec_predicted = (predicted_idx == idx_neutral).long() * diff_to_contr
         merge_neutr_contr_vec_gold = (lbl_batch == idx_neutral).long() * diff_to_contr
-        print('predicted_idx before reassign', predicted_idx)
-        print('lbl before reassign', lbl_batch)
+        #print('predicted_idx before reassign', predicted_idx)
+        #print('lbl before reassign', lbl_batch)
         predicted_idx = predicted_idx + merge_neutr_contr_vec_predicted
         lbl_batch = lbl_batch + merge_neutr_contr_vec_gold
-        print('predicted_idx after reassign', predicted_idx)
-        print('predicted_idx after reassign', lbl_batch)
+        #print('predicted_idx after reassign', predicted_idx)
+        #print('predicted_idx after reassign', lbl_batch)
         correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
 
     return correct / total
