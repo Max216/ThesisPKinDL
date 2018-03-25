@@ -19,6 +19,7 @@ def main():
     Usage:
         evaluate.py eval <model> <data> [<embeddings>] [--embd1=<embd1>] [--embd2=<embd2>]
         evaluate.py ea <model>
+        evaluate.py eam <model>
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
@@ -65,6 +66,28 @@ def main():
         for category in sorted(categories):
             data = dataholder.get_dataset_for_category(embedding_holder, category)
             accuracy = ev.eval(classifier, data, 1, embedding_holder.padding())
+            print('Accuracy on', category, '->', accuracy)
+
+    elif args['eam']:
+        print('Evaluate all merged labels contradiction+neutral')
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+        _,classifier, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
+        classifier = m.cuda_wrap(classifier)
+
+        for name, dp in [('train data', config.PATH_TRAIN_DATA), ('dev data', config.PATH_DEV_DATA), ('test data',config.PATH_TEST_DATA)]:
+            dh = data_handler.Datahandler(dp)
+            data = dh.get_dataset(embedding_holder)
+            classifier.eval()
+            print('Accuracy on', name, ':', ev.eval_merge_contr_neutr(classifier, data, 32, embedding_holder.padding()), dh.tag_to_idx)
+
+        # Adversarial
+        dataholder = data_handler.Datahandler(config.PATH_ADV_DATA, data_format='snli_adversarial')
+        categories = dataholder.get_categories()
+        print('New dataset:')
+        print('Accuracy over all data ->', ev.eval_merge_contr_neutr(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()), dataholder.tag_to_idx)
+        for category in sorted(categories):
+            data = dataholder.get_dataset_for_category(embedding_holder, category)
+            accuracy = ev.eval_merge_contr_neutr(classifier, data, 1, embedding_holder.padding(), dataholder.tag_to_idx)
             print('Accuracy on', category, '->', accuracy)
 
         

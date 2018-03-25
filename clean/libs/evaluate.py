@@ -85,6 +85,38 @@ def eval_simple_2(classifier, data_loader):
 
     return correct / total
 
+def eval_merge_contr_neutr(classifier, data, batch_size, padding_token, tag_to_idx):
+
+    idx_neutral = tag_to_idx['neutral']
+    idx_contradiction = tag_to_idx['contradiction']
+
+    classifier.eval()
+    data_loader = DataLoader(data, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
+
+    correct = 0
+    total = len(data)
+
+    for premise_batch, hyp_batch, lbl_batch in data_loader:
+        prediction = classifier(
+            autograd.Variable(premise_batch),
+            autograd.Variable(hyp_batch)#,
+            #twister=twister
+        ).data
+
+        # count corrects
+        print(tag_to_idx)
+        _, predicted_idx = torch.max(prediction, dim=1)
+        print('predicted_idx before reassign', predicted_idx)
+        print('lbl before reassign', lbl_batch)
+        predicted_idx = predicted_idx[predicted_idx == idx_neutral] = idx_contradiction
+        lbl_batch = lbl_batch[lbl_batch == idx_neutral] = idx_contradiction
+        print('predicted_idx after reassign', predicted_idx)
+        print('predicted_idx after reassign', lbl_batch)
+        correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
+
+    return correct / total
+
+
 def eval(classifier, data, batch_size, padding_token, twister=None):
     '''
     Evaluate a model
