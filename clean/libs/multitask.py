@@ -226,10 +226,11 @@ class MultiTaskTarget:
                         entailing_words = list(entailing_words) 
 
                         if make_even_dist:
-                            print('Make even dist')
+                            #print('Make even dist')
                             entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
                         else:
-                            print('Not make even dist')
+                            #print('Not make even dist')
+                            pass
                         samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
                         targets[sent_id] = samples
 
