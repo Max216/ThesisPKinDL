@@ -108,8 +108,8 @@ def eval_merge_contr_neutr(classifier, data, batch_size, padding_token, tag_to_i
         _, predicted_idx = torch.max(prediction, dim=1)
         print('predicted_idx before reassign', predicted_idx)
         print('lbl before reassign', lbl_batch)
-        predicted_idx = predicted_idx[predicted_idx == idx_neutral] = idx_contradiction
-        lbl_batch = lbl_batch[lbl_batch == idx_neutral] = idx_contradiction
+        predicted_idx = predicted_idx[predicted_idx==idx_neutral] = idx_contradiction
+        lbl_batch = lbl_batch[lbl_batch==idx_neutral] = idx_contradiction
         print('predicted_idx after reassign', predicted_idx)
         print('predicted_idx after reassign', lbl_batch)
         correct += torch.sum(torch.eq(lbl_batch, predicted_idx))
