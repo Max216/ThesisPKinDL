@@ -13,7 +13,7 @@ def main():
         multitask_analyse.py freq_avg <data_res>
     """)
 
-    if args['freq1']:
+    if args['freq_avg']:
         calc_multitask_average_per_sent(args['<data_res>'])
 
 
