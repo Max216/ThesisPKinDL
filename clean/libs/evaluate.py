@@ -90,6 +90,8 @@ def eval_merge_contr_neutr(classifier, data, batch_size, padding_token, tag_to_i
     idx_neutral = tag_to_idx['neutral']
     idx_contradiction = tag_to_idx['contradiction']
 
+    diff_to_contr = idx_contradiction - idx_neutral
+
     classifier.eval()
     data_loader = DataLoader(data, drop_last=False, batch_size=batch_size, shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
 
@@ -107,7 +109,7 @@ def eval_merge_contr_neutr(classifier, data, batch_size, padding_token, tag_to_i
         print(tag_to_idx)
         _, predicted_idx = torch.max(prediction, dim=1)
         print('predicted_idx before reassign', predicted_idx)
-        print('idx with neutral', predicted_idx == idx_neutral)
+        print('idx with neutral', (predicted_idx == idx_neutral).long())
         print('idx with contr', predicted_idx == idx_contradiction)
         print('lbl before reassign', lbl_batch)
         predicted_idx = predicted_idx[predicted_idx==idx_neutral] = idx_contradiction
