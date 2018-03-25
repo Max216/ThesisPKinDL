@@ -22,7 +22,7 @@ def calc_multitask_average_per_sent(res_path):
     embedding_holder = embeddingholder.create_embeddingholder()
 
     train_set, next_id = datahandler_train.get_dataset_id(embedding_holder, start_id=0)
-    mt = MultiTaskTarget([train_set], res_path, embedding_holder)
+    mt = multitask.MultiTaskTarget([train_set], res_path, embedding_holder)
 
     words, labels, has_content = mt.get_targets(make_even_dist=False)
 
