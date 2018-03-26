@@ -211,7 +211,7 @@ class Datahandler:
         return [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
 
     def get_categories(self):
-        if not self.has_categories
+        if not self.has_categories:
         #if len(self.samples[0]) != 6:
             print('No categories')
             1/0
