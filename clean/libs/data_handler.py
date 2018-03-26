@@ -173,10 +173,14 @@ class Datahandler:
                 p_len = s[3] + 2
                 h_len = s[4] + 2
 
-                if data_format != 'snli_adversarial':
-                    samples.append((p,h,s[2], p_len, h_len))
-                else:
+                if data_format == 'snli_adversarial':
                     samples.append((p,h,s[2], p_len, h_len, s[5]))
+                elif data_format == 'snli_adversarial_incl_replacements':
+                    samples.append((p,h,s[2], p_len, h_len, s[5], s[6], s[7]))
+                else:# data_format != 'snli_adversarial':
+                    samples.append((p,h,s[2], p_len, h_len))
+                #else:
+                #    samples.append((p,h,s[2], p_len, h_len, s[5]))
 
             self.samples = samples
 
