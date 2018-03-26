@@ -21,7 +21,7 @@ def main():
         evaluate.py ea <model>
         evaluate.py eam <model>
         evaluate.py misclassified_adv <amount> <classifier>
-        evaluate.py misclassified_cat <data_path> <classifier>
+        evaluate.py misclassified_cat <data_path> <classifier> <category>
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
@@ -67,7 +67,7 @@ def main():
         dataholder = data_handler.Datahandler(args['<data_path>'], data_format='snli_adversarial_incl_replacements')
         categories = dataholder.get_categories()
         amount = int(args['<amount>'])
-        data = dataholder.get_dataset_for_category_including_sents_and_replacement(embedding_holder, category)
+        data = dataholder.get_dataset_for_category_including_sents_and_replacement(embedding_holder, args['<category>'])
         ev.print_category_result(classifier, data, 32, embedding_holder.padding(), amount=amount)
 
     elif args['ea']:
