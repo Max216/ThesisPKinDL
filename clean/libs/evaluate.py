@@ -187,6 +187,7 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
         _, predicted_idx = torch.max(prediction, dim=1)
         print('predicted_idx', predicted_idx)
         print('lbl_battch', lbl_batch)
+        print('corrects:', torch.eq(lbl_batch, predicted_idx))
         #predicted = predicted_idx.
         #for i in range()
         predictions.extend([idx_to_lbl[i] for i in predicted_idx])
