@@ -66,9 +66,9 @@ def main():
         _,classifier, _2 = model_tools.load(args['<classifier>'], embedding_holder=embedding_holder)
         dataholder = data_handler.Datahandler(args['<data_path>'], data_format='snli_adversarial_incl_replacements')
         categories = dataholder.get_categories()
-        amount = int(args['<amount>'])
+        #amount = int(args['<amount>'])
         data = dataholder.get_dataset_for_category_including_sents_and_replacement(embedding_holder, args['<category>'])
-        ev.print_category_result(classifier, data, 32, embedding_holder.padding(), amount=amount)
+        ev.print_category_result(classifier, data, 32, embedding_holder.padding(), amount=20)
 
     elif args['ea']:
         print('Evaluate all')
