@@ -10,6 +10,32 @@ from torch.utils.data import Dataset
 
 from libs import config, data_tools, embeddingholder
 
+
+class SentEncoderDatasetIncludingSents(Dataset):
+    def __init__(self, samples, embedding_holder, tag_to_idx):
+        '''
+        Create a new dataset for the given samples
+        :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
+        :paraam embedding_holder    To map from word to number
+        :param tag_to_idx         dictionary mapping the string label to a number
+        '''
+        
+        self.converted_samples = [(
+            torch.LongTensor([embedding_holder.word_index(w) for w in p]),
+            torch.LongTensor([embedding_holder.word_index(w) for w in h]),
+            tag_to_idx[lbl],
+            len_p,
+            len_h,
+            p,
+            h
+        ) for (p, h, lbl, len_p, len_h) in samples]
+
+    def __len__(self):
+        return len(self.converted_samples)
+
+    def __getitem__(self, idx):
+        return self.converted_samples[idx]
+
 class SentEncoderDataset(Dataset):
     '''
     Dataset format to give to classifier
@@ -141,6 +167,10 @@ class Datahandler:
         curent_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
         return SentEncoderDataset(curent_samples, embedding_holder, self.tag_to_idx)
 
+    def get_dataset_for_category_including_sents(self, embedding_holder, category):
+        curent_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
+        return SentEncoderDatasetIncludingSents(curent_samples, embedding_holder, self.tag_to_idx)
+
     def get_samples_for_category(self, category):
         return [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
 
@@ -160,6 +190,13 @@ class Datahandler:
         else:
             current_samples = self.samples
         return SentEncoderDataset(current_samples, embedding_holder, self.tag_to_idx)
+
+    def get_dataset_including_sents(self, embedding_holder):
+        if len(self.samples[0]) != 5:
+            current_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples]
+        else:
+            current_samples = self.samples
+        return SentEncoderDatasetIncludingSents(current_samples, embedding_holder, self.tag_to_idx)
 
     def get_dataset_id(self, embedding_holder, start_id=0):
         if len(self.samples[0]) != 5:
