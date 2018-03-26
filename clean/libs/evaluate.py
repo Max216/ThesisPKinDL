@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader
 import torch.autograd as autograd
 import random
-
+import collections
 
 from libs import collatebatch, data_tools
 from libs import model as m
