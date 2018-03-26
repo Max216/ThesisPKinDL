@@ -188,7 +188,7 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
         print('predicted_idx', predicted_idx)
         print('lbl_battch', lbl_batch)
 
-        corrects = torch.eq(lbl_batch, predicted_idx).long().cpu().numpy().list()
+        corrects = torch.eq(lbl_batch, predicted_idx).long().cpu().numpy().tolist()
         for i in range(len(corrects)):
             if corrects[i] == 1:
                 print('correct')
