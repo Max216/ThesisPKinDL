@@ -239,7 +239,7 @@ def print_category_result(classifier, dataset, batch_size, padding_token, amount
             if corrects[i] == 1:
                 replacement_counter_correct[repl1[i]][repl2[i]] += 1
             else:
-                replacement_counter_correct[repl1[i]][repl2[i]] += 1
+                replacement_counter_incorrect[repl1[i]][repl2[i]] += 1
 
     all_keys_premise = sorted(list(set(list(replacement_counter_correct.keys()) + list(replacement_counter_incorrect.keys()))))
     print('# Accuracy per word (from premise)')
@@ -251,7 +251,7 @@ def print_category_result(classifier, dataset, batch_size, padding_token, amount
             cnt_k_correct += replacement_counter_correct[k][kh] 
             cnt_k_incorrect += replacement_counter_incorrect[k][kh]
 
-        print('Samples:', cnt_k_incorrect + cnt_k_correct, ', Accuracy:', cnt_k_correct / (cnt_k_incorrect + cnt_k_correct))
+        print('Word:', k, ', samples:', cnt_k_incorrect + cnt_k_correct, ', Accuracy:', cnt_k_correct / (cnt_k_incorrect + cnt_k_correct))
 
 
 
