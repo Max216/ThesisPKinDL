@@ -21,6 +21,7 @@ def main():
         evaluate.py ea <model>
         evaluate.py eam <model>
         evaluate.py misclassified_adv <amount> <classifier>
+        evaluate.py misclassified_cat <data_path> <classifier>
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
