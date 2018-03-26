@@ -5,6 +5,7 @@ Methods for evaluation
 import torch
 from torch.utils.data import DataLoader
 import torch.autograd as autograd
+import random
 
 
 from libs import collatebatch, data_tools
@@ -185,19 +186,30 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
 
         # count corrects
         _, predicted_idx = torch.max(prediction, dim=1)
-        print('predicted_idx', predicted_idx)
-        print('lbl_battch', lbl_batch)
+        #print('predicted_idx', predicted_idx)
+        #print('lbl_battch', lbl_batch)
 
         corrects = torch.eq(lbl_batch, predicted_idx).long().cpu().numpy().tolist()
+        gold_labels = [idx_to_lbl[i] for i in lbl_batch.cpu().numpy().tolist()]
+        predicted_labels = [idx_to_lbl[i] for i in predicted_idx.cpu().numpy().toloist()]
         for i in range(len(corrects)):
             if corrects[i] == 1:
-                print('correct')
+                correct_samples.append((p_sents[i], h_sents[i], predicted_labels[i], gold_labels[i]))
             else:
-                print('incorrect')
-        print('corrects:', )
-        #predicted = predicted_idx.
-        #for i in range()
-        predictions.extend([idx_to_lbl[i] for i in predicted_idx])
+                incorrect_samples.append((p_sents[i], h_sents[i], predicted_labels[i], gold_labels[i]))
+        
+        for name, data in [('correct', correct_samples), ('incorrect', incorrect_samples)]:
+            print(name)
+            if len(data) <= amount:
+                use_data = data
+            else:
+                use_data = random.sample(data, amount)
+
+            for p, h predicted, gold in use_data:
+                print('Gold:', gold, 'predicted:', predicted)
+                print('[p]', ' '.join(p))
+                print('[h]', ' '.join(h))
+                print('--')
 
 def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
     '''
