@@ -58,7 +58,7 @@ def main():
         for category in categories:
             data = dataholder.get_dataset_for_category_including_sents(embedding_holder, category)
             print('#', category)
-            ev.print_misclassified(classifier, data, 32, embeddingholder.padding(), amount=amount)
+            ev.print_misclassified(classifier, data, 32, embedding_holder.padding(), amount=amount)
 
 
     elif args['ea']:
