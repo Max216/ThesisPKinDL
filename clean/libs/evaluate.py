@@ -198,18 +198,18 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
             else:
                 incorrect_samples.append((p_sents[i], h_sents[i], predicted_labels[i], gold_labels[i]))
         
-        for name, data in [('correct', correct_samples), ('incorrect', incorrect_samples)]:
-            print(name)
-            if len(data) <= amount:
-                use_data = data
-            else:
-                use_data = random.sample(data, amount)
+    for name, data in [('correct', correct_samples), ('incorrect', incorrect_samples)]:
+        print(name)
+        if len(data) <= amount:
+            use_data = data
+        else:
+            use_data = random.sample(data, amount)
 
-            for p, h, predicted, gold in use_data:
-                print('Gold:', gold, 'predicted:', predicted)
-                print('[p]', ' '.join(p))
-                print('[h]', ' '.join(h))
-                print('--')
+        for p, h, predicted, gold in use_data:
+            print('Gold:', gold, 'predicted:', predicted)
+            print('[p]', ' '.join(p))
+            print('[h]', ' '.join(h))
+            print('--')
 
 def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
     '''
