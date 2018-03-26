@@ -36,6 +36,33 @@ class SentEncoderDatasetIncludingSents(Dataset):
     def __getitem__(self, idx):
         return self.converted_samples[idx]
 
+class SentEncoderDatasetIncludingSentsAndReplacements(Dataset):
+    def __init__(self, samples, embedding_holder, tag_to_idx):
+        '''
+        Create a new dataset for the given samples
+        :param samples              parsed samples of the form [(premise, hypothesis, label)] (all strings)
+        :paraam embedding_holder    To map from word to number
+        :param tag_to_idx         dictionary mapping the string label to a number
+        '''
+        
+        self.converted_samples = [(
+            torch.LongTensor([embedding_holder.word_index(w) for w in p]),
+            torch.LongTensor([embedding_holder.word_index(w) for w in h]),
+            tag_to_idx[lbl],
+            len_p,
+            len_h,
+            p,
+            h,
+            rep1,
+            rep2
+        ) for (p, h, lbl, len_p, len_h, rep11, rep2) in samples]
+
+    def __len__(self):
+        return len(self.converted_samples)
+
+    def __getitem__(self, idx):
+        return self.converted_samples[idx]
+
 class SentEncoderDataset(Dataset):
     '''
     Dataset format to give to classifier
@@ -110,6 +137,7 @@ class Datahandler:
         self.valid_labels = valid_labels
         self.tag_to_idx = dict([(label, i) for i, label in enumerate(valid_labels)])
         self.data_format = data_format
+        self.has_categories = False
 
         with open(path) as f_in:
             if data_format == 'snli':
@@ -118,6 +146,10 @@ class Datahandler:
                 self.samples = data_tools._load_snli_nltk(f_in.readlines())
             elif data_format == 'snli_adversarial':
                 self.samples = data_tools._load_snli_adversarial(f_in.readlines())
+                self.has_categories = True
+            elif data_format == 'snli_adversarial_incl_replacements':
+                self.has_categories = True
+                self.samples = data_tools._load_snli_adversarials_including_replacement(f_in.readlines())
             else:
                 print('Unknown data format:', data_format)
                 1/0
@@ -171,11 +203,16 @@ class Datahandler:
         curent_samples = [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
         return SentEncoderDatasetIncludingSents(curent_samples, embedding_holder, self.tag_to_idx)
 
+    def get_dataset_for_category_including_sents_and_replacement(self, embedding_holder, category):
+        curent_samples = [(p, h, lbl, p_len, h_len, rep1, rep2) for p, h, lbl, p_len, h_len, rep1, rep2, cat in self.samples if cat == category]
+        return SentEncoderDatasetIncludingSentsAndReplacements(curent_samples, embedding_holder, self.tag_to_idx)
+
     def get_samples_for_category(self, category):
         return [(p, h, lbl, p_len, h_len) for p, h, lbl, p_len, h_len, cat in self.samples if cat == category]
 
     def get_categories(self):
-        if len(self.samples[0]) != 6:
+        if not self.has_categories
+        #if len(self.samples[0]) != 6:
             print('No categories')
             1/0
     

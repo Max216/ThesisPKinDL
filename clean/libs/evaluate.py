@@ -211,6 +211,54 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
             print('[h]', ' '.join(h))
             print('--')
 
+def print_category_result(classifier, dataset, batch_size, padding_token, amount=20):
+    classifier.eval()
+    data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size,shuffle=False, collate_fn=collatebatch.CollateBatchIncludingSentsIncludingReplacements(padding_token))
+
+    predictions = []
+
+    correct_samples = []
+    incorrect_samples = []
+
+    replacement_counter_correct = collections.defaultdict(lambda: collections.defaultdict(int))
+    replacement_counter_incorrect = collections.defaultdict(lambda: collections.defaultdict(int))
+
+    for premise_batch, hyp_batch, lbl_batch, p_sents, h_sents, repl1, repl2 in data_loader:
+        prediction = classifier(
+            autograd.Variable(m.cuda_wrap(premise_batch)),
+            autograd.Variable(m.cuda_wrap(hyp_batch))#,
+        ).data
+
+        # count corrects
+        _, predicted_idx = torch.max(prediction, dim=1)
+        #print('predicted_idx', predicted_idx)
+        #print('lbl_battch', lbl_batch)
+
+        corrects = torch.eq(lbl_batch, predicted_idx).long().cpu().numpy().tolist()
+        for i in range(len(corrects)):
+            if corrects[i] == 1:
+                replacement_counter_correct[repl1[i]][repl2[i]] += 1
+            else:
+                replacement_counter_correct[repl1[i]][repl2[i]] += 1
+
+    all_keys_premise = sorted(list(set(replacement_counter_correct.keys() + replacement_counter_incorrect.keys())))
+    print('# Accuracy per word (from premise)')
+    for k in all_keys_premise:
+        all_keys_hyp = sorted(list(set(replacement_counter_correct[k].keys() + replacement_counter_incorrect[k].keys())))
+        cnt_k_correct = 0
+        cnt_k_incorrect = 0
+        for kh in all_keys_hyp:
+            cnt_k_correct += replacement_counter_correct[k][kh] 
+            cnt_k_incorrect += replacement_counter_incorrect[k][kh]
+
+        print('Samples:', cnt_k_incorrect + cnt_k_correct, ', Accuracy:', cnt_k_correct / (cnt_k_incorrect + cnt_k_correct))
+
+
+
+    print('# Accuracy for word-pair')
+    print('TODO')
+
+
 def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
     '''
     Create a dictionary with the prediction like dict[gold][predicted] = #amount. Batch size is one.

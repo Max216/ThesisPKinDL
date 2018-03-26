@@ -60,6 +60,14 @@ def main():
             print('#', category)
             ev.print_misclassified(classifier, data, 32, embedding_holder.padding(), amount=amount)
 
+    elif args['misclassified_cat']:
+        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+        _,classifier, _2 = model_tools.load(args['<classifier>'], embedding_holder=embedding_holder)
+        dataholder = data_handler.Datahandler(args['<data_path>'], data_format='snli_adversarial_incl_replacements')
+        categories = dataholder.get_categories()
+        amount = int(args['<amount>'])
+        data = dataholder.get_dataset_for_category_including_sents_and_replacement(embedding_holder, category)
+        ev.print_category_result(classifier, data, 32, embedding_holder.padding(), amount=amount)
 
     elif args['ea']:
         print('Evaluate all')

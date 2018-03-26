@@ -77,6 +77,11 @@ def _load_snli_adversarial(lines, valid_labels=DEFAULT_VALID_LABELS):
     data = [(_tokenize(pd['sentence1']), _tokenize(pd['sentence2']), pd['gold_label'], pd['category']) for pd in parsed_data]
     return [(p, h, lbl, len(p), len(h), cat) for p,h,lbl,cat in data]
 
+def _load_snli_adversarials_including_replacement(lines, valid_labels=DEFAULT_VALID_LABELS):
+    parsed_data = [json.loads(line) for line in lines]
+    data = [(_tokenize(pd['sentence1']), _tokenize(pd['sentence2']), pd['gold_label'], pd['category'], pd['replaced1'], pd['replaced2']) for pd in parsed_data]
+    return [(p, h, lbl, len(p), len(h), rep1, rep2, cat) for p,h,lbl,cat,rep1, rep2 in data]
+
 def _load_snli_nltk(lines, valid_labels=DEFAULT_VALID_LABELS, include_lengths=True):
     def extract_snli_line(line):
         parsed_data = json.loads(line)
