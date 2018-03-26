@@ -20,7 +20,7 @@ def main():
         evaluate.py eval <model> <data> [<embeddings>] [--embd1=<embd1>] [--embd2=<embd2>]
         evaluate.py ea <model>
         evaluate.py eam <model>
-        evaluate.py misclassified_adv <amount>
+        evaluate.py misclassified_adv <amount> <classifier>
 
         <model> = Path to trained model
         <data>  = Path to data to test model with 
@@ -50,7 +50,7 @@ def main():
 
     elif args['misclassified_adv']:
         embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
-        _,classifier, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
+        _,classifier, _2 = model_tools.load(args['<classifier>'], embedding_holder=embedding_holder)
         dataholder = data_handler.Datahandler(config.PATH_ADV_DATA, data_format='snli_adversarial')
         categories = dataholder.get_categories()
         amount = int(args['<amount>'])
