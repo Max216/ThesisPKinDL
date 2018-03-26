@@ -205,7 +205,7 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
             else:
                 use_data = random.sample(data, amount)
 
-            for p, h predicted, gold in use_data:
+            for p, h, predicted, gold in use_data:
                 print('Gold:', gold, 'predicted:', predicted)
                 print('[p]', ' '.join(p))
                 print('[h]', ' '.join(h))
