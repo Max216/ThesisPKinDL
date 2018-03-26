@@ -241,6 +241,17 @@ def print_category_result(classifier, dataset, batch_size, padding_token, amount
             else:
                 replacement_counter_incorrect[repl1[i]][repl2[i]] += 1
 
+    hyp_replacement_counter_correct = collections.defaultdict(lambda: collections.defaultdict(int))
+    hyp_replacement_counter_incorrect = collections.defaultdict(lambda: collections.defaultdict(int))
+
+    for kp in replacement_counter_correct:
+        for kh in replacement_counter_correct[kp]:
+            hyp_replacement_counter_correct[kh][kp] += replacement_counter_correct[kp][kh]
+
+    for kp in replacement_counter_incorrect:
+        for kh in replacement_counter_incorrect[kp]:
+            hyp_replacement_counter_incorrect[kh][kp] += replacement_counter_incorrect[kp][kh]
+
     all_keys_premise = sorted(list(set(list(replacement_counter_correct.keys()) + list(replacement_counter_incorrect.keys()))))
     print('# Accuracy per word (from premise)')
     for k in all_keys_premise:
@@ -252,6 +263,19 @@ def print_category_result(classifier, dataset, batch_size, padding_token, amount
             cnt_k_incorrect += replacement_counter_incorrect[k][kh]
 
         print('Word:', k, ', samples:', cnt_k_incorrect + cnt_k_correct, ', Accuracy:', cnt_k_correct / (cnt_k_incorrect + cnt_k_correct))
+
+    print('# Accuracy per word (from hypothesis)')
+    all_keys_hyp = sorted(list(set(list(hyp_replacement_counter_correct.keys()) + list(hyp_replacement_counter_incorrect.keys()))))
+    for k in all_keys_hyp:
+        all_keys_prem = sorted(list(set(list(hyp_replacement_counter_correct[k].keys()) + list(hyp_replacement_counter_incorrect[k].keys()))))
+        cnt_k_correct = 0
+        cnt_k_incorrect = 0
+        for kp in all_keys_prem:
+            cnt_k_correct += hyp_replacement_counter_correct[k][kp] 
+            cnt_k_incorrect += hyp_replacement_counter_incorrect[k][kp]
+
+        print('Word:', k, ', samples:', cnt_k_incorrect + cnt_k_correct, ', Accuracy:', cnt_k_correct / (cnt_k_incorrect + cnt_k_correct))
+
 
 
 
