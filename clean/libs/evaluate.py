@@ -191,7 +191,7 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
 
         corrects = torch.eq(lbl_batch, predicted_idx).long().cpu().numpy().tolist()
         gold_labels = [idx_to_lbl[i] for i in lbl_batch.cpu().numpy().tolist()]
-        predicted_labels = [idx_to_lbl[i] for i in predicted_idx.cpu().numpy().toloist()]
+        predicted_labels = [idx_to_lbl[i] for i in predicted_idx.cpu().numpy().tolist()]
         for i in range(len(corrects)):
             if corrects[i] == 1:
                 correct_samples.append((p_sents[i], h_sents[i], predicted_labels[i], gold_labels[i]))
