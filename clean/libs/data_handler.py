@@ -55,7 +55,7 @@ class SentEncoderDatasetIncludingSentsAndReplacements(Dataset):
             h,
             rep1,
             rep2
-        ) for (p, h, lbl, len_p, len_h, rep11, rep2) in samples]
+        ) for (p, h, lbl, len_p, len_h, rep1, rep2) in samples]
 
     def __len__(self):
         return len(self.converted_samples)
