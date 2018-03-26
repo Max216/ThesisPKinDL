@@ -188,7 +188,7 @@ def print_misclassified(classifier, dataset, batch_size, padding_token, idx_to_l
         print('predicted_idx', predicted_idx)
         print('lbl_battch', lbl_batch)
         #predicted = predicted_idx.
-        for i in range()
+        #for i in range()
         predictions.extend([idx_to_lbl[i] for i in predicted_idx])
 
 def create_prediction_dict(classifier, data, padding_token, idx_to_lbl, identifiers=None, twister=None):
