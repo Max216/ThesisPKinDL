@@ -279,19 +279,19 @@ def find_samples(testset_path, file, group):
     regexps = [(re.compile('\\b' + w + '\\b')) for w in list(group_words)]
     counter = 0
     for sample in dataset:
-        if sample['gold_label'] == 'contradiction':
-            for i in range(len(group_words)):
-                r1 = regexps[i]
-                if r1.search(sample['sentence1']):
-                    for j in range(len(regexps)):
-                        if i != j:
-                            r2 = regexps[j]
-                            if r2.search(sample['sentence2']):
-                                counter += 1
-                                print(sample['sentence1'])
-                                print(sample['sentence2'])
-                                print()
-                                break
+        #if sample['gold_label'] == 'contradiction':
+        for i in range(len(group_words)):
+            r1 = regexps[i]
+            if r1.search(sample['sentence1']):
+                for j in range(len(regexps)):
+                    if i != j:
+                        r2 = regexps[j]
+                        if r2.search(sample['sentence2']):
+                            counter += 1
+                            print(sample['sentence1'])
+                            print(sample['sentence2'])
+                            print()
+                            break
     print('total:', counter)
 
 
