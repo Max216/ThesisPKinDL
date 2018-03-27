@@ -288,6 +288,7 @@ def find_samples(testset_path, file, group):
                         r2 = regexps[j]
                         if r2.search(sample['sentence2']):
                             counter += 1
+                            print(sample['gold_label'])
                             print(sample['sentence1'])
                             print(sample['sentence2'])
                             print()
