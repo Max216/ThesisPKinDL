@@ -214,8 +214,10 @@ class MultiTaskTarget:
                         entailing_words = list()
                         contradicting_words = list()
                         for w_idx in list(set(sent)):
-                            entailing_words.append((w_idx, in_sent_samples[w_idx]))
-                            contradicting_words.append((w_idx, not_in_sent_samples[w_idx]))
+                            if len(in_sent_samples[w_idx]) > 0:
+                                entailing_words.append((w_idx, in_sent_samples[w_idx]))
+                            if len(not_in_sent_samples[w_idx]) > 0:
+                                contradicting_words.append((w_idx, not_in_sent_samples[w_idx]))
 
                         # clean not needed here
                         #contradicting_words = list(contradicting_words - entailing_words)
@@ -244,7 +246,7 @@ class MultiTaskTarget:
                 target_has_content[i] = False
             else:
                 #source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
-                print(targets[i])
+                print(zip(*targets[i]))
                 source_w, target_ws, lbl = targets[i]
                 target_words[i] = torch.LongTensor(target_ws).view(-1,1)
                 target_labels[i] = torch.LongTensor([lbl] * len(target_ws)).view(-1)
