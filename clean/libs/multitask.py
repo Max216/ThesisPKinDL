@@ -252,6 +252,10 @@ class MultiTaskTarget:
                 target_labels[i] = list(lbl)
                 source_words[i] = list(source_w)
                 print('source w', source_words[i])
+                # adapt source words to positions in sentence
+                current_sent = all_sents[i]
+                source_words[i] = [[i for i in range(current_sent.size()[0]) if current_sent[i] == sw] for sw in source_words[i]]
+                print('source w', source_words[i])
                 print('sents', all_sents[i])
                 print('trget w', target_words[i])
                 print('labels', target_labels[i])
