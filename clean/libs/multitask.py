@@ -231,9 +231,9 @@ class MultiTaskTarget:
                         targets[sent_id] = samples
                         all_sents[sent_id] = sent
 
-        target_words = [[] for i in range(len(targets))]
-        target_labels = [[] for i in range(len(targets))]
-        source_words = [[] for i in range(len(targets))]
+        target_words = [[0] for i in range(len(targets))]
+        target_labels = [[0] for i in range(len(targets))]
+        source_words = [[0] for i in range(len(targets))]
         target_has_content = [True for i in range(len(targets))]
 
         for i in range(len(targets)):
