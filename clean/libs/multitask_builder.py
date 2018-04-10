@@ -341,8 +341,9 @@ class MultitaskBuilder:
         """ Create a dataset based on wordnet and the given sentences """
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
-
+        print('in get all samples')
         if self._mask_sentence:
+            print('AND NOT MASKING')
 
             #print('premise repr',premise_repr.size())
             samples = []
