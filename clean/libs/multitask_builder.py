@@ -250,6 +250,11 @@ class MultitaskBuilder:
         self._mask_sentence = False
         if 'mask_sent' in params:
             self._mask_sentence = True
+            target_words, target_labels, target_has_content, source_positions = multitask_targets
+            self._source_word_positions = source_positions
+        else:
+            target_words, target_labels, target_has_content = multitask_targets
+
         if 'after_epoch' in params:
             self._after_epoch = params['after_epoch']
         else:
@@ -408,13 +413,16 @@ class MultitaskBuilder:
         else:
             print('TODO mask sentence.')
             print('activations',activations[0].size(), activations[1].size())
-            print('premise_var', premise_var.size())
+            #print('premise_var', premise_var.size())
             samples = []
             count = 0
             for i in range(len(premise_ids)):
                 _id = premise_ids[i]
 
                 if self._has_content[_id]:
+                    print('source word positions for masking', self._source_word_positions[_id])
+                    print('target words, each of them align', self._target_words[_id])
+                    print('target labels to predict', self._target_labels[_id])
                     embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
                     embds = embds.view(embds.size()[0], -1)
                     single_repr = premise_repr[i,:].view(1,-1)
@@ -962,7 +970,7 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
         params['regularization_update'] = constant_25_percent
         params['mask_sent'] = True
 
-        return MultitaskBuilder(params, lr, mt_target.get_targets(), classifier, embedding_holder)
+        return MultitaskBuilder(params, lr, mt_target.get_targets_with_positions(), classifier, embedding_holder)
 
 
 

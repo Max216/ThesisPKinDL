@@ -181,7 +181,7 @@ class MultiTaskTarget:
         self.embedding_holder = embedding_holder
 
     
-    def get_targets(self,make_even_dist=True):
+    def get_targets_with_positions(self,make_even_dist=True):
         with open(self.resource_data_path) as f_in:
             data = [line.strip().split('\t') for line in f_in.readlines()]
 
@@ -251,16 +251,9 @@ class MultiTaskTarget:
                 target_words[i] = list(target_ws)
                 target_labels[i] = list(lbl)
                 source_words[i] = list(source_w)
-                print('source w', source_words[i])
                 # adapt source words to positions in sentence
                 current_sent = all_sents[i]
                 source_words[i] = [[i for i in range(current_sent.size()[0]) if current_sent[i] == sw] for sw in source_words[i]]
-                print('source w', source_words[i])
-                print('sents', all_sents[i])
-                print('trget w', target_words[i])
-                print('labels', target_labels[i])
-                1/0
-                print()
                 #print('pos adding')
 
             #print('added', target_words[i].size())
@@ -268,10 +261,10 @@ class MultiTaskTarget:
         self._target_words = target_words
         self._target_labels = target_labels
         self._target_has_content = target_has_content
-        return self._target_words, self._target_labels, self._target_has_content
+        return self._target_words, self._target_labels, self._target_has_content, source_words[i]
 
 
-    def get_targets_X(self, make_even_dist=True):
+    def get_targets(self, make_even_dist=True):
 
         # create data
         with open(self.resource_data_path) as f_in:
