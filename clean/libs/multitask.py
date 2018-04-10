@@ -246,13 +246,15 @@ class MultiTaskTarget:
                 target_has_content[i] = False
             else:
                 #source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
-                print([a for a in zip(*targets[i])])
-                source_w, target_ws, lbl = targets[i]
-                target_words[i] = torch.LongTensor(target_ws).view(-1,1)
-                target_labels[i] = torch.LongTensor([lbl] * len(target_ws)).view(-1)
-                source_words[i] = [[]]
-                print('source w', source_words)
+                #print([a for a in zip(*targets[i])])
+                source_w, target_ws, lbl = zip(*targets[i])
+                target_words[i] = list(target_ws)
+                target_labels[i] = list(lbl)
+                source_words[i] = list(source_w)
+                print('source w', source_words[i])
                 print('sents', all_sents[i])
+                print('trget w', target_words[i])
+                print('labels', target_labels[i])
                 1/0
                 print()
                 #print('pos adding')
