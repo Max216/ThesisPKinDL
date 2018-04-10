@@ -410,6 +410,7 @@ class MultitaskBuilder:
             print('TODO mask sentence.')
             print('activations',activations)
             print('premise_var', premise_var)
+            1/0
 
     def predict(self, sent_reprs):
         """
