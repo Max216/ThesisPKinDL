@@ -244,6 +244,7 @@ class MultiTaskTarget:
                 target_has_content[i] = False
             else:
                 #source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
+                print(targets[i])
                 source_w, target_ws, lbl = targets[i]
                 target_words[i] = torch.LongTensor(target_ws).view(-1,1)
                 target_labels[i] = torch.LongTensor([lbl] * len(target_ws)).view(-1)
