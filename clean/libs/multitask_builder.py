@@ -266,7 +266,7 @@ class MultitaskBuilder:
         else:
             self._zero_grad = _zero_grad_obj
 
-        
+        print('mask sent:', self._mask_sentence)
 
         #self._res_word_vec_in_sent = m.cuda_wrap(torch.LongTensor([0 for i in]))
 
