@@ -180,10 +180,61 @@ class MultiTaskTarget:
         self.resource_data_path = resource_data_path
         self.embedding_holder = embedding_holder
 
-        
+    
+    def get_targets(self,make_even_dist=True):
+        with open(self.resource_data_path) as f_in:
+            data = [line.strip().split('\t') for line in f_in.readlines()]
+
+        not_in_sent_samples = collections.defaultdict(list) 
+        in_sent_samples = collections.defaultdict(list)
+
+        # go through resource and get word pairs into dictionaries
+        for d in data:
+            w1 = self.embedding_holder.word_index(d[0])
+            w2 = self.embedding_holder.word_index(d[1])
+            if d[2] == 'contradiction':
+                not_in_sent_samples[w1].append(w2)
+            elif d[2] == 'entailment':
+                in_sent_samples[w1].append(w2)
+
+        # create empty result arrays
+        indizes = [(p_id, h_id) for ds in self.datasets for p,h,l,pl,hl,p_id,h_id in ds]
+        max_id = max([_id1 for _id1, _id2 in indizes] + [_id2 for _id1, _id2 in indizes])
+        print('maxid', max_id)
+
+        # Iterate through each sentence in each dataset
+        count = 0
+        targets = [[] for i in range(max_id + 1)]
+        for dataset in self.datasets:
+            for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
+                for sent, sent_id in [(p, p_id), (h, h_id)]:
+                    if len(targets[sent_id]) == 0:
+                        #print('in it')
+                        entailing_words = set()
+                        contradicting_words = set()
+                        for w_idx in sent:
+                            #w_idx = embedding_holder.word_index(w)
+                            #if w_idx in entailing_words:print('yay')
+                            #print('###', in_sent_samples[w_idx])
+                            print('going throigh zeug:', w_idx)
+                            entailing_words.update(in_sent_samples[w_idx])
+                            contradicting_words.update(not_in_sent_samples[w_idx])
+                            #print('###',not_in_sent_samples[w_idx])
+
+                        contradicting_words = list(contradicting_words - entailing_words)
+                        entailing_words = list(entailing_words) 
+
+                        if make_even_dist:
+                            #print('Make even dist')
+                            entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
+                        else:
+                            #print('Not make even dist')
+                            pass
+                        samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
+                        targets[sent_id] = samples
 
 
-    def get_targets(self, make_even_dist=True):
+    def get_targets_X(self, make_even_dist=True):
 
         # create data
         with open(self.resource_data_path) as f_in:
