@@ -210,28 +210,53 @@ class MultiTaskTarget:
                 for sent, sent_id in [(p, p_id), (h, h_id)]:
                     if len(targets[sent_id]) == 0:
                         #print('in it')
-                        entailing_words = set()
-                        contradicting_words = set()
-                        for w_idx in sent:
-                            #w_idx = embedding_holder.word_index(w)
-                            #if w_idx in entailing_words:print('yay')
-                            #print('###', in_sent_samples[w_idx])
-                            print('going throigh zeug:', w_idx)
-                            entailing_words.update(in_sent_samples[w_idx])
-                            contradicting_words.update(not_in_sent_samples[w_idx])
-                            #print('###',not_in_sent_samples[w_idx])
+                        entailing_words = list()
+                        contradicting_words = list()
+                        for w_idx in list(set(sent)):
+                            entailing_words.append((w_idx, in_sent_samples[w_idx]))
+                            contradicting_words.append((w_idx, not_in_sent_samples[w_idx]))
 
-                        contradicting_words = list(contradicting_words - entailing_words)
-                        entailing_words = list(entailing_words) 
+                        # clean not needed here
+                        #contradicting_words = list(contradicting_words - entailing_words)
+                        #entailing_words = list(entailing_words) 
 
-                        if make_even_dist:
-                            #print('Make even dist')
-                            entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
-                        else:
-                            #print('Not make even dist')
-                            pass
-                        samples = [(w, 0) for w in contradicting_words] + [(w,1) for w in entailing_words]
+                        #if make_even_dist:
+                        #    #print('Make even dist')
+                        #    entailing_words, contradicting_words = make_even(entailing_words, contradicting_words)
+                        #else:
+                        #    #print('Not make even dist')
+                        #    pass
+                        samples = [(sent, source_w, target_ws, 0) for source_w, target_ws in contradicting_words] + [(sent, source_w, target_ws, 1) for source_w, target_ws in entailing_words]
                         targets[sent_id] = samples
+
+        target_words = [[] for i in range(len(targets))]
+        target_labels = [[] for i in range(len(targets))]
+        source_words = [[] for i in range(len(targets))]
+        target_has_content = [True for i in range(len(targets))]
+
+        for i in range(len(targets)):
+            if len(targets[i]) == 0:
+                target_words[i] = False
+                target_labels[i] = False
+                source_words[i] = False
+                target_has_content[i] = False
+            else:
+                sents, source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
+                target_words[i] = w_indizes.view(-1,1)
+                target_labels[i] = labels.view(-1)
+                source_words[i] = [[]]
+                print('source w', source_words)
+                print('sents', sents)
+                1/0
+                print()
+                #print('pos adding')
+
+            #print('added', target_words[i].size())
+
+        self._target_words = target_words
+        self._target_labels = target_labels
+        self._target_has_content = target_has_content
+        return self._target_words, self._target_labels, self._target_has_content
 
 
     def get_targets_X(self, make_even_dist=True):
