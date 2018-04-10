@@ -434,8 +434,8 @@ class MultitaskBuilder:
                         binary_masks = []
                         for sp in source_positions:
                             print('sp',sp)
-                            print('orig', single_act[:200])
-                            print('mapped',(single_act==sp)[:200])
+                            print('orig', single_act.cpu().numpy().tolist()[:200])
+                            print('mapped',(single_act==sp).cpu().numpy().tolist()[:200])
                             current_mask = single_act.clone().fill_(0.0)
 
                         print('act', single_act)
