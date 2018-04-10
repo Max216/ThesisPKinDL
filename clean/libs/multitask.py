@@ -261,7 +261,7 @@ class MultiTaskTarget:
         self._target_words = target_words
         self._target_labels = target_labels
         self._target_has_content = target_has_content
-        return self._target_words, self._target_labels, self._target_has_content, source_words[i]
+        return self._target_words, self._target_labels, self._target_has_content, source_words
 
 
     def get_targets(self, make_even_dist=True):
