@@ -205,6 +205,7 @@ class MultiTaskTarget:
         # Iterate through each sentence in each dataset
         count = 0
         targets = [[] for i in range(max_id + 1)]
+        all_sents = [[] for i in range(max_id + 1)]
         for dataset in self.datasets:
             for p,h,lbl,p_len,h_len,p_id,h_id in dataset:
                 for sent, sent_id in [(p, p_id), (h, h_id)]:
@@ -226,8 +227,9 @@ class MultiTaskTarget:
                         #else:
                         #    #print('Not make even dist')
                         #    pass
-                        samples = [(sent, source_w, target_ws, 0) for source_w, target_ws in contradicting_words] + [(sent, source_w, target_ws, 1) for source_w, target_ws in entailing_words]
+                        samples = [(source_w, target_ws, 0) for source_w, target_ws in contradicting_words] + [(source_w, target_ws, 1) for source_w, target_ws in entailing_words]
                         targets[sent_id] = samples
+                        all_sents[sent_id] = sent
 
         target_words = [[] for i in range(len(targets))]
         target_labels = [[] for i in range(len(targets))]
@@ -241,12 +243,12 @@ class MultiTaskTarget:
                 source_words[i] = False
                 target_has_content[i] = False
             else:
-                sents, source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
+                source_words, w_indizes,  labels = [torch.LongTensor(list(a)) for a in zip(*targets[i])]
                 target_words[i] = w_indizes.view(-1,1)
                 target_labels[i] = labels.view(-1)
                 source_words[i] = [[]]
                 print('source w', source_words)
-                print('sents', sents)
+                print('sents', all_sents[i])
                 1/0
                 print()
                 #print('pos adding')
