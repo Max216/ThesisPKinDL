@@ -336,7 +336,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
             premise_info = (premise_var, sentence_representations[0])
             hypothesis_info = (hyp_var, sentence_representations[1])
 
-            backward_loss = builder.loss(loss, premise_info, hypothesis_info, premise_ids, hyp_ids)
+            backward_loss = builder.loss(loss, premise_info, hypothesis_info, premise_ids, hyp_ids, activation_indizes)
             backward_loss.backward()
             #torch.autograd.backward(backward_loss)#.backward()
 
@@ -372,7 +372,7 @@ def train_simult(model_name, classifier, embedding_holder, train_set, dev_set, t
                     hypothesis_info = (hyp_var, sentence_representations[1])
 
                     if validate_mt:
-                        builder.add_evaluation(premise_info, hypothesis_info, premise_ids, hyp_ids)
+                        builder.add_evaluation(premise_info, hypothesis_info, premise_ids, hyp_ids, activations=activation_indizes)
 
 
                 print('Running time:', time.time() - start_time, 'seconds')

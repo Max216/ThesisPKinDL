@@ -247,6 +247,9 @@ class MultitaskBuilder:
         self._word_dict = embedding_holder.reverse()
         self._regularization = 1
         self._regularization_update = params['regularization_update']
+        self._mask_sentence = False
+        if 'mask_sent' in params:
+            self._mask_sentence = True
         if 'after_epoch' in params:
             self._after_epoch = params['after_epoch']
         else:
@@ -305,9 +308,9 @@ class MultitaskBuilder:
         if self._multitask_network != None:
             self._multitask_network.eval()
 
-    def add_evaluation(self, premise_info, hypothesis_info, premise_ids, hyp_ids):
+    def add_evaluation(self, premise_info, hypothesis_info, premise_ids, hyp_ids, activations=None):
         """ evaluate the samples and remember the results """
-        eval_data, counts = self.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
+        eval_data, counts = self.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids, activations=activations)
         for samples, lbls in eval_data:
             pred = self._multitask_network(samples)
             _, predicted_idx = torch.max(pred.data, dim=1)
@@ -320,11 +323,11 @@ class MultitaskBuilder:
         self._correct_multitask_samples = 0
         self._total_count_multitask_samples = 0
 
-    def loss(self, snli_loss, premise_info, hypothesis_info, premise_ids, hyp_ids):
+    def loss(self, snli_loss, premise_info, hypothesis_info, premise_ids, hyp_ids, activations=None):
         """ Calculate the loss for thee gradient """
         #print('now create loss')
         #print(list(self._classifier.sent_encoder.lstm1.parameters())[0])
-        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, premise_ids, hyp_ids, self)
+        multitask_loss = self._loss_fn_multitask(premise_info, hypothesis_info, premise_ids, hyp_ids, self, activations=activations)
         #print('multitask loss', multitask_loss)
         return self._loss_fn(snli_loss, multitask_loss, self)
 
@@ -333,74 +336,80 @@ class MultitaskBuilder:
         for pg in self._optimizer.param_groups:
             pg['lr'] = new_lr
 
-    def get_all_multitask_samples(self, premise_info, hypothesis_info, premise_ids, hyp_ids):
+    def get_all_multitask_samples(self, premise_info, hypothesis_info, premise_ids, hyp_ids, activations=None):
         #start = time.time()
         """ Create a dataset based on wordnet and the given sentences """
         premise_var, premise_repr = premise_info
         hyp_var, hyp_repr = hypothesis_info
 
-        #print('premise repr',premise_repr.size())
-        samples = []
-        count = 0
-        for i in range(len(premise_ids)):
-            #print('##')
-            _id = premise_ids[i]
-            #print('_id',_id)
+        if self._mask_sentence:
 
-            if self._has_content[_id]:
-                #print('len target words:', len(self._target_words))
-                #print('target_words[i].size()', self._target_words[_id].size())
-                embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
-                embds = embds.view(embds.size()[0], -1)
-                #print('embds.size()', embds.size())
-                single_repr = premise_repr[i,:].view(1,-1)
-                #print('single_repr.size()', single_repr.size())
+            #print('premise repr',premise_repr.size())
+            samples = []
+            count = 0
+            for i in range(len(premise_ids)):
+                #print('##')
+                _id = premise_ids[i]
+                #print('_id',_id)
 
-                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
-                #print(duplicated_repr)
-                #print('duplicated_repr.size()', duplicated_repr.size())
+                if self._has_content[_id]:
+                    #print('len target words:', len(self._target_words))
+                    #print('target_words[i].size()', self._target_words[_id].size())
+                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                    embds = embds.view(embds.size()[0], -1)
+                    #print('embds.size()', embds.size())
+                    single_repr = premise_repr[i,:].view(1,-1)
+                    #print('single_repr.size()', single_repr.size())
 
-                concatenated_input = torch.cat((duplicated_repr, embds), 1)
-                #print('concatenated_input size()', concatenated_input.size())
-                labels = self._target_labels[_id]
-                #print('labels.size()', labels.size())
+                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                    #print(duplicated_repr)
+                    #print('duplicated_repr.size()', duplicated_repr.size())
 
-                samples.append((concatenated_input, labels))
-                count += labels.size()[0]
-            else:
-                #print('Skipping one')
-                pass
+                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                    #print('concatenated_input size()', concatenated_input.size())
+                    labels = self._target_labels[_id]
+                    #print('labels.size()', labels.size())
 
-        for i in range(len(hyp_ids)):
-            #print('##')
-            _id = hyp_ids[i]
-            #print('_id',_id)
+                    samples.append((concatenated_input, labels))
+                    count += labels.size()[0]
+                else:
+                    #print('Skipping one')
+                    pass
 
-            if self._has_content[_id]:
-                #print('len target words:', len(self._target_words))
-                #print('target_words[i].size()', self._target_words[_id].size())
-                embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
-                embds = embds.view(embds.size()[0], -1)
-                #print('embds.size()', embds.size())
-                single_repr = hyp_repr[i,:].view(1,-1)
-                #print('single_repr.size()', single_repr.size())
+            for i in range(len(hyp_ids)):
+                #print('##')
+                _id = hyp_ids[i]
+                #print('_id',_id)
 
-                duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
-                #print(duplicated_repr)
-                #print('duplicated_repr.size()', duplicated_repr.size())
+                if self._has_content[_id]:
+                    #print('len target words:', len(self._target_words))
+                    #print('target_words[i].size()', self._target_words[_id].size())
+                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                    embds = embds.view(embds.size()[0], -1)
+                    #print('embds.size()', embds.size())
+                    single_repr = hyp_repr[i,:].view(1,-1)
+                    #print('single_repr.size()', single_repr.size())
 
-                concatenated_input = torch.cat((duplicated_repr, embds), 1)
-                #print('concatenated_input size()', concatenated_input.size())
-                labels = self._target_labels[_id]
-                #print('labels.size()', labels.size())
+                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                    #print(duplicated_repr)
+                    #print('duplicated_repr.size()', duplicated_repr.size())
 
-                samples.append((concatenated_input, labels))
-                count += labels.size()[0]
-            else:
-                #print('Skipping one')
-                pass
+                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                    #print('concatenated_input size()', concatenated_input.size())
+                    labels = self._target_labels[_id]
+                    #print('labels.size()', labels.size())
 
-            return samples, count
+                    samples.append((concatenated_input, labels))
+                    count += labels.size()[0]
+                else:
+                    #print('Skipping one')
+                    pass
+
+                return samples, count
+        else:
+            print('TODO mask sentence.')
+            print('activations',activations)
+            print('premise_var', premise_var)
 
     def predict(self, sent_reprs):
         """
@@ -426,17 +435,17 @@ def get_optimizer_multitask_only(classifier, multitask_network, lr):
 #
 # Combining Loss functions
 #
-def loss_snli_only(snli_loss, multitask_loss, builder):
+def loss_snli_only(snli_loss, multitask_loss, builder, activations=None):
     return snli_loss
 
-def loss_multitask_only(snli_loss, multitask_loss, builder):
+def loss_multitask_only(snli_loss, multitask_loss, builder, activations=None):
     #print('multitask loss', multitask_loss.data[0])
     return multitask_loss
 
-def loss_equal_both(snli_loss, multitask_loss, builder):
+def loss_equal_both(snli_loss, multitask_loss, builder, activations=None):
     return (snli_loss + multitask_loss) / 2
 
-def loss_on_regularization(snli_loss, multitask_loss, builder):
+def loss_on_regularization(snli_loss, multitask_loss, builder, activations=None):
     return builder.reg_snli * snli_loss + builder.reg_mt * multitask_loss
 
 
@@ -444,12 +453,12 @@ def loss_on_regularization(snli_loss, multitask_loss, builder):
 # Loss function for MultiTask
 #
 
-def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder):
+def loss_multitask_reweighted(premise_info, hypothesis_info, premise_ids, hyp_ids, builder, activations):
     """Average the loss over the batches of all samples created from these sentence pairs"""
 
     #premise_var, premise_repr = premise_info
     #hyp_var, hyp_repr = hypothesis_info
-    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids)
+    samples, sample_count = builder.get_all_multitask_samples(premise_info, hypothesis_info, premise_ids, hyp_ids, activations=activations)
 
     loss = []#autograd.Variable(m.cuda_wrap(torch.FloatTensor([0])))
     #batch_sizes = 0
