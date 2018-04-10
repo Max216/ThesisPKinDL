@@ -260,7 +260,7 @@ class MultitaskBuilder:
         else:
             self._after_epoch = None
         
-        target_words, target_labels, target_has_content = multitask_targets
+        #target_words, target_labels, target_has_content = multitask_targets
         self._target_words = target_words
         self._target_labels = target_labels
         self._has_content = target_has_content
