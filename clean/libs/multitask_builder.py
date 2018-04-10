@@ -407,9 +407,60 @@ class MultitaskBuilder:
                 return samples, count
         else:
             print('TODO mask sentence.')
-            print('activations',activations)
-            print('premise_var', premise_var)
-            1/0
+            print('activations',activations[0].size(), activations[1].size())
+            print('premise_var', premise_var.size())
+            samples = []
+            count = 0
+            for i in range(len(premise_ids)):
+                _id = premise_ids[i]
+
+                if self._has_content[_id]:
+                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                    embds = embds.view(embds.size()[0], -1)
+                    single_repr = premise_repr[i,:].view(1,-1)
+
+                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                    print('duplicated_repr:', duplicated_repr.size())
+                    print('embds', embds.size())
+
+                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                    labels = self._target_labels[_id]
+
+                    samples.append((concatenated_input, labels))
+                    count += labels.size()[0]
+                    1/0
+                else:
+                    #print('Skipping one')
+                    pass
+
+            for i in range(len(hyp_ids)):
+                #print('##')
+                _id = hyp_ids[i]
+                #print('_id',_id)
+
+                if self._has_content[_id]:
+                    #print('len target words:', len(self._target_words))
+                    #print('target_words[i].size()', self._target_words[_id].size())
+                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
+                    embds = embds.view(embds.size()[0], -1)
+                    #print('embds.size()', embds.size())
+                    single_repr = hyp_repr[i,:].view(1,-1)
+                    #print('single_repr.size()', single_repr.size())
+
+                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
+                    #print(duplicated_repr)
+                    #print('duplicated_repr.size()', duplicated_repr.size())
+
+                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
+                    #print('concatenated_input size()', concatenated_input.size())
+                    labels = self._target_labels[_id]
+                    #print('labels.size()', labels.size())
+
+                    samples.append((concatenated_input, labels))
+                    count += labels.size()[0]
+                else:
+                    #print('Skipping one')
+                    pass
 
     def predict(self, sent_reprs):
         """
