@@ -423,6 +423,23 @@ class MultitaskBuilder:
                     print('source word positions for masking', self._source_word_positions[_id])
                     print('target words, each of them align', self._target_words[_id])
                     print('target labels to predict', self._target_labels[_id])
+                    for iidx in range(len(self._source_word_positions[_id])):
+                        source_positions = self._source_word_positions[_id][iidx]
+                        target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
+                        target_words = target_words.view(target_words.size()[0], -1)
+                        print('target word shape:', target_words.size())
+                        single_repr = premise_repr[i,:].view(1,-1)
+                        # TODO mask it
+                        single_act = activations[0][i,:].view(1,-1)
+                        print('act', single_act)
+                        1/0
+
+
+
+
+
+
+
                     embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
                     embds = embds.view(embds.size()[0], -1)
                     single_repr = premise_repr[i,:].view(1,-1)
