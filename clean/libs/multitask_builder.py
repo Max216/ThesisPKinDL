@@ -420,9 +420,9 @@ class MultitaskBuilder:
                 _id = premise_ids[i]
 
                 if self._has_content[_id]:
-                    print('source word positions for masking', self._source_word_positions[_id])
-                    print('target words, each of them align', self._target_words[_id])
-                    print('target labels to predict', self._target_labels[_id])
+                    #print('source word positions for masking', self._source_word_positions[_id])
+                    #print('target words, each of them align', self._target_words[_id])
+                    #print('target labels to predict', self._target_labels[_id])
                     for iidx in range(len(self._source_word_positions[_id])):
                         source_positions = self._source_word_positions[_id][iidx]
                         target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
@@ -431,6 +431,13 @@ class MultitaskBuilder:
                         single_repr = premise_repr[i,:].view(1,-1)
                         # TODO mask it
                         single_act = activations[0][i,:].view(1,-1)
+                        binary_masks = []
+                        for sp in source_positions:
+                            print('sp',sp)
+                            print('orig', single_act)
+                            print('mapped',(single_act==sp))
+                            current_mask = single_act.clone().fill_(0.0)
+
                         print('act', single_act)
                         1/0
 
