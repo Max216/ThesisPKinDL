@@ -428,7 +428,7 @@ class MultitaskBuilder:
 
                     for iidx in range(len(self._source_word_positions[_id])):
                         source_positions = self._source_word_positions[_id][iidx]
-                        labels = self._target_labels[_id][iidx]
+                        labels = self._target_labels[_id]
                         target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
                         target_words = target_words.view(target_words.size()[0], -1)
                         single_repr = premise_repr[i,:].view(1,-1)
@@ -448,6 +448,7 @@ class MultitaskBuilder:
                     print('final sent samples:', concatenated_sentence_samples.size())
                     print('final labels:', labels.size())
                     count += concatenated_sentence_samples.size()[0]
+                    1/0
                     samples.append(concatenated_sentence_samples)
 
                 else:
