@@ -447,7 +447,9 @@ class MultitaskBuilder:
                         print('masked sents', duplicated_repr.size())
                         print('target words', target_words.size())
 
-                        sentence_samples.append(torch.cat([masked_repr, target_words], dim=1))
+                        concatenated = torch.cat([masked_repr, target_words], dim=0)
+                        print('conncatenated', concatenated)
+                        sentence_samples.append(concatenated)
 
                     print('sent samples', sentence_samples)
 
