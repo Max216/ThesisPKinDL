@@ -435,6 +435,11 @@ class MultitaskBuilder:
                         final_mask, _ = torch.max(binary_masks, dim=0)
                         print(final_mask)
                         print('final mask:', final_mask.size())
+
+                        # mask single rep
+                        masked_repr = single_repr * final_mask
+                        print('masked representation', masked_repr)
+                        duplicated_repr = torch.cat([masked_repr for i in range(target_words.size()[0])], 0)
                         
 
                         print('act', single_act)
