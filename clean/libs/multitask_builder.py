@@ -411,8 +411,6 @@ class MultitaskBuilder:
 
                 return samples, count
         else:
-            print('TODO mask sentence.')
-            print('activations',activations[0].size(), activations[1].size())
             #print('premise_var', premise_var.size())
             samples = []
             count = 0
@@ -445,11 +443,8 @@ class MultitaskBuilder:
 
 
                     concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
-                    print('final sent samples:', concatenated_sentence_samples.size())
-                    print('final labels:', labels.size())
                     count += concatenated_sentence_samples.size()[0]
-                    1/0
-                    samples.append(concatenated_sentence_samples)
+                    samples.append((concatenated_sentence_samples, labels))
 
                 else:
                     pass
@@ -466,9 +461,10 @@ class MultitaskBuilder:
 
                     for iidx in range(len(self._source_word_positions[_id])):
                         source_positions = self._source_word_positions[_id][iidx]
+                        labels = self._target_labels[_id]
                         target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
                         target_words = target_words.view(target_words.size()[0], -1)
-                        single_repr = premise_repr[i,:].view(1,-1)
+                        single_repr = hyp_repr[i,:].view(1,-1)
                         single_act = activations[1][i,:].view(1,-1)
                         binary_masks = torch.cat([(single_act==sp).float() for sp in source_positions], dim=0)
                         final_mask, _ = torch.max(binary_masks, dim=0)
@@ -483,6 +479,7 @@ class MultitaskBuilder:
 
                     concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
                     count += concatenated_sentence_samples.size()[0]
+                    samples.append((concatenated_sentence_samples, labels))
                 else:
                     #print('Skipping one')
                     pass
