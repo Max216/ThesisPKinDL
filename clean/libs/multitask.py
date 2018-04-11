@@ -252,7 +252,7 @@ class MultiTaskTarget:
                 target_words[i] = [torch.LongTensor(ws) for ws in target_ws]
                 print('these are the target ws', list(target_ws))
                 print('these are the labels', list(lbl))
-                target_labels[i] = [torch.LongTensor(list(lbl) * len(target_ws[j])).view(-1) for j in range(len(target_ws))]
+                target_labels[i] = [torch.LongTensor([list(lbl)[j]] * len(target_ws[j])).view(-1) for j in range(len(target_ws))]
                 print('target labels[i]', target_labels[i])
                 1/0
                 source_words[i] = list(source_w)
