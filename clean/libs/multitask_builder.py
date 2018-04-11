@@ -441,7 +441,8 @@ class MultitaskBuilder:
                         print('masked representation', masked_repr)
                         duplicated_repr = torch.cat([masked_repr for i in range(target_words.size()[0])], 0)
                         
-
+                        print('masked sents', duplicated_repr.size())
+                        print('target words', target_words.size())
                         print('act', single_act)
                         1/0
 
