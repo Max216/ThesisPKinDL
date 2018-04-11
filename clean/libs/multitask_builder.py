@@ -987,6 +987,17 @@ def get_builder(classifier, mt_type, mt_target, lr, embedding_holder):
 
         return MultitaskBuilder(params, lr, mt_target.get_targets_with_positions(), classifier, embedding_holder)
 
+    elif mt_type == 'mt_both_snli_ddropout_300_masking':
+        print('mt_both_snli_ddropout_300_masking')
+        # weight both results the same, all the time
+        params['multitask_network'] = get_multitask_nw_dropout(classifier, mlp=300)
+        params['optimizer'] = get_optimizer_multitask_only
+        params['loss_fn_multitask'] = loss_multitask_reweighted
+        params['loss_fn'] = loss_on_regularization
+        params['regularization_update'] = constant_25_percent
+        params['mask_sent'] = True
+
+        return MultitaskBuilder(params, lr, mt_target.get_targets_with_positions(), classifier, embedding_holder)
 
 
 
