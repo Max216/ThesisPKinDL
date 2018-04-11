@@ -250,13 +250,8 @@ class MultiTaskTarget:
                 source_w, target_ws, lbl = zip(*targets[i])
                 target_ws = list(target_ws)
                 target_words[i] = [torch.LongTensor(ws) for ws in target_ws]
-                print('these are the target ws', list(target_ws))
-                print('these are the labels', list(lbl))
                 target_labels[i] = [torch.LongTensor([list(lbl)[j]] * len(target_ws[j])).view(-1) for j in range(len(target_ws))]
-                print('target labels[i]', target_labels[i])
                 target_labels[i] = torch.cat(target_labels[i], dim=0)
-                print('yay un jetzt', target_labels[i])
-                1/0
                 source_words[i] = list(source_w)
                 # adapt source words to positions in sentence
                 current_sent = all_sents[i]

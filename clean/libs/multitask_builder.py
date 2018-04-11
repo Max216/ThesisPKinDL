@@ -445,6 +445,8 @@ class MultitaskBuilder:
 
 
                     concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
+                    print('final sent samples:', concatenated_sentence_samples.size())
+                    print('final labels:', labels.size())
                     count += concatenated_sentence_samples.size()[0]
                     samples.append(concatenated_sentence_samples)
 
