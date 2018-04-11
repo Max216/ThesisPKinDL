@@ -431,7 +431,7 @@ class MultitaskBuilder:
                         single_repr = premise_repr[i,:].view(1,-1)
                         # TODO mask it
                         single_act = activations[0][i,:].view(1,-1)
-                        binary_masks = torch.cat([(single_act==sp).long() for sp in source_positions], dim=0)
+                        binary_masks = torch.cat([(single_act==sp).float() for sp in source_positions], dim=0)
                         final_mask, _ = torch.max(binary_masks, dim=0)
                         print(final_mask)
                         print('final mask:', final_mask.size())
