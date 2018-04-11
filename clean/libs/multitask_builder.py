@@ -423,6 +423,9 @@ class MultitaskBuilder:
                     #print('source word positions for masking', self._source_word_positions[_id])
                     #print('target words, each of them align', self._target_words[_id])
                     #print('target labels to predict', self._target_labels[_id])
+
+                    sentence_samples = []
+
                     for iidx in range(len(self._source_word_positions[_id])):
                         source_positions = self._source_word_positions[_id][iidx]
                         target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
@@ -443,8 +446,14 @@ class MultitaskBuilder:
                         
                         print('masked sents', duplicated_repr.size())
                         print('target words', target_words.size())
-                        print('act', single_act)
-                        1/0
+
+                        sentence_samples.append(torch.cat([masked_repr, target_words], dim=1))
+
+                    print('sent samples', sentence_samples)
+
+                    concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
+                    print('concatenated', concatenated_sentence_samples.size())
+                    1/0
 
 
 
