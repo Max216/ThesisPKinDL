@@ -249,7 +249,9 @@ class MultiTaskTarget:
                 #print([a for a in zip(*targets[i])])
                 source_w, target_ws, lbl = zip(*targets[i])
                 target_words[i] = [torch.LongTensor(ws) for ws in list(target_ws)]
-                target_labels[i] = list(lbl)
+                print('these are the labels', list(lbl))
+                1/0
+                target_labels[i] = [torch.LongTensor(list(lbl))]
                 source_words[i] = list(source_w)
                 # adapt source words to positions in sentence
                 current_sent = all_sents[i]

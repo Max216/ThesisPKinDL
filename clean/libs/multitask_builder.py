@@ -428,57 +428,27 @@ class MultitaskBuilder:
 
                     for iidx in range(len(self._source_word_positions[_id])):
                         source_positions = self._source_word_positions[_id][iidx]
+                        labels = self._target_labels[_id][iidx]
                         target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
                         target_words = target_words.view(target_words.size()[0], -1)
-                        print('target word shape:', target_words.size())
                         single_repr = premise_repr[i,:].view(1,-1)
-                        # TODO mask it
                         single_act = activations[0][i,:].view(1,-1)
                         binary_masks = torch.cat([(single_act==sp).float() for sp in source_positions], dim=0)
                         final_mask, _ = torch.max(binary_masks, dim=0)
-                        print(final_mask)
-                        print('final mask:', final_mask.size())
 
                         # mask single rep
                         masked_repr = single_repr * final_mask
-                        print('masked representation', masked_repr)
                         duplicated_repr = torch.cat([masked_repr for i in range(target_words.size()[0])], 0)
                         
-                        print('masked sents', duplicated_repr.size())
-                        print('target words', target_words.size())
-
                         concatenated = torch.cat([duplicated_repr, target_words], dim=1)
-                        print('conncatenated', concatenated)
                         sentence_samples.append(concatenated)
 
-                    print('sent samples', sentence_samples)
 
                     concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
-                    print('concatenated', concatenated_sentence_samples.size())
-                    1/0
+                    count += concatenated_sentence_samples.size()[0]
+                    samples.append(concatenated_sentence_samples)
 
-
-
-
-
-
-
-                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
-                    embds = embds.view(embds.size()[0], -1)
-                    single_repr = premise_repr[i,:].view(1,-1)
-
-                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
-                    print('duplicated_repr:', duplicated_repr.size())
-                    print('embds', embds.size())
-
-                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
-                    labels = self._target_labels[_id]
-
-                    samples.append((concatenated_input, labels))
-                    count += labels.size()[0]
-                    1/0
                 else:
-                    #print('Skipping one')
                     pass
 
             for i in range(len(hyp_ids)):
@@ -489,23 +459,27 @@ class MultitaskBuilder:
                 if self._has_content[_id]:
                     #print('len target words:', len(self._target_words))
                     #print('target_words[i].size()', self._target_words[_id].size())
-                    embds = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id])))
-                    embds = embds.view(embds.size()[0], -1)
-                    #print('embds.size()', embds.size())
-                    single_repr = hyp_repr[i,:].view(1,-1)
-                    #print('single_repr.size()', single_repr.size())
+                    sentence_samples = []
 
-                    duplicated_repr = torch.cat([single_repr for i in range(embds.size()[0])], 0)
-                    #print(duplicated_repr)
-                    #print('duplicated_repr.size()', duplicated_repr.size())
+                    for iidx in range(len(self._source_word_positions[_id])):
+                        source_positions = self._source_word_positions[_id][iidx]
+                        target_words = self._multitask_network.lookup_word(autograd.Variable(m.cuda_wrap(self._target_words[_id][iidx])))
+                        target_words = target_words.view(target_words.size()[0], -1)
+                        single_repr = premise_repr[i,:].view(1,-1)
+                        single_act = activations[1][i,:].view(1,-1)
+                        binary_masks = torch.cat([(single_act==sp).float() for sp in source_positions], dim=0)
+                        final_mask, _ = torch.max(binary_masks, dim=0)
 
-                    concatenated_input = torch.cat((duplicated_repr, embds), 1)
-                    #print('concatenated_input size()', concatenated_input.size())
-                    labels = self._target_labels[_id]
-                    #print('labels.size()', labels.size())
+                        # mask single rep
+                        masked_repr = single_repr * final_mask
+                        duplicated_repr = torch.cat([masked_repr for i in range(target_words.size()[0])], 0)
+                        
+                        concatenated = torch.cat([duplicated_repr, target_words], dim=1)
+                        sentence_samples.append(concatenated)
 
-                    samples.append((concatenated_input, labels))
-                    count += labels.size()[0]
+
+                    concatenated_sentence_samples = torch.cat(sentence_samples, dim=0)
+                    count += concatenated_sentence_samples.size()[0]
                 else:
                     #print('Skipping one')
                     pass
