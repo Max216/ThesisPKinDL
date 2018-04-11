@@ -409,7 +409,7 @@ class MultitaskBuilder:
                     #print('Skipping one')
                     pass
 
-                return samples, count
+            return samples, count
         else:
             #print('premise_var', premise_var.size())
             samples = []
@@ -483,6 +483,7 @@ class MultitaskBuilder:
                 else:
                     #print('Skipping one')
                     pass
+            return samples, count
 
     def predict(self, sent_reprs):
         """
