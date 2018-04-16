@@ -27,7 +27,7 @@ def find_premise_with_size(data_path, size):
 
     print('results')
     for s in samples:
-        if len(s['sentence1'].split(' ')) == 2:
+        if len(s['sentence1'].split(' ')) == size:
             print('[p]', s['sentence1'])
             print('[h]', s['sentence2'])
             print('[lbl]', s['gold_label'])
