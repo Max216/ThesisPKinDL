@@ -10,13 +10,28 @@ def main():
     Usage:
         sampling.py samplesame <data> <amount>
         sampling.py find <data> <sent>
+        sampling.py findsize <data> <size>
     """)
 
     if args['samplesame']:
         sample_same_premise(args['<data>'], int(args['<amount>']))
     elif args['find']:
         find_samples_with_premise(args['<data>'], args['<sent>'])
+    elif args['findsize']:
+        find_premise_with_size(args['<data>'], int(args['<size>']))
 
+
+def find_premise_with_size(data_path, size):
+    with open(data_path) as f_in:
+        samples = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    print('results')
+    for s in samples:
+        if len(s['sentence1'].split(' ')) == 2:
+            print('[p]', s['sentence1'])
+            print('[h]', s['sentence2'])
+            print('[lbl]', s['gold_label'])
+            print()
 
 def find_samples_with_premise(data_path, sent):
     with open(data_path) as f_in:
