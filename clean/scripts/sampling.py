@@ -9,11 +9,26 @@ def main():
 
     Usage:
         sampling.py samplesame <data> <amount>
+        sampling.py find <data> <sent>
     """)
 
     if args['samplesame']:
         sample_same_premise(args['<data>'], int(args['<amount>']))
+    elif args['find']:
+        find_samples_with_premise(args['<data>'], args['<sent>'])
 
+
+def find_samples_with_premise(data_path, sent):
+    with open(data_path) as f_in:
+        samples = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    print('results')
+    for s in samples:
+        if s['sentence1'] == sent:
+            print('[p]', s['sentence1'])
+            print('[h]', s['sentence2'])
+            print('[lbl]', s['gold_label'])
+            print()
 
 def sample_same_premise(data_path, amount):
     with open(data_path) as f_in:
