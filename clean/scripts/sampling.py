@@ -1,4 +1,6 @@
 import sys, os
+from docopt import docopt
+
 sys.path.append('./../')
 import json, collections, random
 
