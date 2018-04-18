@@ -265,8 +265,10 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
             for embd in used_embeddings:
                 word = embd.split(' ')[0]
                 if word in hypernym_embedding_dict:
+                    print('adding word', hypernym_embedding_dict[word])
                     embd = embd + ' ' + hypernym_embedding_dict[word]
                 else:
+                    print('Adding unk:', unk_vec)
                     embd = embd + ' ' + unk_vec
 
                 f_out.write(embd + '\n')
