@@ -248,8 +248,6 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
     with open(hypernym_embedding_file) as f_in:
         hypernym_dict = dict()
         hypernym_embedding_lines = [line.strip() for line in f_in.readlines()]
-        print(hypernym_embedding_lines)
-        1/0
         hypernym_embedding_dict = dict()
 
         for line in hypernym_embedding_lines:
@@ -267,10 +265,8 @@ def concat_hypernyms(embedding_file, hypernym_embedding_file, out_file):
             for embd in used_embeddings:
                 word = embd.split(' ')[0]
                 if word in hypernym_embedding_dict:
-                    print('adding word', hypernym_embedding_dict[word])
                     embd = embd + ' ' + hypernym_embedding_dict[word]
                 else:
-                    print('Adding unk:', unk_vec)
                     embd = embd + ' ' + unk_vec
 
                 f_out.write(embd + '\n')
