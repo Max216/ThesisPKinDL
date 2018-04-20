@@ -18,7 +18,7 @@ def main():
 
     Usage:
         evaluate.py eval <model> <data> [<embeddings>] [--embd1=<embd1>] [--embd2=<embd2>]
-        evaluate.py ea <model>
+        evaluate.py ea <model> [<embeddings>]
         evaluate.py eam <model>
         evaluate.py misclassified_adv <amount> <classifier>
         evaluate.py misclassified_cat <data_path> <classifier> <category>
@@ -72,7 +72,10 @@ def main():
 
     elif args['ea']:
         print('Evaluate all')
-        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+        embd_path = config.PATH_WORD_EMBEDDINGS
+        if args['<embeddings>']:
+            embd_path = args['<embeddings>']
+        embedding_holder = embeddingholder.EmbeddingHolder(embd_path)
         _,classifier, _2 = model_tools.load(model_path, embedding_holder=embedding_holder)
         classifier = m.cuda_wrap(classifier)
 
