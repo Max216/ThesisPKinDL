@@ -11,6 +11,7 @@ def main():
         sampling.py samplesame <data> <amount>
         sampling.py find <data> <sent>
         sampling.py findsize <data> <size>
+        <sampling.py> find_label <data> <label> <amount>
     """)
 
     if args['samplesame']:
@@ -19,6 +20,23 @@ def main():
         find_samples_with_premise(args['<data>'], args['<sent>'])
     elif args['findsize']:
         find_premise_with_size(args['<data>'], int(args['<size>']))
+    elif args['find_label']:
+        find_samples_with_label(args['<data>'], args['<label>'], int(args['<amount>']))
+
+
+def find_samples_with_label(data_path, label, amount):
+    with open(data_path) as f_in:
+        samples = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    samples = [s for s in samples if s['gold_label'] == label]
+    samples = random.sample(samples, amount)
+
+    for s in samples:
+        print('[p]', s['sentence1'])
+        print('[h]', s['sentence2'])
+        print('[lbl]', s['gold_label'])
+        print()
+
 
 
 def find_premise_with_size(data_path, size):
