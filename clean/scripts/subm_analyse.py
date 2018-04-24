@@ -54,6 +54,7 @@ def to_single_word(w):
         ('at night', 'night'),
         ('in a hallway', 'hallway'),
         ('can not', 'not'),
+        ('no one', 'no'),
     ])
 
     return mapping[w]
