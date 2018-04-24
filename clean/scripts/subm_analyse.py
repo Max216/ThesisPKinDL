@@ -50,7 +50,7 @@ def analyse_word_distribution(train_data, newtest, out_file):
     only_orig_counts = sorted([orig_counts[w] for w in orig_counts])
     print('maximum counts', only_orig_counts[-3:])
     print('minimum counts:', only_orig_counts[:3])
-    print('mean:', np.mean(np.asarray(only_orig_counts)),'validate::' sum(only_orig_counts) / len(only_orig_counts))
+    print('mean:', np.mean(np.asarray(only_orig_counts)),'validate::', sum(only_orig_counts) / len(only_orig_counts))
     print('median:', np.median(np.asarray(only_orig_counts)))
 
     print('Write details out ...')
