@@ -11,7 +11,7 @@ def main():
         sampling.py samplesame <data> <amount>
         sampling.py find <data> <sent>
         sampling.py findsize <data> <size>
-        <sampling.py> find_label <data> <label> <amount>
+        sampling.py find_label <data> <label> <amount>
     """)
 
     if args['samplesame']:
