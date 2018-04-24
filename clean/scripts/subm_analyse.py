@@ -39,12 +39,15 @@ def analyse_word_distribution(train_data, newtest, out_file):
     regexps = [((w, re.compile('\\b' + w + '\\b'))) for w in replacement_counter]
     print('Created', len(regexps), 'regexp')
     orig_counts = collections.defaultdict(int)
-    for data in train:
+    for i, data in enumerate(train):
         for w, regex in regexps:
             if regex.search(data['sentence1']):
                 orig_counts[w] += 1
             if regex.search(data['sentence2']):
                 orig_counts[w] += 1
+
+        if i + 1 % 20000 == 0:
+            print('Checked:', i+1)
 
     print('Done')
     only_orig_counts = sorted([orig_counts[w] for w in orig_counts])
