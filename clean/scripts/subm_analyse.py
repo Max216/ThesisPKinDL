@@ -11,11 +11,28 @@ def main():
 
     Usage:
         subm_analyse.py word_dist <train_data> <newtest> <out>
+        subm_analyse.py wn_baseline <newtest>
 
     """)
 
     if args['word_dist']:
         analyse_word_distribution(args['<train_data>'], args['<newtest>'], args['<out>'])
+    elif args['wn_baseline']:
+        calc_wn_baseline(args['<newtest>'])
+
+def calc_wn_baseline(newtest):
+    print('Read new test-set ...')
+    with open(newtest) as f_in:
+        test = [json.loads(line.strip()) for line in f_in.readlines()]
+    print('Done.')
+    print('Get Replacement words')
+    repl_words1 = set([d['replaced1'] for d in test])
+    repl_words2 = set([d['replaced1'] for d in test])
+    repl_words = list(repl_words1 + repl_words2)
+
+    # find the ones with more than one word
+    multi_word = [w for w in [rw.split(' ') for rw in repl_words] if len(w) > 1]
+    print(multi_word)
 
 
 def analyse_word_distribution(train_data, newtest, out_file):
