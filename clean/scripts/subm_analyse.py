@@ -35,6 +35,7 @@ def to_single_word(w):
         ('Saudi Arabia', 'saudi_arabia'),
         ('french horn', 'french_horn'),
         ('North Korea', 'north_korea'),
+        ('South Korean', 'south_korea'),
         ('electric guitar', 'electric_guitar'),
         ('in a room', 'room'),
         ('New Zealand', 'new_zealand'),
