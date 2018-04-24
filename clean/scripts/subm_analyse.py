@@ -46,6 +46,7 @@ def analyse_word_distribution(train_data, newtest, out_file):
             if regex.search(data['sentence2']):
                 orig_counts[w] += 1
 
+        print(i)
         if i + 1 % 20000 == 0:
             print('Checked:', i+1)
 
