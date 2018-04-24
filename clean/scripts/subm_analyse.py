@@ -38,23 +38,27 @@ def analyse_word_distribution(train_data, newtest, out_file):
     print('Count replaced words in train data ...')
     regexps = [((w, re.compile('\\b' + w + '\\b'))) for w in replacement_counter]
     print('Created', len(regexps), 'regexp')
+    correct_labels = set(['entailment', 'contradiction', 'neutral'])
     orig_counts = collections.defaultdict(int)
     for i, data in enumerate(train):
-        for w, regex in regexps:
-            if regex.search(data['sentence1']):
-                orig_counts[w] += 1
-            if regex.search(data['sentence2']):
-                orig_counts[w] += 1
+        if data['gold_label'] in correct_labels:
+            for w, regex in regexps:
+                if regex.search(data['sentence1']):
+                    orig_counts[w] += 1
+                if regex.search(data['sentence2']):
+                    orig_counts[w] += 1
 
-        if i  % 10000 == 0:
-            print('Checked:', i+1)
+            if i  % 10000 == 0:
+                print('Checked:', i+1)
 
     print('Done')
     only_orig_counts = sorted([orig_counts[w] for w in orig_counts])
     print('maximum counts', only_orig_counts[-3:])
     print('minimum counts:', only_orig_counts[:3])
     print('mean:', np.mean(np.asarray(only_orig_counts)),'validate::', sum(only_orig_counts) / len(only_orig_counts))
+    print('first percintile', np.percentile(np.asarray(only_orig_counts), 25))
     print('median:', np.median(np.asarray(only_orig_counts)))
+    print('third percintile', np.percentile(np.asarray(only_orig_counts), 75))
 
     print('Write details out ...')
     with open(out_file, 'w') as f_out:
