@@ -6,6 +6,10 @@ from docopt import docopt
 import collections
 import numpy as np
 
+import nltk
+
+from nltk.corpus import wordnet as wn
+
 def main():
     args = docopt("""Analyse creation and baselines for the submission. 
 
@@ -20,6 +24,38 @@ def main():
     elif args['wn_baseline']:
         calc_wn_baseline(args['<newtest>'])
 
+def to_single_word(w):
+    mapping = dict([
+        ('in a garage', 'garage'),
+        ('close to', 'close'),
+        ('a lot of', 'lot'),
+        ('far away from', 'far'),
+        ('in a kitchen', 'kitchen'),
+        ('living room', 'living_room'),
+        ('Saudi Arabia', 'saudi_arabia'),
+        ('french horn', 'french_horn'),
+        ('North Korea', 'north_korea'),
+        ('electric guitar', 'electric_guitar'),
+        ('in a room', 'room'),
+        ('New Zealand', 'new_zealand'),
+        ('in a bathroom', 'bathroom'),
+        ('plenty of', 'plenty'),
+        ('during the day', 'day'),
+        ('prison cell', 'prison_cell'),
+        ('dining room', 'dining_room'),
+        ('in front of', 'in_front'),
+        ('in a building', 'building'),
+        ('acoustic guitar', 'acoustic_guitar'),
+        ('far from', 'far'),
+        ('common room', 'common_room'),
+        ('hot chocolate', 'hot_chocolate'),
+        ('North Korean', 'north_korean'),
+        ('at night', 'night'),
+        ('in a hallway', 'hallway')
+    ])
+
+    return mapping[w]
+
 def calc_wn_baseline(newtest):
     print('Read new test-set ...')
     with open(newtest) as f_in:
@@ -33,6 +69,10 @@ def calc_wn_baseline(newtest):
     # find the ones with more than one word
     multi_word = [w for w in [rw.split(' ') for rw in repl_words] if len(w) > 1]
     print(multi_word)
+    print('Validate')
+
+    for w in multi_word:
+        print(wn.synset(to_single_word(w)))
 
 
 def analyse_word_distribution(train_data, newtest, out_file):
