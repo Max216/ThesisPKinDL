@@ -72,7 +72,7 @@ def calc_wn_baseline(newtest):
     print('Validate')
 
     for w in multi_word:
-        print(wn.synset(to_single_word(' '.join(w))))
+        print(wn.synsets(to_single_word(' '.join(w))))
 
 
 def analyse_word_distribution(train_data, newtest, out_file):
