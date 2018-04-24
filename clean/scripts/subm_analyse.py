@@ -51,7 +51,8 @@ def to_single_word(w):
         ('hot chocolate', 'hot_chocolate'),
         ('North Korean', 'north_korean'),
         ('at night', 'night'),
-        ('in a hallway', 'hallway')
+        ('in a hallway', 'hallway'),
+        ('can not', 'not'),
     ])
 
     return mapping[w]
