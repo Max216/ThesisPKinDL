@@ -28,7 +28,7 @@ def calc_wn_baseline(newtest):
     print('Get Replacement words')
     repl_words1 = set([d['replaced1'] for d in test])
     repl_words2 = set([d['replaced1'] for d in test])
-    repl_words = list(repl_words1 + repl_words2)
+    repl_words = list(repl_words1 | repl_words2)
 
     # find the ones with more than one word
     multi_word = [w for w in [rw.split(' ') for rw in repl_words] if len(w) > 1]
