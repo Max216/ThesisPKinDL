@@ -308,6 +308,7 @@ def predict(w1, w2, lbl):
         if anto or cohypo:
             lbl_best = 'contradiction'
 
+    print('Returning', lbl_first, lbl_best)
     return (lbl_first, lbl_best)
 
 def print_evaluation(pred_dict):
