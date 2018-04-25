@@ -316,7 +316,7 @@ def print_evaluation(pred_dict):
     print('# By category:')
     all_predictions = collections.defaultdict(lambda: collections.defaultdict(int))
     for cat in categories:
-        print(ev.accuracy_prediction_dict(pred_dict[cat]))
+        print(cat, ':', ev.accuracy_prediction_dict(pred_dict[cat]))
         for gold in pred_dict[cat]:
             for pred in pred_dict[cat][gold]:
                 all_predictions[gold][pred] += pred_dict[cat][gold][pred]
@@ -358,11 +358,15 @@ def calc_wn_baseline(newtest):
     # by category, label_gold, label_predicted, amount
     predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
-    for w1, w2, lbl, category in test:
+    for cnt, (w1, w2, lbl, category) in enumerate(test):
+        if cnt % 10000 == 0:
+            print('samples done:', cnt, '\r')
         result =  predict(w1, w2, lbl)
         lbl_first, lbl_best = result
         predictiondict_first[category][lbl][lbl_first] += 1
         predictiondict_best[category][lbl][lbl_best] += 1
+
+    print('')
 
     print('Done.')
     print('Results for heuristic: first synset:')
