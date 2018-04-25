@@ -36,8 +36,11 @@ def is_synonym(synsets1, synsets2):
     best_idx = NOT_IDX
 
     for i, s1 in enumerate(synsets1):
+        s1_all = set([s.name()for s in s1.similar_tos()] + [s1.name()])
         for j, s2 in enumerate(synsets2):
-            if s1.name() == s2.name():
+            s2_all = set([s.name() for s in s2.similar_tos()] + [s2.name()])
+            #if s1.name() == s2.name():
+            if len(s1_all & s2_all) > 0:
                 result = True
                 idx = max([i,j])
                 if i >= best_idx and j >= best_idx:
