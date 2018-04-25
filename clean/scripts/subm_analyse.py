@@ -314,7 +314,7 @@ def print_evaluation(pred_dict):
     categories = sorted([k for k in pred_dict.keys()])
 
     print('# By category:')
-    all_predictions = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
+    all_predictions = collections.defaultdict(lambda: collections.defaultdict(int))
     for cat in categories:
         print(ev.accuracy_prediction_dict(pred_dict[cat]))
         for gold in pred_dict[cat]:
@@ -356,8 +356,8 @@ def calc_wn_baseline(newtest):
     test = [(to_single_word(d['replaced1'].split(' ')), to_single_word(d['replaced2'].split(' ')), d['gold_label'], d['category']) for d in test]
 
     # by category, label_gold, label_predicted, amount
-    predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
-    predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
+    predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
+    predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     for w1, w2, lbl, category in test:
         lbl_first, lbl_best = predict(w1, w2, lbl)
         predictiondict_first[category][lbl][lbl_first] += 1
