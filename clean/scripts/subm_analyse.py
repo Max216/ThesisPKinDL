@@ -53,19 +53,24 @@ def is_antonym(synsets1, synsets2):
     best_idx = NOT_IDX
 
 
-    for i, s1 in enumerate(synsets1):
-        antonyms1 = [anto.name() for lemma in s1.lemmas() for anto in lemma.antonyms() ]
-        if len(antonyms1) == 0:
-            continue
-        else:
-            for j, s2 in enumerate(synsets2):
-                if len(set(antonyms1) & set(s2.lemma_names())) > 0:
-                    result = True
-                    idx = max([i,j])
-                    if i >= best_idx and j >= best_idx:
-                        break
-                    elif idx < best_idx:
-                        best_idx = idx
+    # extend synsets2
+
+
+    for i, s1_orig in enumerate(synsets1):
+        for s1 in [s1_orig] + [s for s in s1_orig.similar_tos()]:
+            antonyms1 = [anto.name() for lemma in s1.lemmas() for anto in lemma.antonyms() ]
+            if len(antonyms1) == 0:
+                continue
+            else:
+                for j, s2_orig in enumerate(synsets2):
+                    for s2 in [s2_orig] + [s for s in s2_orig.similar_tos()]:
+                        if len(set(antonyms1) & set(s2.lemma_names())) > 0:
+                            result = True
+                            idx = max([i,j])
+                            if i >= best_idx and j >= best_idx:
+                                break
+                            elif idx < best_idx:
+                                best_idx = idx
     return (best_idx, result)
 
 
@@ -139,8 +144,8 @@ def is_cohyponym(synsets1, synsets2, max_dist=2):
 
 
 def test():
-    w1 = 'pretty'
-    w2 = 'beautiful'
+    w1 = 'little'
+    w2 = 'wide'
 
 
     syn_w1  = wn.synsets(w1)
