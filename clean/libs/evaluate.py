@@ -8,7 +8,7 @@ import torch.autograd as autograd
 import random
 import collections
 
-from libs import collatebatch, data_tools
+#from libs import collatebatch, data_tools
 #from libs import model as m
 
 ZERO = 0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
