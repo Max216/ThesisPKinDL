@@ -12,7 +12,7 @@ from collections import defaultdict
 
 # For running on cluster
 import os; 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # for cuda
 def make_with_cuda(t):
