@@ -359,7 +359,7 @@ def calc_wn_baseline(newtest):
     predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     for cnt, (w1, w2, lbl, category) in enumerate(test):
-        if cnt % 10000 == 0:
+        if cnt % 10 == 0:
             print('samples done:' + str(cnt), end='\r')
         result =  predict(w1, w2, lbl)
         lbl_first, lbl_best = result
