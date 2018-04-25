@@ -358,7 +358,7 @@ def calc_wn_baseline(newtest):
     # by category, label_gold, label_predicted, amount
     predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
-    for w1, w2, lbl, category in t:
+    for w1, w2, lbl, category in test:
         lbl_first, lbl_best = predict(w1, w2, lbl)
         predictiondict_first[category][lbl][lbl_first] += 1
         predictiondict_best[category][lbl][lbl_best] += 1
