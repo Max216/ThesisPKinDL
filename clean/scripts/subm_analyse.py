@@ -226,7 +226,7 @@ def test():
 
 def to_single_word(w):
     if len(w) == 1:
-        return w
+        return w[0]
 
     mapping = dict([
         ('in a garage', 'garage'),
