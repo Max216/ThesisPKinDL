@@ -267,7 +267,7 @@ def predict(w1, w2, lbl):
     synsets2 = wn.synsets(w2)
 
     if len(synsets1) == 0 or len(synsets2) == 0:
-        return 'other'
+        return ('other', 'other')
 
     syn_score, syn = is_synonym(synsets1, synsets2)
     anto_score, anto = is_antonym(synsets1, synsets2)
@@ -360,7 +360,6 @@ def calc_wn_baseline(newtest):
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     for w1, w2, lbl, category in test:
         result =  predict(w1, w2, lbl)
-        print('returned:', result)
         lbl_first, lbl_best = result
         predictiondict_first[category][lbl][lbl_first] += 1
         predictiondict_best[category][lbl][lbl_best] += 1
