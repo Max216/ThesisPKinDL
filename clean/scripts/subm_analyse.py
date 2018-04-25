@@ -139,89 +139,19 @@ def is_cohyponym(synsets1, synsets2, max_dist=2):
 
 
 def test():
-    w1 = 'living_room'
-    w2 = 'parlor'
-    hyp2 = 'area'
-    cohypo2 = 'study_hall'
-
-    a1 = 'good'
-    a2 = 'bad'
-    a3 = 'black'
-    a4 = 'white'
+    w1 = 'small'
+    w2 = 'huge'
 
 
     syn_w1  = wn.synsets(w1)
     syn_w2  = wn.synsets(w2)
-    syn_hyp2  = wn.synsets(hyp2)
-    syn_cohypo2  = wn.synsets(cohypo2)
 
-    syn_a1  = wn.synsets(a1)
-    syn_a2  = wn.synsets(a2)
-    syn_a3  = wn.synsets(a3)
-    syn_a4  = wn.synsets(a4)
+    print('syn', is_synonym(syn_w1, syn_w2))
+    print('anto', is_antonym(syn_w1, syn_w2))
+    print('hypo', is_hyponym(syn_w1, syn_w2))
+    print('hyper', is_hypernym(syn_w1, syn_w2))
+    print('cohypo', is_cohyponym(syn_w1, syn_w2))
 
-    t1 = 'cat'
-    t2 = 'dog'
-    t3 = 'drum'
-    t4 = 'guitar'
-    t5 = 'lion'
-    t6 = 'tiger'
-
-    syn_t1  = wn.synsets(t1)
-    syn_t2  = wn.synsets(t2)
-    syn_t3  = wn.synsets(t3)
-    syn_t4  = wn.synsets(t4)
-    syn_t5  = wn.synsets(t5)
-    syn_t6  = wn.synsets(t6)
-
-    print('# Synonyms')
-    print(w1, w1, is_synonym(syn_w1,syn_w1))
-    print(w1, w2, is_synonym(syn_w1,syn_w2))
-    print(w2, w1, is_synonym(syn_w2,syn_w1))
-    print(w1, cohypo2, is_synonym(syn_w1,syn_cohypo2))
-    print(w1, hyp2, is_synonym(syn_w1,syn_hyp2))
-    print(a1, a2, is_synonym(syn_a1, syn_a2))
-    print(a2, a1, is_synonym(syn_a2, syn_a1))
-    print(a3, a2, is_synonym(syn_a3, syn_a2))
-    print(a1, a4, is_synonym(syn_a1, syn_a4))
-
-    print('# Antonyms')
-    print(a1, a2, is_antonym(syn_a1, syn_a2))
-    print(a2, a1, is_antonym(syn_a2, syn_a1))
-    print(a3, a2, is_antonym(syn_a3, syn_a2))
-    print(a1, a4, is_antonym(syn_a1, syn_a4))
-    print(a3, a4, is_antonym(syn_a3, syn_a4))
-
-    print('# Hypernyms')
-    print(w1, w2, is_hypernym(syn_w1, syn_w2))
-    print(w1, hyp2, is_hypernym(syn_w1, syn_hyp2))
-    print(w2, hyp2, is_hypernym(syn_w2, syn_hyp2))
-    print(hyp2, w1, is_hypernym(syn_hyp2, syn_w1))
-    print(hyp2, w2, is_hypernym(syn_hyp2, syn_w2))
-
-    print('# Hyponyms')
-    print(w1, w2, is_hyponym(syn_w1, syn_w2))
-    print(w1, hyp2, is_hyponym(syn_w1, syn_hyp2))
-    print(w2, hyp2, is_hyponym(syn_w2, syn_hyp2))
-    print(hyp2, w1, is_hyponym(syn_hyp2, syn_w1))
-    print(hyp2, w2, is_hyponym(syn_hyp2, syn_w2))
-
-    print('# Cohyponyms')
-    print(w1, w2, is_cohyponym(syn_w1, syn_w2))
-    print(w1, hyp2, is_cohyponym(syn_w1, syn_hyp2))
-    print(w2, hyp2, is_cohyponym(syn_w2, syn_hyp2))
-    print(hyp2, w1, is_cohyponym(syn_hyp2, syn_w1))
-    print(hyp2, w2, is_cohyponym(syn_hyp2, syn_w2))
-
-    print(t1, t2, is_cohyponym(syn_t1, syn_t2))
-    print(t1, t2, is_cohyponym(syn_t1, syn_t2))
-    print(t3, t4, is_cohyponym(syn_t3, syn_t4))
-    print(t4, t3, is_cohyponym(syn_t4, syn_t3))
-    print(t5, t6, is_cohyponym(syn_t5, syn_t6))
-    print(t6, t5, is_cohyponym(syn_t6, syn_t5))
-
-    print(t1, t4, is_cohyponym(syn_t1, syn_t4))
-    print(t2, t6, is_cohyponym(syn_t6, syn_t6))
 
 
 def to_single_word(w):
@@ -257,7 +187,7 @@ def to_single_word(w):
         ('at night', 'night'),
         ('in a hallway', 'hallway'),
         ('can not', 'not'),
-        ('no one', 'no'),
+        ('no one', 'no_one'),
     ])
 
     return mapping[' '.join(w)]
@@ -390,9 +320,9 @@ def calc_wn_baseline(newtest):
         predictiondict_best[category][lbl][lbl_best] += 1
 
         if lbl != lbl_first:
-            misclassified_first[category][lbl].add((w1, w2))
+            misclassified_first[category][lbl_first].add((w1, w2))
         if lbl != lbl_best:
-            misclassified_best[category][lbl].add((w1, w2))
+            misclassified_best[category][lbl_best].add((w1, w2))
 
     print('')
 
