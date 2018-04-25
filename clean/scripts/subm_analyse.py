@@ -310,13 +310,27 @@ def predict(w1, w2, lbl):
 
     return (lbl_first, lbl_best)
 
+def percent_of_pred_lbl(pred_dict, lbl):
+
+    cnt_total = 0
+    cnt_lbl = 0
+
+    for gold in pred_dict:
+        for pred in pred_dict:
+            cnt_total += pred_dict[gold][pred]
+            if pred == lbl:
+                cnt_lbl += pred_dict[gold][pred]
+
+    return cnt_lbl / cnt_total
+
 def print_evaluation(pred_dict):
     categories = sorted([k for k in pred_dict.keys()])
 
     print('# By category:')
     all_predictions = collections.defaultdict(lambda: collections.defaultdict(int))
     for cat in categories:
-        print(cat, ':', ev.accuracy_prediction_dict(pred_dict[cat]))
+        wn_rel_percent = 1 - percent_of_pred_lbl(pred_dict[cat], 'other')
+        print(cat, ':', ev.accuracy_prediction_dict(pred_dict[cat]), 'percent with wn relations:', wn_rel_percent)
         for gold in pred_dict[cat]:
             for pred in pred_dict[cat][gold]:
                 all_predictions[gold][pred] += pred_dict[cat][gold][pred]
@@ -331,7 +345,7 @@ def print_evaluation(pred_dict):
     print('Contradiction: recall:', recall_c, 'prec:', prec_c)
 
 def print_misclassified(mis_dict):
-    categories = sorted([k for k in pred_dict.keys()])
+    categories = sorted([k for k in mis_dict.keys()])
     for cat in categories:
         print('#', cat)
         for lbl in mis_dict[cat]:
