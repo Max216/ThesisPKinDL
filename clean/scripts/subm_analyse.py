@@ -330,6 +330,12 @@ def print_evaluation(pred_dict):
     print('Neutral: recall:', recall_n, 'prec:', prec_n)
     print('Contradiction: recall:', recall_c, 'prec:', prec_c)
 
+def print_misclassified(mis_dict):
+    categories = sorted([k for k in pred_dict.keys()])
+    for cat in categories:
+        print('#', cat)
+        for lbl in mis_dict[cat]:
+            print(lbl, '-->', mis_dict[cat][lbl])
 
 def calc_wn_baseline(newtest):
     print('Read new test-set ...')
@@ -359,8 +365,8 @@ def calc_wn_baseline(newtest):
     predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     
-    misclassified_first = set()
-    misclassified_best = set()
+    misclassified_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: set())))
+    misclassified_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: set())))
     for cnt, (w1, w2, lbl, category) in enumerate(test):
         if cnt % 10 == 0:
             print('samples done:' + str(cnt), end='\r')
@@ -370,9 +376,9 @@ def calc_wn_baseline(newtest):
         predictiondict_best[category][lbl][lbl_best] += 1
 
         if lbl != lbl_first:
-            misclassified_first.add((w1, w2))
+            misclassified_first[category][lbl].add((w1, w2))
         if lbl != lbl_best:
-            misclassified_best.add((w1, w2))
+            misclassified_best[category][lbl].add((w1, w2))
 
     print('')
 
@@ -381,9 +387,13 @@ def calc_wn_baseline(newtest):
     print_evaluation(predictiondict_first)
     print('results for heuristic: best synset:')
     print_evaluation(predictiondict_best)
-
-    print('## misclassified first', misclassified_first)
-    print('## misclassified_best', misclassified_best)
+    print()
+    print()
+    print('## misclassified first')
+    print_misclassified(misclassified_first)
+    print()
+    print('## misclassified_best')
+    print_misclassified(misclassified_best)
 
 
 
