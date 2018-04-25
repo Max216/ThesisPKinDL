@@ -260,7 +260,7 @@ def to_single_word(w):
         ('no one', 'no'),
     ])
 
-    return mapping[w]
+    return mapping[' '.join(w)]
 
 def predict(w1, w2, lbl):
     synsets1 = wn.synsets(w1)
