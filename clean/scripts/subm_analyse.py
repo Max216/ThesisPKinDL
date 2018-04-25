@@ -358,6 +358,9 @@ def calc_wn_baseline(newtest):
     # by category, label_gold, label_predicted, amount
     predictiondict_first = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     predictiondict_best = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
+    
+    misclassified_first = set()
+    misclassified_best = set()
     for cnt, (w1, w2, lbl, category) in enumerate(test):
         if cnt % 10 == 0:
             print('samples done:' + str(cnt), end='\r')
@@ -366,6 +369,11 @@ def calc_wn_baseline(newtest):
         predictiondict_first[category][lbl][lbl_first] += 1
         predictiondict_best[category][lbl][lbl_best] += 1
 
+        if lbl != lbl_first:
+            misclassified_first.add((w1, w2))
+        if lbl != lbl_best:
+            misclassified_best.add((w1, w2))
+
     print('')
 
     print('Done.')
@@ -373,6 +381,9 @@ def calc_wn_baseline(newtest):
     print_evaluation(predictiondict_first)
     print('results for heuristic: best synset:')
     print_evaluation(predictiondict_best)
+
+    print('## misclassified first', misclassified_first)
+    print('## misclassified_best', misclassified_best)
 
 
 
