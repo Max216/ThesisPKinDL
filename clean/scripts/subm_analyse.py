@@ -139,8 +139,8 @@ def is_cohyponym(synsets1, synsets2, max_dist=2):
 
 
 def test():
-    w1 = 'small'
-    w2 = 'huge'
+    w1 = 'pretty'
+    w2 = 'beautiful'
 
 
     syn_w1  = wn.synsets(w1)
@@ -251,6 +251,7 @@ def percent_of_pred_lbl(pred_dict, lbl):
             if pred == lbl:
                 cnt_lbl += pred_dict[gold][pred]
 
+    print('total cnt', lbl, cnt_lbl)
     return cnt_lbl / cnt_total
 
 def print_evaluation(pred_dict):
