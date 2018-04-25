@@ -248,6 +248,7 @@ def percent_of_pred_lbl(pred_dict, lbl):
     for gold in pred_dict:
         for pred in pred_dict:
             cnt_total += pred_dict[gold][pred]
+            print('gold:', gold, 'pred', pred, pred_dict[gold][pred])
             if pred == lbl:
                 cnt_lbl += pred_dict[gold][pred]
 
