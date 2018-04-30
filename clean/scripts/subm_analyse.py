@@ -147,18 +147,19 @@ def is_cohyponym(synsets1, synsets2, max_dist=2):
 
 
 def test():
-    w1 = 'little'
-    w2 = 'wide'
+    w1 = 'power_drill'
+    w2 = 'tool'
 
 
-    syn_w1  = wn.synsets(w1)
-    syn_w2  = wn.synsets(w2)
+    s1 = wn.synsets(w1)[0]
+    s2 = wn.synsets(w2)[0]
 
-    print('syn', is_synonym(syn_w1, syn_w2))
-    print('anto', is_antonym(syn_w1, syn_w2))
-    print('hypo', is_hyponym(syn_w1, syn_w2))
-    print('hyper', is_hypernym(syn_w1, syn_w2))
-    print('cohypo', is_cohyponym(syn_w1, syn_w2))
+    print(s1.name(), s1.definition())
+    print(s2.name(), s2.definition())
+
+    common = s1.lowest_common_hypernyms(s2)[0]
+    print('lowest:', common.name(), common.definition())
+    print('dist:', s1.shortest_path_distance(s2))
 
 
 

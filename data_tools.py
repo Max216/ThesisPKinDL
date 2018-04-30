@@ -235,6 +235,7 @@ def main():
         data_tools.py req_embeddings <embeddings> <data_train> <data_dev> <data_test> <name_out>
         data_tools.py unique_sents <model_path> <data> <amount> <name_out>
         data_tools.py pos_unique_sents <path>
+        data_tools.py pos_tag <sent>
 
         <embeddings>         Path to all embeddings.
         <data_train>         Path to train set.
@@ -249,6 +250,12 @@ def main():
         unique_sents(args['<model_path>'], args['<data>'], int(args['<amount>']), args['<name_out>'])
     elif args['pos_unique_sents']:
         pos_unique_sents(args['<path>'])
+    elif args['pos_tag']:
+        s = args['<sent>'].strip().split(' ')
+        print(s)
+        tokenized_sents = nlp.tokenizer.tokens_from_list(s)
+        nlp.tagger(s)
+        print([t.tag_ for t in s])
     
 
 if __name__ == '__main__':
