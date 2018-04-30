@@ -253,9 +253,9 @@ def main():
     elif args['pos_tag']:
         s = args['<sent>'].strip().split(' ')
         print(s)
-        tokenized_sents = nlp.tokenizer.tokens_from_list(s)
-        nlp.tagger(s)
-        print([t.tag_ for t in s])
+        tokenized_sent = nlp.tokenizer.tokens_from_list(s)
+        nlp.tagger(tokenized_sent)
+        print([t.tag_ for t in tokenized_sent])
     
 
 if __name__ == '__main__':
