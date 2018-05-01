@@ -213,6 +213,7 @@ def load_data(folder, data_type, dimensions):
 	all_data_raw = []
 	dt = np.dtype(float)
 	for file in file_names:
+		print('open', file)
 		with open(file) as f_in:
 			data = [(
 				np.take(np.asarray(d[2].strip().split(' '), dtype=dt), dimensions),
@@ -250,7 +251,9 @@ def main():
 		print('top')
 		dimensions = np.asarray(SD_DIMENSIONS[:int(args['<dimensions>'].strip())])
 
+	print('Load data  train')
 	data_train = load_data(folder, 'train', dimensions)
+	print('Load data  dev')
 	data_dev = load_data(folder, 'dev', dimensions)
 
 	name = args['--n']
