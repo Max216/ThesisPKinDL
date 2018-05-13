@@ -19,6 +19,8 @@ def main():
         subm_analyse.py word_dist <train_data> <newtest> <out>
         subm_analyse.py wn_baseline <newtest>
         subm_analyse.py test
+        subm_analyse.py merge <orig_data> <wp_data> <out_data>
+        subm_analyse.py find_relevant <wn_data> <dataset> <out>
 
     """)
 
@@ -28,8 +30,75 @@ def main():
         calc_wn_baseline(args['<newtest>'])
     elif args['test']:
         test()
+    elif args['merge']:
+        merge(args['<orig_data>'], args['<wp_data>'], args['<out_data>'])
+    elif args['find_relevant']:
+        find_relevant(args['<wn_data>'], args['<dataset>'] args['<out>'])
 
 NOT_IDX = 999999
+
+def find_relevant(data_path, dataset_path, out_path):
+    print('Load dataset')
+
+    with open(dataset_path) as f_in:
+        dataset = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    categories = collections.defaultdict(list)
+    for sample in dataset:
+        categories[sample['category']].append(sample)
+
+    print('Load data')
+    with open(data_path) as f_in:
+        data = [line.strip().split('\t') for line in f_in.readline()]
+
+    covered_pairs_in = set()
+    covered_pairs_out = set()
+    for w1, w2, lbl in data:
+        if lbl == 'entailment':
+            covered_pairs_in.add(w1 + '_' + w2)
+        elif lbl == 'contradiction':
+            covered_pairs_out.add(w1 + '_' + w2)
+        else:
+            1/0
+
+    print('Filter')
+    final_data = []
+    for cat in categories.keys():
+        print('Category:', cat)
+        initial_amount = len(categories[cat])
+        category_samples = []
+        for sample in categories[cat]:
+            key = sample['replaced1'] + '_' + sample['replaced2']
+            if sample['gold_label'] == 'contradiction':
+                if key in covered_pairs_out:
+                    category_samples.append(sample)
+            elif sample['gold_label'] == 'entailment':
+                if key in covered_pairs_in:
+                    category_samples.append(sample)
+
+        print('Captured:', len(category_samples),'/', initial_amount)
+        final_data.extend(category_samples)
+
+
+    print('Write out')
+    with open(out_path, 'w') as f_out:
+        for s in final_data:
+            f_out.write(json.dumps(s) + '\n')
+
+
+def merge(path_orig, path_wp, path_out):
+    with open(path_orig) as f_in:
+        data = [json.loads(line.strip()) for line in f_in.readlines()]
+    with open(path_wp) as f_in:
+        word_pair_data = [json.loads(line.strip()) for line in f_in.readlines()]
+        word_pairs = dict()
+        for sample in word_pair_data:
+            word_pairs[sample['pairID']] = [sample['replaced1'], sample['replaced2']]
+
+    with open(path_out, 'w') as f_out:
+        for sample in data:
+            sample['replaced'] = word_pairs[sample['pairID']]
+            f_out.write(json.dumps(sample) + '\n')
 
 def is_synonym(synsets1, synsets2):
     result = False
