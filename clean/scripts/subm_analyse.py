@@ -82,6 +82,8 @@ def find_relevant(data_path, dataset_path, out_path):
                     category_samples.append(sample)
                 else:
                     final_data_out.append(sample)
+            else:
+                final_data_out.append(sample)
             
 
         print('Captured:', len(category_samples),'/', initial_amount)
