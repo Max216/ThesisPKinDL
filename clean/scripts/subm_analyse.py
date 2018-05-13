@@ -75,11 +75,14 @@ def find_relevant(data_path, dataset_path, out_path):
             if sample['gold_label'] == 'contradiction':
                 if key in covered_pairs_out:
                     category_samples.append(sample)
+                else:
+                    final_data_out.append(sample)
             elif sample['gold_label'] == 'entailment':
                 if key in covered_pairs_in:
                     category_samples.append(sample)
-            else:
-                final_data_out.append(sample)
+                else:
+                    final_data_out.append(sample)
+            
 
         print('Captured:', len(category_samples),'/', initial_amount)
         final_data.extend(category_samples)
