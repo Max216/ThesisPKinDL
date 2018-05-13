@@ -50,6 +50,8 @@ def find_relevant(data_path, dataset_path, out_path):
     print('Load data')
     with open(data_path) as f_in:
         data = [line.strip().split('\t') for line in f_in.readline()]
+        data = [d for d in data if len(d) == 3]
+    print('Found:', len(data))
 
     covered_pairs_in = set()
     covered_pairs_out = set()
