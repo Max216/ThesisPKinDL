@@ -33,7 +33,7 @@ def main():
     elif args['merge']:
         merge(args['<orig_data>'], args['<wp_data>'], args['<out_data>'])
     elif args['find_relevant']:
-        find_relevant(args['<wn_data>'], args['<dataset>'] args['<out>'])
+        find_relevant(args['<wn_data>'], args['<dataset>'], args['<out>'])
 
 NOT_IDX = 999999
 
