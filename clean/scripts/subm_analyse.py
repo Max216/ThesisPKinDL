@@ -38,6 +38,28 @@ def main():
 NOT_IDX = 999999
 
 def find_relevant(data_path, dataset_path, out_path):
+
+    mapping = dict([
+        ('in a garage', 'garage'),
+        ('close to', 'close'),
+        ('far away from', 'far'),
+        ('in a kitchen', 'kitchen'),
+        ('in a room', 'room'),
+        ('in a bathroom', 'bathroom'),
+        ('plenty of', 'plenty'),
+        ('during the day', 'day'),
+        ('in a building', 'building'),
+        ('far from', 'far'),
+        ('at night', 'night'),
+        ('in a hallway', 'hallway')
+    ])
+
+    def map(w):
+        if w in mapping:
+            return mapping[w]
+        else:
+            return w
+
     print('Load dataset')
 
     with open(dataset_path) as f_in:
@@ -71,7 +93,7 @@ def find_relevant(data_path, dataset_path, out_path):
         initial_amount = len(categories[cat])
         category_samples = []
         for sample in categories[cat]:
-            key = sample['replaced1'] + '_' + sample['replaced2']
+            key = map(sample['replaced1']) + '_' + map(sample['replaced2'])
             if sample['gold_label'] == 'contradiction':
                 if key in covered_pairs_out:
                     category_samples.append(sample)
