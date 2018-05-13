@@ -65,6 +65,7 @@ def find_relevant(data_path, dataset_path, out_path):
 
     print('Filter')
     final_data = []
+    final_data_out = []
     for cat in categories.keys():
         print('Category:', cat)
         initial_amount = len(categories[cat])
@@ -77,14 +78,21 @@ def find_relevant(data_path, dataset_path, out_path):
             elif sample['gold_label'] == 'entailment':
                 if key in covered_pairs_in:
                     category_samples.append(sample)
+            else:
+                final_data_out.append(sample)
 
         print('Captured:', len(category_samples),'/', initial_amount)
         final_data.extend(category_samples)
 
 
-    print('Write out')
-    with open(out_path, 'w') as f_out:
+    print('Write out IN')
+    with open(out_path + '.in', 'w') as f_out:
         for s in final_data:
+            f_out.write(json.dumps(s) + '\n')
+
+    print('Write out OUT')
+    with open(out_path + '.out', 'w') as f_out:
+        for s in final_data_out:
             f_out.write(json.dumps(s) + '\n')
 
 
