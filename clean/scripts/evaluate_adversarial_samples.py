@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 sys.path.append('./../')
 
 from docopt import docopt
@@ -54,10 +54,33 @@ def main():
 
 
     elif args['eo']:
+        print('Read raw data')
+        with open(dataset_path) as f_in:
+            raw_data = [json.loads(line.strip()) for line in f_in.readlines()]
+
         outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
         #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
     
-        print(outcomes[:2], ';', golds[:2])
+        appendix = dataset_path.split('.')[-1]
+        outpath = os.path.join(args['<out_folder>'], classifier_name + '.' + appendix)
+
+        with open(outpath, 'w') as f_out:
+            for i in range(len(outcomes)):
+                gold = golds[i]
+                pred = outcomes[i]
+                data_gold = raw_data[i]['gold_label']
+                sample = raw_data[i]
+
+                # verify
+                if data_gold != gold:
+                    print('nope')
+                    1/0
+
+                sample['predicted_label'] = pred
+                f_out.write(json.puts(sample) + '\n')
+
+        
+
         
     else:
         total_correct = 0
