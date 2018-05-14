@@ -86,8 +86,6 @@ class SentEncoderDataset(Dataset):
             len_h
         ) for (p, h, lbl, len_p, len_h) in samples]
 
-        print('converted')
-        print(self.converted_samples)
 
     def __len__(self):
         return len(self.converted_samples)
@@ -159,6 +157,7 @@ class Datahandler:
                 print('Unknown data format:', data_format)
                 1/0
 
+        print('loaded', self.samples)
         
         if include_start_end_token:
             print('Including start/stop symbols')
@@ -198,6 +197,7 @@ class Datahandler:
             print('non sorting')
             #print(samples)
 
+        print('Done', self.samples)
     def get_sentences(self):
         used_keys = set()
         unique_sents = []
