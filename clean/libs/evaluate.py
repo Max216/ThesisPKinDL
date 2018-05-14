@@ -175,7 +175,8 @@ def predict_outcomes2(classifier, dataset, batch_size, padding_token, twister=No
 
     predictions = []
     golds = []
-    for premise_batch, hyp_batch, lbl_batch in data_loader:
+    for idx in range(len(data_loader)):
+        premise_batch, hyp_batch, lbl_batch = data_loader[idx]
         prediction = classifier(
             autograd.Variable(m.cuda_wrap(premise_batch)),
             autograd.Variable(m.cuda_wrap(hyp_batch))#,
