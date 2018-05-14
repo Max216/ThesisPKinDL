@@ -20,6 +20,8 @@ class CollateBatch(object):
         
     def __call__(self, batch):
 
+        print('called', batch)
+
         premise, hypothesis, label, len_p, len_h = [list(a) for a in zip(*batch)]
 
         max_len_premise = int(np.max(len_p))
