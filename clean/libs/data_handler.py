@@ -187,7 +187,10 @@ class Datahandler:
 
         # sort by premise length
         if sort:
+            print('sorting')
             self.samples = sorted(self.samples, key=lambda x: x[3])
+        else:
+            print('non sorting')
 
     def get_sentences(self):
         used_keys = set()
