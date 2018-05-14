@@ -84,6 +84,9 @@ class SentEncoderDataset(Dataset):
             len_h
         ) for (p, h, lbl, len_p, len_h) in samples]
 
+        print('converted')
+        print(self.converted_samples)
+
     def __len__(self):
         return len(self.converted_samples)
 
@@ -191,7 +194,7 @@ class Datahandler:
             self.samples = sorted(self.samples, key=lambda x: x[3])
         else:
             print('non sorting')
-            print(samples)
+            #print(samples)
 
     def get_sentences(self):
         used_keys = set()
