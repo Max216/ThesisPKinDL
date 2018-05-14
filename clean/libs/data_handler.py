@@ -191,6 +191,7 @@ class Datahandler:
             self.samples = sorted(self.samples, key=lambda x: x[3])
         else:
             print('non sorting')
+            print(samples)
 
     def get_sentences(self):
         used_keys = set()
