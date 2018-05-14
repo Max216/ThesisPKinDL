@@ -178,7 +178,7 @@ def predict_outcomes2(classifier, dataset, batch_size, padding_token, twister=No
     collator = collatebatch.CollateBatchIncludingSents(padding_token)
     for idx in range(len(dataset)):
 
-        premise_batch, hyp_batch, lbl_batch = collator(dataset[idx])
+        premise_batch, hyp_batch, lbl_batch = collator([dataset[idx]])
         prediction = classifier(
             autograd.Variable(m.cuda_wrap(premise_batch)),
             autograd.Variable(m.cuda_wrap(hyp_batch))#,
