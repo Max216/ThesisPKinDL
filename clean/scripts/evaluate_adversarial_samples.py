@@ -12,6 +12,7 @@ def main():
     Usage:
         evaluate_adversarial_samples.py evaluate <model_path> <dataset_path> [--embd1=<embd1>] [--embd2=<embd2>]
         evaluate_adversarial_samples.py experiment1 <model_path> <dataset_path> <output_path>
+        evaluate_adversarial_samples.py eo <model_path> <dataset_path> <out_folder> [--embd1=<embd1>] [--embd2=<embd2>]
     """)
 
     model_path = args['<model_path>']
@@ -43,6 +44,13 @@ def main():
     dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
         
+        
+        outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
+        #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
+    
+        print(outcomes[:2], ';', golds[:2])
+
+    elif args['eo']:
         categories = dataholder.get_categories()
         for category in categories:
             dataset = dataholder.get_dataset_for_category(embedding_holder, category)
