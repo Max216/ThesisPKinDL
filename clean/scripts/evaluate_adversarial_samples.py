@@ -77,7 +77,7 @@ def main():
 
                 # verify
                 if data_gold != gold:
-                    print('nope:', data_gold, 'vs', gold)
+                    print('nope:', data_gold, 'vs', gold, sample)
                     1/0
 
                 sample['predicted_label'] = pred
