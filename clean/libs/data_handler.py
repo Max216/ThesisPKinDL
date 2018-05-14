@@ -76,7 +76,6 @@ class SentEncoderDataset(Dataset):
         :param tag_to_idx         dictionary mapping the string label to a number
         '''
 
-        print('lbls', [s[2] for s in samples])
         
         self.converted_samples = [(
             torch.LongTensor([embedding_holder.word_index(w) for w in p]),

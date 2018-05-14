@@ -68,9 +68,6 @@ def main():
         if not os.path.exists(args['<out_folder>']):
             os.makedirs(args['<out_folder>'])
 
-        print('pred',len(outcomes), outcomes)
-        print('golds',len(golds), golds)
-        print(len(raw_data), [s['gold_label'] for s in raw_data])
         with open(outpath, 'w') as f_out:
             for i in range(len(outcomes)):
                 gold = golds[i]
