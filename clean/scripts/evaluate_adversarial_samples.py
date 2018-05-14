@@ -68,6 +68,7 @@ def main():
         if not os.path.exists(args['<out_folder>']):
             os.makedirs(args['<out_folder>'])
 
+        print(outcomes)
         with open(outpath, 'w') as f_out:
             for i in range(len(outcomes)):
                 gold = golds[i]
