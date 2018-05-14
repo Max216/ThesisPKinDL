@@ -148,7 +148,7 @@ def print_calc_acc(samples):
             if sample['gold_label'] == sample['predicted_label']:
                 c_correct += 1
 
-            print('Accuracy', k, ':', c_correct / c_total)
+        print('Accuracy', k, ':', c_correct / c_total)
         correct += c_correct
 
     print('Total:', correct / total)
