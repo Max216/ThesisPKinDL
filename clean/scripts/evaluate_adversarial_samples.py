@@ -41,7 +41,7 @@ def main():
 
     
 
-    #dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
+    dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
         categories = dataholder.get_categories()
         for category in categories:
@@ -59,7 +59,7 @@ def main():
             raw_data = [json.loads(line.strip()) for line in f_in.readlines()]
 
         dataset = data_handler.get_datahandler_dev(path=dataset_path, sort=False).get_dataset(embedding_holder)
-        outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
+        outcomes, golds = evaluate.predict_outcomes2(classifier, dataset, 1, embedding_holder.padding())
         #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
     
         appendix = dataset_path.split('.')[-1]
