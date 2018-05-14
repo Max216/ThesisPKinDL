@@ -6,6 +6,8 @@ from docopt import docopt
 from libs import model_tools, compatability, evaluate, data_handler, embeddingholder
 from exportable import adv_dataset
 
+import collections
+
 def main():
     args = docopt("""Evaluate a model on an adversarial dataset.
 
@@ -68,6 +70,7 @@ def main():
         if not os.path.exists(args['<out_folder>']):
             os.makedirs(args['<out_folder>'])
 
+        adapted_samples = []
         with open(outpath, 'w') as f_out:
             for i in range(len(outcomes)):
                 gold = golds[i]
@@ -81,9 +84,12 @@ def main():
                     1/0
 
                 sample['predicted_label'] = pred
+                adapted_samples.append(sample)
                 f_out.write(json.dumps(sample) + '\n')
 
-        
+
+
+        print_calc_acc(adapted_samples)
 
         
     else:
@@ -123,6 +129,31 @@ def main():
 
     #adv_dataset.evaluate(prediction_fn, dataset_path, output_path,print_samples=5)
 
+
+def print_calc_acc(samples):
+
+    categories = collections.defaultdict(list)
+    for s in samples:
+        categories[s['category']].append(s)
+
+    correct = 0
+    total = len(samples)
+
+    all_cats = sorted([k for k in categories.keys()])
+    for k in all_cats:
+        c_correct = 0
+        c_total = len(categories[k])
+        for i in range(c_total):
+            sample = categories[k][i]
+            if sample['gold_label'] == sample['predicted_label']:
+                c_correct += 1
+
+            print('Accuracy', k, ':', c_correct / c_total)
+        correct += c_correct
+
+    print('Total:', correct / total)
+
+            
 
 if __name__ == '__main__':
     main()
