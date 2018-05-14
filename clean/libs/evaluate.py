@@ -185,6 +185,7 @@ def predict_outcomes2(classifier, dataset, batch_size, padding_token, twister=No
         # count corrects
         _, predicted_idx = torch.max(prediction, dim=1)
         predictions.extend([idx_to_lbl[i] for i in predicted_idx])
+        print(lbl_batch)
         golds.extend([idx_to_lbl[i] for i in lbl_batch])
     
     return predictions, golds
