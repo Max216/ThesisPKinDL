@@ -58,6 +58,7 @@ def main():
         with open(dataset_path) as f_in:
             raw_data = [json.loads(line.strip()) for line in f_in.readlines()]
 
+        dataset = data_handler.get_datahandler_dev(path=dataset_path).get_dataset(embedding_holder)
         outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
         #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
     
