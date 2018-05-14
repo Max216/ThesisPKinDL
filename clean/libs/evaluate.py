@@ -171,12 +171,14 @@ def predict_outcomes(classifier, dataset, batch_size, padding_token, twister=Non
 
 def predict_outcomes2(classifier, dataset, batch_size, padding_token, twister=None, idx_to_lbl=data_tools.DEFAULT_VALID_LABELS):
     classifier.eval()
-    data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size,shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
+    #data_loader = DataLoader(dataset, drop_last=False, batch_size=batch_size,shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
 
     predictions = []
     golds = []
-    for idx in range(len(data_loader)):
-        premise_batch, hyp_batch, lbl_batch = data_loader[idx]
+    collator = collatebatch.CollateBatchIncludingSents(padding_token)
+    for idx in range(len(dataset)):
+
+        premise_batch, hyp_batch, lbl_batch = collator(dataset[idx])
         prediction = classifier(
             autograd.Variable(m.cuda_wrap(premise_batch)),
             autograd.Variable(m.cuda_wrap(hyp_batch))#,
