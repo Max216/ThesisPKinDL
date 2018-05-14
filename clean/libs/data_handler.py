@@ -354,6 +354,7 @@ def get_datahandler_train(path=None, lower=None):
 def get_datahandler_dev(path=None, lower=None, sort=True):
     if path == None:
         path = config.PATH_DEV_DATA
+    print('sort', sort)
     return Datahandler(path, lower=lower, sort=sort)
 
 def get_dataset(samples, embedding_holder, tag_to_idx):
