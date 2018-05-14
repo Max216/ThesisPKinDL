@@ -175,7 +175,7 @@ def predict_outcomes2(classifier, dataset, batch_size, padding_token, twister=No
 
     predictions = []
     golds = []
-    collator = collatebatch.CollateBatchIncludingSents(padding_token)
+    collator = collatebatch.CollateBatch(padding_token)
     for idx in range(len(dataset)):
 
         premise_batch, hyp_batch, lbl_batch = collator([dataset[idx]])
