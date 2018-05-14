@@ -41,7 +41,7 @@ def main():
 
     
 
-    dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
+    #dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
         categories = dataholder.get_categories()
         for category in categories:
