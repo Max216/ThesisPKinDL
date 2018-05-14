@@ -29,7 +29,6 @@ class CollateBatch(object):
         h = torch.cat([self.pad(m.cuda_wrap(h_sent), max_len_hypothesis).view(-1,1) for h_sent in hypothesis], dim=1)
         l = m.cuda_wrap(torch.LongTensor(label))
 
-        print('return', l)
         return p,h,l
 
 class CollateBatchIncludingSents(object):

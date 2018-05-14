@@ -126,7 +126,7 @@ class Datahandler:
     Loads data.
     '''
 
-    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS, include_start_end_token=True, lower=None):
+    def __init__(self, path, data_format=data_tools.DEFAULT_DATA_FORMAT, valid_labels=data_tools.DEFAULT_VALID_LABELS, include_start_end_token=True, lower=None, sort=True):
         '''
         Create a Datahandler for the data at the given path
 
@@ -186,7 +186,8 @@ class Datahandler:
 
 
         # sort by premise length
-        self.samples = sorted(self.samples, key=lambda x: x[3])
+        if sort:
+            self.samples = sorted(self.samples, key=lambda x: x[3])
 
     def get_sentences(self):
         used_keys = set()
@@ -341,10 +342,10 @@ def get_datahandler_train(path=None, lower=None):
     print('use the following training data:', path)
     return Datahandler(path, lower=lower)
 
-def get_datahandler_dev(path=None, lower=None):
+def get_datahandler_dev(path=None, lower=None, sort=True):
     if path == None:
         path = config.PATH_DEV_DATA
-    return Datahandler(path, lower=lower)
+    return Datahandler(path, lower=lower, sort=sort)
 
 def get_dataset(samples, embedding_holder, tag_to_idx):
     return SentEncoderDataset(self.samples, embedding_holder, self.tag_to_idx, lower)
