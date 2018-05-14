@@ -80,7 +80,7 @@ def main():
                     1/0
 
                 sample['predicted_label'] = pred
-                f_out.write(json.puts(sample) + '\n')
+                f_out.write(json.dumps(sample) + '\n')
 
         
 
