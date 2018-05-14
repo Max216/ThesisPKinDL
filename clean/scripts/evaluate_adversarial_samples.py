@@ -43,14 +43,6 @@ def main():
 
     dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
     if args['evaluate']:
-        
-        
-        outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
-        #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
-    
-        print(outcomes[:2], ';', golds[:2])
-
-    elif args['eo']:
         categories = dataholder.get_categories()
         for category in categories:
             dataset = dataholder.get_dataset_for_category(embedding_holder, category)
@@ -58,6 +50,15 @@ def main():
             print('Accuracy on', category, '->', accuracy)
 
         print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
+        
+
+
+    elif args['eo']:
+        outcomes, golds = evaluate.predict_outcomes2(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding())
+        #print('Accuracy over all data ->', evaluate.eval(classifier, dataholder.get_dataset(embedding_holder), 1, embedding_holder.padding()))
+    
+        print(outcomes[:2], ';', golds[:2])
+        
     else:
         total_correct = 0
         total_amount = 0
