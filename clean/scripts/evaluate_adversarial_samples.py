@@ -64,8 +64,8 @@ def main():
         appendix = dataset_path.split('.')[-1]
         outpath = os.path.join(args['<out_folder>'], classifier_name + '.' + appendix)
 
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(args['<out_folder>']):
+            os.makedirs(args['<out_folder>'])
 
         with open(outpath, 'w') as f_out:
             for i in range(len(outcomes)):
