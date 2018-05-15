@@ -46,6 +46,7 @@ class EmbeddingHolder:
             wv = np.vstack((wv, unk, padding))
 
         if include_start_end:
+            print('add start end for', path)
             words[START_SENT] = next_idx
             next_idx += 1
             words[END_SENT] = next_idx
