@@ -24,7 +24,10 @@ def main():
     embd1 = args['--embd1']
     embd2 = args['--embd2']
 
-    embedding_holder = embeddingholder.create_embeddingholder()
+    if embd1 != None:
+        embedding_holder = embeddingholder.create_embeddingholder(start_stop=False)
+    else:
+        embedding_holder = embeddingholder.create_embeddingholder()
     if embd1 != None:
         embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1, include_start_end=False))
     if embd2 != None:

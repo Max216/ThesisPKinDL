@@ -151,10 +151,10 @@ class EmbeddingHolder:
 
         return wv
 
-def create_embeddingholder(path=None, lower=None):
+def create_embeddingholder(path=None, lower=None, start_stop=True):
     if path == None and lower == 'lower':
         path = config.PATH_WORD_EMBEDDINGS_LOWER
     elif path == None:
         path = config.PATH_WORD_EMBEDDINGS
 
-    return EmbeddingHolder(path)
+    return EmbeddingHolder(path, include_start_end=start_stop)
