@@ -26,9 +26,9 @@ def main():
 
     embedding_holder = embeddingholder.create_embeddingholder()
     if embd1 != None:
-        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1, include_start_end=False))
     if embd2 != None:
-        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
+        embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2, include_start_end=False))
 
     # load model
     if model_path.split('.')[-1] == 'model':
