@@ -37,16 +37,20 @@ def main():
 
 
     if args['eval']:
-        embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
+
+        if embd1 != None:
+            embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS, include_start_end=False)
+        else:
+            embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
         embeddings_diff = []
         if embeddings_path != None:
             print ('Merge embeddings')
-            embedding_holder_new = embeddingholder.EmbeddingHolder(new_embeddings)
+            embedding_holder_new = embeddingholder.EmbeddingHolder(new_embeddings, include_start_end=False)
             embeddings_diff = embedding_holder.add_unknowns_from(embedding_holder_new)
         if embd1:
-            embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1))
+            embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1, include_start_end=False))
         if embd2:
-            embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2))
+            embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2, include_start_end=False))
         evaluate(model_path, data_path, embedding_holder, embeddings_diff=embeddings_diff)
 
     elif args['misclassified_adv']:
