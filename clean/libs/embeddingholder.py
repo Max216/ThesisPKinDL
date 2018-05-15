@@ -28,7 +28,7 @@ class EmbeddingHolder:
         vocab_file = open(path + '.vocab', 'r')
         vocab = [w.rstrip('\n') for w in vocab_file]
         words = dict([(vocab[i], i) for i in range(len(vocab))])
-        
+        print('loaded embd', wv.shape)
         amount = wv.shape[0]
         self.dimen = wv.shape[1]
         
