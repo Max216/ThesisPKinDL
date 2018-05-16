@@ -45,8 +45,10 @@ def main():
         classifier_name, classifier, embedding_holder = model_tools.load(model_path, embedding_holder)
 
     
-
-    dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial')
+    if embd1 != None
+        dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial', include_start_end_token=True)
+    else:
+        dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial', include_start_end_token=True)
     if args['evaluate']:
         categories = dataholder.get_categories()
         for category in categories:
