@@ -37,9 +37,10 @@ def main():
 
 
     if args['eval']:
-
+        start_stop = True
         if embd1 != None:
             embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS, include_start_end=False)
+            start_stop = False
         else:
             embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
         embeddings_diff = []
@@ -51,7 +52,7 @@ def main():
             embedding_holder.concat(embeddingholder.EmbeddingHolder(embd1, include_start_end=False))
         if embd2:
             embedding_holder.concat(embeddingholder.EmbeddingHolder(embd2, include_start_end=False))
-        evaluate(model_path, data_path, embedding_holder, embeddings_diff=embeddings_diff)
+        evaluate(model_path, data_path, embedding_holder, embeddings_diff=embeddings_diff, start_stop=start_stop)
 
     elif args['misclassified_adv']:
         embedding_holder = embeddingholder.EmbeddingHolder(config.PATH_WORD_EMBEDDINGS)
@@ -124,7 +125,7 @@ def main():
 
 
 
-def evaluate(model_path, data_path, embedding_holder, twister=None, embeddings_diff=False):
+def evaluate(model_path, data_path, embedding_holder, twister=None, embeddings_diff=False, start_stop=True):
     # Load model
 
 
@@ -137,7 +138,7 @@ def evaluate(model_path, data_path, embedding_holder, twister=None, embeddings_d
         classifier.inc_embedding_layer(embeddings_diff)
 
     print('Load data ...')
-    data = data_handler.Datahandler(data_path).get_dataset(embedding_holder)
+    data = data_handler.Datahandler(data_path, include_start_end_token=start_stop).get_dataset(embedding_holder)
     print(len(data), 'samples loaded.')
     print('Evaluate ...')
     classifier.eval()
