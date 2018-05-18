@@ -2,6 +2,7 @@ import sys, os, json
 sys.path.append('./../')
 
 from libs import model_tools, compatability, evaluate, data_handler, embeddingholder, collatebatch, data_tools
+from docopt import docopt
 
 import torch
 
