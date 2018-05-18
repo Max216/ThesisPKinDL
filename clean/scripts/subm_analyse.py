@@ -9,7 +9,7 @@ import numpy as np
 import nltk
 
 from nltk.corpus import wordnet as wn
-from libs import evaluate as ev
+#from libs import evaluate as ev
 
 
 def main():
@@ -21,6 +21,7 @@ def main():
         subm_analyse.py test
         subm_analyse.py merge <orig_data> <wp_data> <out_data>
         subm_analyse.py find_relevant <wn_data> <dataset> <out>
+        subm_analyse.py eval_hypern <data_path> <base_path> <vocab_path>
 
     """)
 
@@ -34,8 +35,209 @@ def main():
         merge(args['<orig_data>'], args['<wp_data>'], args['<out_data>'])
     elif args['find_relevant']:
         find_relevant(args['<wn_data>'], args['<dataset>'], args['<out>'])
+    elif args['eval_hypern']:
+        eval_hypern(args['<data_path>'], args['<base_path>'], args['<vocab_path>'])
 
 NOT_IDX = 999999
+
+mapping = dict([
+        ('in a garage', 'garage'),
+        ('close to', 'close'),
+        ('far away from', 'far'),
+        ('in a kitchen', 'kitchen'),
+        ('in a room', 'room'),
+        ('in a bathroom', 'bathroom'),
+        ('plenty of', 'plenty'),
+        ('during the day', 'day'),
+        ('in a building', 'building'),
+        ('far from', 'far'),
+        ('at night', 'night'),
+        ('in a hallway', 'hallway')
+    ])
+
+
+def _map(w):
+    if w in mapping:
+        return mapping[w]
+    return w
+
+def get_hyper_lemmas(w, amount=5):
+    synsets = wn.synsets(w)
+
+    count = 0
+    done = False
+    lemma_list = []
+    while count < amount and not done:
+        if len(synsets) == 0:
+            done = True
+        else:
+            syns = synsets[0]
+            hypernyms = syns.hypernyms() + syns.instance_hypernyms()
+            if len(hypernyms) == 0:
+                done = True
+            else:
+                lemmas = [lemma.name() for lemma in hypernyms[0].lemmas() if len(lemma.name().split(' ')) == 1]
+                if len(lemmas) > 0:
+                    count +=1
+                    lemma_list.extend(lemmas)
+                synsets = hypernyms
+
+    return set(lemma_list)
+
+
+def eval_hypern(data_path, base_path, vocab_path):
+    print('Read vocab')
+    with open(vocab_path) as f_in:
+        vocab = set(line.strip() for line in f_in.readlines())
+
+    bins_total = [0,3,6,9]
+    bins_percentage = 0.1
+
+    print('Read data')
+    with open(data_path) as f_in:
+        data = [json.loads(line.strip()) for line in f_in.readlines()]
+
+    with open(base_path) as f_in:
+        data_base = [json.loads(line.strip()) for line in f_in.readlines()]
+    base_dict = dict()
+    for db in data_base:
+        if db['gold_label'] == db['predicted_label']:
+            base_dict[db['pairID']] = True
+        else:
+            base_dict[db['pairID']] = False
+
+    correct_correct = 0
+    correct_incorrect = 0
+    incorrect_correct = 0
+    incorrect_incorrect = 0
+
+    correct = collections.defaultdict(list)
+    incorrect = collections.defaultdict(list)
+
+    incorrect_correct_dict = collections.defaultdict(list)
+    correct_incorrect_dict = collections.defaultdict(list)
+
+    print('Sort data')
+    for d in data:
+        w1 = _map(d['replaced1'])
+        w2 = _map(d['replaced2'])
+
+        is_correct = d['gold_label'] == d['predicted_label']
+
+        if len(w1.split(' ')) > 1 or len(w2.split(' ')) > 1 or w1 not in vocab or w2 not in vocab:
+            pass
+        else:
+            sample = (w1, w2, d['category'])
+            if is_correct:
+                correct[d['gold_label']].append(sample)
+            else:
+                incorrect[d['gold_label']].append(sample)
+
+        if is_correct:
+            if base_dict[d['pairID']]:
+                correct_correct += 1
+                
+            else:
+                incorrect_correct += 1
+                incorrect_correct_dict[d['gold_label']].append(sample)
+        else:
+            if base_dict[d['pairID']]:
+                correct_incorrect += 1
+                correct_incorrect_dict[d['gold_label']].append(sample)
+            else:
+                incorrect_incorrect += 1
+
+    print('correct_correct', correct_correct)
+    print('correct_incorrect', correct_incorrect)
+    print('incorrect_correct', incorrect_correct)
+    print('incorrect_incorrect', incorrect_incorrect)
+
+    print('incorrect_correct', 'ent', len(incorrect_correct_dict['entailment']), 'cont', len(incorrect_correct_dict['contradiction']))
+    print('correct_incorrect', 'ent', len(correct_incorrect_dict['entailment']), 'cont', len(correct_incorrect_dict['contradiction']))
+
+    #incorrect_correct_anton = []
+    print('Calc')
+    for tag, sample_dict in [('correct', correct), ('incorrect', incorrect)]:
+        print('#', tag)
+        for lbl, samples in [('entailment', sample_dict['entailment']), 
+        ('contradiction', sample_dict['contradiction']), 
+        ('entail_incorrect_correct', incorrect_correct_dict['entailment']),
+        ('entail_correct_incorrect', correct_incorrect_dict['entailment']),
+        ('contr_incorrect_correct', incorrect_correct_dict['contradiction']),
+        ('contr_correct_incorrect', correct_incorrect_dict['contradiction'])]:
+            print('lbl', lbl)
+            results = collections.defaultdict(int)
+            results_percentage  = list()
+            results_percentage_cat = list()
+            for w1, w2, cat in samples:
+                set1 = get_hyper_lemmas(w1)
+                set2 = get_hyper_lemmas(w2)
+
+                len1 = len(list(set1))
+                len2 = len(list(set2))
+                len_total = len(list(set1 | set2))
+                if len1 + len2 == 0:
+                    shared = -1
+                else:
+                    shared = len(list(set1 & set2))
+                    results_percentage.append(shared/(len_total))
+                    results_percentage_cat.append(cat)
+                results[shared] += 1
+
+
+
+            #for k in results:
+            #    print('shared:', k, 'amount:', results[k], round(results[k] / len(samples), 2))
+            print('--bins')
+            binz = [0 for i in range(len(bins_total))]
+            for k in results:
+                added = False
+                for j in range(len(bins_total)):
+                    if k < bins_total[j]:
+                        binz[j-1] += results[k]
+                        added = True
+                        break
+
+                if not added:
+                    binz[-1] += results[k]
+
+            #for j in range(len(binz)):
+            #    print('bin:', bins_total[j],':', binz[j], round(binz[j]/ len(samples), 3))
+
+
+            print('mean:', np.mean(np.asarray(results_percentage)), 'std:',  np.std(np.asarray(results_percentage)), 'median:', np.median(np.asarray(results_percentage)))
+            
+            min_val = min(results_percentage)
+            max_val = max(results_percentage)
+            amount_bins = max_val // bins_percentage
+
+            start = 0.0
+            bins = []
+            while len(bins) < amount_bins:
+                bins.append(start)
+                start += bins_percentage
+
+            amount_per_bins = [0 for i in range(len(bins))]
+            cats_per_bins = [[] for i in range(len(bins))]
+
+
+            for cnt, v in enumerate(results_percentage):
+                added = False
+                for j in range(len(bins)):
+                    if v < bins[j]:
+                        amount_per_bins[j-1] += 1
+                        cats_per_bins[j-1].append(results_percentage_cat[cnt])
+                        added = True
+                        break
+                if not added:
+                    amount_per_bins[-1] += 1
+                    cats_per_bins[-1].append(results_percentage_cat[cnt])
+           
+            print('percentage bins')
+            for i in range(len(bins)):
+                print(bins[i], ':', amount_per_bins[i], round(amount_per_bins[i] / len(samples), 3), collections.Counter(cats_per_bins[i]).most_common())
+            print()
+
 
 def find_relevant(data_path, dataset_path, out_path):
 

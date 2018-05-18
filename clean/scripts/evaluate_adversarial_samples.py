@@ -46,7 +46,7 @@ def main():
 
     
     if embd1 != None:
-        dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial', include_start_end_token=True)
+        dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial', include_start_end_token=False)
     else:
         dataholder = data_handler.Datahandler(dataset_path, data_format='snli_adversarial', include_start_end_token=True)
     if args['evaluate']:
