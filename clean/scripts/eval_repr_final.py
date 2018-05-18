@@ -30,7 +30,7 @@ def store_repr(model_path, data_path, out_path):
 
     index_to_tag = data_tools.DEFAULT_VALID_LABELS
     with open(out_path, 'w') as f_out:
-        data_loader = DataLoader(dataholder, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(padding_token))
+        data_loader = DataLoader(dataholder, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
         for premise_batch, hyp_batch, lbl_batch in data_loader:
             prediction, _, representations = classifier(
                 autograd.Variable(premise_batch),
