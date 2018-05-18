@@ -40,7 +40,7 @@ def store_repr(model_path, data_path, out_path):
 
             _, predicted_idx = torch.max(prediction.data, dim=1)
             pred_label = index_to_tag[predicted_idx[0]]
-            gold_label = index_to_tag[lbl_batch.data[0]]
+            gold_label = index_to_tag[lbl_batch[0]]
 
             premise_repr = representations[0][0].data
             hyp_repr = representations[1][0].data
