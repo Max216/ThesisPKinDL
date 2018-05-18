@@ -29,8 +29,11 @@ def store_repr(model_path, data_path, out_path):
     print('Predict')
 
     index_to_tag = data_tools.DEFAULT_VALID_LABELS
+    dataset = dataholder.get_dataset(embedding_holder)
+    amount = len(dataset)
     with open(out_path, 'w') as f_out:
-        data_loader = DataLoader(dataholder.get_dataset(embedding_holder), drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
+        cnt=1
+        data_loader = DataLoader(dataset, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
         for premise_batch, hyp_batch, lbl_batch in data_loader:
             prediction, _, representations = classifier(
                 autograd.Variable(premise_batch),
@@ -42,13 +45,18 @@ def store_repr(model_path, data_path, out_path):
             pred_label = index_to_tag[predicted_idx[0]]
             gold_label = index_to_tag[lbl_batch[0]]
 
-            premise_repr = representations[0][0].data
-            hyp_repr = representations[1][0].data
+            premise_repr = representations[0][0].data.numpy().tolist()
+            hyp_repr = representations[1][0].data.numpy().tolist()
 
-            print('pred:', pred_label)
-            print('gold:', gold_label)
-            print('premise_repr', premise_repr)
-            print('hyp_repr', hyp_repr)
+            f_out.write(gold_label + ' ' + pred_label + '\n')
+            f_out.write(' '.join([str(v) for v in premise_repr]) + '\n')
+            f_out.write(' '.join([str(v) for v in hyp_repr]) + '\n')
+
+            print ("\r Progressing: ", cnt, '/', amount, end="")
+            cnt += 1
+
+        print()
+        print('Done.')
 
 
 
