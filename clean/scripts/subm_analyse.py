@@ -22,6 +22,7 @@ def main():
         subm_analyse.py merge <orig_data> <wp_data> <out_data>
         subm_analyse.py find_relevant <wn_data> <dataset> <out>
         subm_analyse.py eval_hypern <data_path> <base_path> <vocab_path>
+        subm_analyse.py count_cat <file>
 
     """)
 
@@ -37,8 +38,15 @@ def main():
         find_relevant(args['<wn_data>'], args['<dataset>'], args['<out>'])
     elif args['eval_hypern']:
         eval_hypern(args['<data_path>'], args['<base_path>'], args['<vocab_path>'])
+    elif args['count_cat']:
+        count_cat(args['<file>'])
 
 NOT_IDX = 999999
+
+def count_cat(file_path):
+    with open(file_path) as f_in:
+        data = [json.loads(line.strip()) for line in f_in.readlines()]
+    print(collections.Counter([s['category'] for s in data]).most_common())
 
 mapping = dict([
         ('in a garage', 'garage'),
