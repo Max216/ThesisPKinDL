@@ -38,7 +38,7 @@ def store_repr(model_path, data_path, out_path):
                 output_sent_info = True
             )
 
-            _, predicted_idx = torch.max(prediction[0].data, dim=1)
+            _, predicted_idx = torch.max(prediction.data, dim=1)
             pred_label = index_to_tag[predicted_idx.data[0]]
             gold_label = index_to_tag[lbl_batch.data[0]]
 
