@@ -62,7 +62,7 @@ def store_repr(model_path, data_path, out_path, act=False):
             premise_repr = representations[0][0].data.numpy().tolist()
             hyp_repr = representations[1][0].data.numpy().tolist()
 
-            responsible_w_p = [p_sent[0][v] for v in act[0][0].numpy()]
+            responsible_w_p = [p_sent[0][v] for v in act[0][0].data.numpy()]
 
             f_out.write(gold_label + ' ' + pred_label + '\t')
             f_out.write(' '.join([str(v) for v in premise_repr]) + '\t')
