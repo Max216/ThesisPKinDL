@@ -1,7 +1,7 @@
 import sys, os, json
 sys.path.append('./../')
 
-VISUALIZE = True
+VISUALIZE = False
 
 if not VISUALIZE:
     from libs import model_tools, compatability, data_handler, embeddingholder, collatebatch, data_tools
@@ -26,29 +26,29 @@ def main():
     """)
 
     if args['store_repr']:
-        store_repr(args['<model_path>'], args['<dataset_path>'], args['<out_path>'])
+        store_repr(args['<model_path>'], args['<dataset_path>'], args['<out_path>'], act=True)
     elif args['matrix']:
         plot_matrix(args['<file_path>'])
 
 
-def store_repr(model_path, data_path, out_path):
+def store_repr(model_path, data_path, out_path, act=False):
 
     print('Load embeddings')
     embedding_holder = embeddingholder.create_embeddingholder()
     print('Load data')
-    dataholder = data_handler.Datahandler(data_path, data_format='snli', include_start_end_token=True)
+    dataholder = data_handler.Datahandler(data_path, data_format='snli', include_start_end_token=True, sort=False)
     print('Load model')
     classifier_name, classifier, embedding_holder = model_tools.load(model_path, embedding_holder)
     print('Predict')
 
     index_to_tag = data_tools.DEFAULT_VALID_LABELS
-    dataset = dataholder.get_dataset(embedding_holder)
+    dataset = dataholder.get_dataset_including_sents(embedding_holder)
     amount = len(dataset)
     with open(out_path, 'w') as f_out:
         cnt=1
-        data_loader = DataLoader(dataset, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatch(embedding_holder.padding()))
-        for premise_batch, hyp_batch, lbl_batch in data_loader:
-            prediction, _, representations = classifier(
+        data_loader = DataLoader(dataset, drop_last=False, batch_size=1, shuffle=False, collate_fn=collatebatch.CollateBatchIncludingSents(embedding_holder.padding()))
+        for premise_batch, hyp_batch, lbl_batch, p_sent, h_sent in data_loader:
+            prediction, act, representations = classifier(
                 autograd.Variable(premise_batch),
                 autograd.Variable(hyp_batch),
                 output_sent_info = True
@@ -61,8 +61,11 @@ def store_repr(model_path, data_path, out_path):
             premise_repr = representations[0][0].data.numpy().tolist()
             hyp_repr = representations[1][0].data.numpy().tolist()
 
-            f_out.write(gold_label + ' ' + pred_label + '\n')
-            f_out.write(' '.join([str(v) for v in premise_repr]) + '\n')
+            print(p_sent[0])
+            print(act[0][0])
+
+            f_out.write(gold_label + ' ' + pred_label + '\t')
+            f_out.write(' '.join([str(v) for v in premise_repr]) + '\t')
             f_out.write(' '.join([str(v) for v in hyp_repr]) + '\n')
 
             print ("\r Progressing: ", cnt, '/', amount, end="")
@@ -80,7 +83,7 @@ def plot_matrix(file_path):
     BIN_SIZE = 0.1
     MAX_VAL = 50
     LABEL = 'contradiction'
-    TYPE = T_ONLY_CORRECT
+    TYPE = T_ANY
 
 
     print('Read data')
