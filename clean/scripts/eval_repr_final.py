@@ -32,6 +32,7 @@ def main():
 
 
 def store_repr(model_path, data_path, out_path, act=False):
+    text_separator = ' ?@? '
 
     print('Load embeddings')
     embedding_holder = embeddingholder.create_embeddingholder()
@@ -61,12 +62,12 @@ def store_repr(model_path, data_path, out_path, act=False):
             premise_repr = representations[0][0].data.numpy().tolist()
             hyp_repr = representations[1][0].data.numpy().tolist()
 
-            print(p_sent[0])
-            print(act[0][0])
+            responsible_w_p = [p_sent[0][v] for v in act[0][0].numpy()]
 
             f_out.write(gold_label + ' ' + pred_label + '\t')
             f_out.write(' '.join([str(v) for v in premise_repr]) + '\t')
-            f_out.write(' '.join([str(v) for v in hyp_repr]) + '\n')
+            f_out.write(' '.join([str(v) for v in hyp_repr]) + '\t')
+            f_out.write(text_separator.join(responsible_w_p) + '\n')
 
             print ("\r Progressing: ", cnt, '/', amount, end="")
             cnt += 1
